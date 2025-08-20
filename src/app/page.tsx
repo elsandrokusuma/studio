@@ -65,7 +65,7 @@ export default function DashboardPage() {
   const [selectedChartItem, setSelectedChartItem] = React.useState<string>("all");
   const [selectedTransaction, setSelectedTransaction] = React.useState<Transaction | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
-  const [greeting, setGreeting] = React.useState<string>('Welcome!');
+  const [greeting, setGreeting] = React.useState<string>('');
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const { toast } = useToast();
@@ -158,6 +158,37 @@ export default function DashboardPage() {
       unsubscribePreOrders();
     }
   }, []);
+
+  const monthlyStockData = React.useMemo(() => {
+    const data: { [key: string]: { month: string; stockIn: number; stockOut: number } } = {};
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    const filteredTransactions = selectedChartItem === 'all'
+      ? transactions
+      : transactions.filter(t => t.itemId === selectedChartItem);
+
+    filteredTransactions.forEach(t => {
+      const date = new Date(t.date);
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+      const monthLabel = `${monthNames[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
+
+      if (!data[monthKey]) {
+        data[monthKey] = { month: monthLabel, stockIn: 0, stockOut: 0 };
+      }
+
+      if (t.type === 'in' || t.type === 'add') {
+        data[monthKey].stockIn += t.quantity;
+      } else if (t.type === 'out') {
+        data[monthKey].stockOut += t.quantity;
+      }
+    });
+
+    return Object.values(data).sort((a, b) => {
+        const aDate = new Date(a.month.split(" '")[0] + " 1, 20" + a.month.split(" '")[1]);
+        const bDate = new Date(b.month.split(" '")[0] + " 1, 20" + b.month.split(" '")[1]);
+        return aDate.getTime() - bDate.getTime();
+    }).slice(-6); // Get last 6 months
+  }, [transactions, selectedChartItem]);
 
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
     if (!db) return;
@@ -323,37 +354,6 @@ export default function DashboardPage() {
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 5)
 
-  const monthlyStockData = React.useMemo(() => {
-    const data: { [key: string]: { month: string; stockIn: number; stockOut: number } } = {};
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    
-    const filteredTransactions = selectedChartItem === 'all'
-      ? transactions
-      : transactions.filter(t => t.itemId === selectedChartItem);
-
-    filteredTransactions.forEach(t => {
-      const date = new Date(t.date);
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      const monthLabel = `${monthNames[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
-
-      if (!data[monthKey]) {
-        data[monthKey] = { month: monthLabel, stockIn: 0, stockOut: 0 };
-      }
-
-      if (t.type === 'in' || t.type === 'add') {
-        data[monthKey].stockIn += t.quantity;
-      } else if (t.type === 'out') {
-        data[monthKey].stockOut += t.quantity;
-      }
-    });
-
-    return Object.values(data).sort((a, b) => {
-        const aDate = new Date(a.month.split(" '")[0] + " 1, 20" + a.month.split(" '")[1]);
-        const bDate = new Date(b.month.split(" '")[0] + " 1, 20" + b.month.split(" '")[1]);
-        return aDate.getTime() - bDate.getTime();
-    }).slice(-6); // Get last 6 months
-  }, [transactions, selectedChartItem]);
-  
   const selectedItemNameChart = selectedChartItem === 'all' 
     ? 'All Items' 
     : inventoryItems.find(item => item.id === selectedChartItem)?.name;
