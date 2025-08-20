@@ -24,17 +24,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PreOrder } from "@/lib/types";
 import { Printer } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 function SuratJalanContent() {
   const searchParams = useSearchParams();
   const [orders, setOrders] = React.useState<PreOrder[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchOrders = async () => {
+        if (!db) {
+            setError("Firebase not configured. Please check your environment variables.");
+            setLoading(false);
+            return;
+        }
+
         const ids = searchParams.get("ids")?.split(",");
         if (!ids || ids.length === 0) {
             setOrders([]);
+            setLoading(false);
             return;
         };
 
@@ -48,6 +58,9 @@ function SuratJalanContent() {
             setOrders(selectedOrders);
         } catch (error) {
             console.error("Failed to fetch pre-orders from Firestore", error);
+            setError("Failed to fetch order details.");
+        } finally {
+            setLoading(false);
         }
     };
     
@@ -61,6 +74,27 @@ function SuratJalanContent() {
   const today = new Date().toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
+
+  if (loading) {
+    return (
+        <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <p>Loading...</p>
+        </div>
+    );
+  }
+  
+  if (error) {
+     return (
+      <div className="flex items-center justify-center h-full">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   if (orders.length === 0) {
     return (
