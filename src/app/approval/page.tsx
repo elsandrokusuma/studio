@@ -182,7 +182,7 @@ export default function ApprovalPage() {
                      </div>
                      <div>
                         <CardTitle>{po.poNumber}</CardTitle>
-                         <Badge variant="warning" className="bg-yellow-100 text-yellow-800">{po.status}</Badge>
+                         <Badge variant="warning">{po.status}</Badge>
                      </div>
                   </div>
                 </div>
