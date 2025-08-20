@@ -38,6 +38,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { FullPageSpinner } from "@/components/full-page-spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const chartConfig = {
@@ -63,7 +65,8 @@ export default function DashboardPage() {
   const [selectedChartItem, setSelectedChartItem] = React.useState<string>("all");
   const [selectedTransaction, setSelectedTransaction] = React.useState<Transaction | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
-  const [greeting, setGreeting] = React.useState<string | null>(null);
+  const [greeting, setGreeting] = React.useState<string>('Welcome!');
+  const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -88,43 +91,12 @@ export default function DashboardPage() {
 
 
   React.useEffect(() => {
-    const qInventory = query(collection(db, "inventory"), orderBy("name"));
-    const unsubscribeInventory = onSnapshot(qInventory, (querySnapshot) => {
-      const items: InventoryItem[] = [];
-      querySnapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() } as InventoryItem);
-      });
-      setInventoryItems(items);
-    });
+    if (!db) {
+      setLoading(false);
+      return;
+    }
+    let active = true;
 
-    const qTransactions = query(collection(db, "transactions"), orderBy("date", "desc"));
-    const unsubscribeTransactions = onSnapshot(qTransactions, (querySnapshot) => {
-      const trans: Transaction[] = [];
-      querySnapshot.forEach((doc) => {
-        trans.push({ id: doc.id, ...doc.data() } as Transaction);
-      });
-      setTransactions(trans);
-    });
-    
-    const qRecentTransactions = query(collection(db, "transactions"), orderBy("date", "desc"), limit(5));
-    const unsubscribeRecentTransactions = onSnapshot(qRecentTransactions, (querySnapshot) => {
-        const trans: Transaction[] = [];
-        querySnapshot.forEach((doc) => {
-            trans.push({ id: doc.id, ...doc.data() } as Transaction);
-        });
-        setRecentTransactions(trans);
-    });
-    
-    const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
-    const unsubscribePreOrders = onSnapshot(qPreOrders, (querySnapshot) => {
-      const orders: PreOrder[] = [];
-      querySnapshot.forEach((doc) => {
-        orders.push({ id: doc.id, ...doc.data() } as PreOrder);
-      });
-      setPreOrders(orders);
-    });
-    
-    // Greeting logic moved to client-side only
     const getGreeting = () => {
       const currentHour = new Date().getHours();
       if (currentHour >= 4 && currentHour < 12) {
@@ -137,15 +109,58 @@ export default function DashboardPage() {
     };
     setGreeting(getGreeting());
 
+    const qInventory = query(collection(db, "inventory"), orderBy("name"));
+    const unsubscribeInventory = onSnapshot(qInventory, (querySnapshot) => {
+      if (!active) return;
+      const items: InventoryItem[] = [];
+      querySnapshot.forEach((doc) => {
+        items.push({ id: doc.id, ...doc.data() } as InventoryItem);
+      });
+      setInventoryItems(items);
+      setLoading(false);
+    }, () => setLoading(false));
+
+    const qTransactions = query(collection(db, "transactions"), orderBy("date", "desc"));
+    const unsubscribeTransactions = onSnapshot(qTransactions, (querySnapshot) => {
+      if (!active) return;
+      const trans: Transaction[] = [];
+      querySnapshot.forEach((doc) => {
+        trans.push({ id: doc.id, ...doc.data() } as Transaction);
+      });
+      setTransactions(trans);
+    });
+    
+    const qRecentTransactions = query(collection(db, "transactions"), orderBy("date", "desc"), limit(5));
+    const unsubscribeRecentTransactions = onSnapshot(qRecentTransactions, (querySnapshot) => {
+      if (!active) return;
+      const trans: Transaction[] = [];
+      querySnapshot.forEach((doc) => {
+        trans.push({ id: doc.id, ...doc.data() } as Transaction);
+      });
+      setRecentTransactions(trans);
+    });
+    
+    const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
+    const unsubscribePreOrders = onSnapshot(qPreOrders, (querySnapshot) => {
+      if (!active) return;
+      const orders: PreOrder[] = [];
+      querySnapshot.forEach((doc) => {
+        orders.push({ id: doc.id, ...doc.data() } as PreOrder);
+      });
+      setPreOrders(orders);
+    });
+    
     return () => {
-        unsubscribeInventory();
-        unsubscribeTransactions();
-        unsubscribeRecentTransactions();
-        unsubscribePreOrders();
+      active = false;
+      unsubscribeInventory();
+      unsubscribeTransactions();
+      unsubscribeRecentTransactions();
+      unsubscribePreOrders();
     }
   }, []);
 
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
+    if (!db) return;
     await addDoc(collection(db, "transactions"), {
       ...transaction,
       date: new Date().toISOString(),
@@ -154,6 +169,7 @@ export default function DashboardPage() {
   
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!db) return;
     const formData = new FormData(e.currentTarget);
     const newItemData = {
       name: formData.get("name") as string,
@@ -184,6 +200,7 @@ export default function DashboardPage() {
 
   const handleStockUpdate = (type: "in" | "out") => async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (!db) return;
       const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
 
       if (!selectedItem) {
@@ -224,6 +241,7 @@ export default function DashboardPage() {
 
   const handleCreatePreOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!db) return;
     const formData = new FormData(e.currentTarget);
     const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
 
@@ -276,6 +294,23 @@ export default function DashboardPage() {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+  }
+
+  if (loading) {
+    return <FullPageSpinner />;
+  }
+  
+  if (!db) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertDescription>
+            Please configure your Firebase credentials in the environment variables to use this application.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   const totalItems = inventoryItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -335,7 +370,7 @@ export default function DashboardPage() {
                <Sun className="h-6 w-6 text-green-700" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-green-900">{greeting ? `${greeting}!` : 'Welcome!'}</h1>
+              <h1 className="text-2xl font-bold text-green-900">{`${greeting}!`}</h1>
               <p className="text-green-800">Here's what's happening with your inventory today.</p>
             </div>
           </div>
