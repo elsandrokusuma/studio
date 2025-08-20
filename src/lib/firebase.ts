@@ -18,13 +18,12 @@ const firebaseEnabled =
   firebaseConfig.authDomain &&
   firebaseConfig.projectId;
 
-if (!firebaseEnabled) {
-  console.warn("Firebase config is missing or incomplete. Firebase services are disabled.");
-}
-
 // Initialize Firebase only if the config is valid
 const app = firebaseEnabled ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
 const db = app ? getFirestore(app) : null;
 
+if (!firebaseEnabled) {
+  console.warn("Firebase config is missing or incomplete. Firebase services are disabled.");
+}
 
 export { db, firebaseEnabled };
