@@ -4,12 +4,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig: FirebaseOptions = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDa0mHjrTK1O73yosGLrE7I5Q51eoNa3sg",
+  authDomain: "stationery-inventory.firebaseapp.com",
+  projectId: "stationery-inventory",
+  storageBucket: "stationery-inventory.firebasestorage.app",
+  messagingSenderId: "812550241868",
+  appId: "1:812550241868:web:056174a385b1539456fee9",
 };
 
 // Check if all required config values are present
