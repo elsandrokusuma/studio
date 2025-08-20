@@ -43,6 +43,8 @@ import type { PreOrder } from "@/lib/types";
 import { Check, X, Box, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FullPageSpinner } from "@/components/full-page-spinner";
 
 type GroupedPO = {
   poNumber: string;
@@ -60,8 +62,13 @@ export default function ApprovalPage() {
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    };
     const q = query(collection(db, "pre-orders"), where("status", "==", "Awaiting Approval"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const orders: PreOrder[] = [];
@@ -88,12 +95,22 @@ export default function ApprovalPage() {
       }));
 
       setApprovalItems(groupedPOs);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching approvals:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not fetch approval items.",
+      });
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   const handleDecision = async (po: GroupedPO, decision: "approved" | "rejected") => {
+    if (!db) return;
     const newStatus = decision === "approved" ? "Approved" : "Rejected";
     
     try {
@@ -126,6 +143,23 @@ export default function ApprovalPage() {
     setSelectedPo(po);
     setDetailsOpen(true);
   };
+
+  if (loading) {
+    return <FullPageSpinner />;
+  }
+
+  if (!db) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertDescription>
+            Please configure your Firebase credentials in the environment variables to use this application.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8">
