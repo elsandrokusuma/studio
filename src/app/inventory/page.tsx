@@ -91,6 +91,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { FullPageSpinner } from "@/components/full-page-spinner";
 
 
 const seedData = [
@@ -227,6 +228,7 @@ export default function InventoryPage() {
   const [isPhotoOpen, setPhotoOpen] = React.useState(false);
   const [photoToShow, setPhotoToShow] = React.useState<string | null>(null);
   const router = useRouter();
+  const [loading, setLoading] = React.useState(true);
 
   // States for camera functionality
   const [isCameraOpen, setCameraOpen] = React.useState(false);
@@ -254,6 +256,10 @@ export default function InventoryPage() {
 
 
   React.useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    }
     const q = query(collection(db, "inventory"), orderBy("name"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const inventoryItems: InventoryItem[] = [];
@@ -261,10 +267,19 @@ export default function InventoryPage() {
         inventoryItems.push({ id: doc.id, ...doc.data() } as InventoryItem);
       });
       setItems(inventoryItems);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching inventory:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not fetch inventory items.",
+      });
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
   
   React.useEffect(() => {
     if(isEditItemOpen && selectedItem) {
@@ -276,6 +291,7 @@ export default function InventoryPage() {
   
 
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
+    if (!db) return;
     await addDoc(collection(db, "transactions"), {
       ...transaction,
       date: new Date().toISOString(),
@@ -285,6 +301,7 @@ export default function InventoryPage() {
 
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!db) return;
     const formData = new FormData(e.currentTarget);
     const newItemData = {
       name: formData.get("name") as string,
@@ -316,7 +333,7 @@ export default function InventoryPage() {
   
    const handleEditItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedItem) return;
+    if (!selectedItem || !db) return;
 
     const formData = new FormData(e.currentTarget);
     const updatedQuantity = Number(formData.get("quantity"));
@@ -363,6 +380,7 @@ export default function InventoryPage() {
 
   const handleStockUpdate = (type: "in" | "out") => async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (!db) return;
       const selectedItemToUpdate = items.find(i => i.id === selectedItemId);
       if (!selectedItemToUpdate) {
         toast({ variant: "destructive", title: "Please select an item." });
@@ -401,7 +419,7 @@ export default function InventoryPage() {
   };
 
   const handleDeleteItem = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || !db) return;
 
     await deleteDoc(doc(db, "inventory", selectedItem.id));
     
@@ -425,6 +443,7 @@ export default function InventoryPage() {
         toast({ variant: "destructive", title: "No file selected" });
         return;
     }
+    if (!db) return;
 
     setIsImporting(true);
 
@@ -620,6 +639,7 @@ export default function InventoryPage() {
   }
 
   const handleSeedDatabase = async () => {
+    if (!db) return;
     setIsSeeding(true);
     try {
       // 1. Delete all existing documents
@@ -660,6 +680,23 @@ export default function InventoryPage() {
   };
   
   const selectedItemForStockOut = items.find(i => i.id === selectedItemId);
+
+  if (loading) {
+    return <FullPageSpinner />;
+  }
+
+  if (!db) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertDescription>
+            Please configure your Firebase credentials in the environment variables to use this application.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -1255,5 +1292,3 @@ export default function InventoryPage() {
     </div>
   );
 }
-
-    
