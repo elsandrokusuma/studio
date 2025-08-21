@@ -116,6 +116,7 @@ export default function ApprovalPage() {
     try {
         const batch = writeBatch(db);
         po.orders.forEach(order => {
+            if (!db) return;
             const orderRef = doc(db, "pre-orders", order.id);
             batch.update(orderRef, { status: newStatus });
         });
