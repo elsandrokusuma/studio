@@ -25,6 +25,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { PreOrder } from "@/lib/types";
 import { Printer } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FullPageSpinner } from "@/components/full-page-spinner";
 
 
 function SuratJalanContent() {
@@ -76,11 +77,7 @@ function SuratJalanContent() {
   });
 
   if (loading) {
-    return (
-        <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <p>Loading...</p>
-        </div>
-    );
+    return <FullPageSpinner />;
   }
   
   if (error) {
@@ -159,10 +156,7 @@ function SuratJalanContent() {
                 </div>
               </div>
               <p className="mb-4">
-                Dengan hormat,
-              </p>
-              <p className="mb-4">
-                Bersama ini kami membuat re-order barang-barang ATK sebagai berikut:
+                Dengan hormat, Bersama ini kami membuat re-order barang-barang ATK sebagai berikut:
               </p>
               <Table>
                 <TableHeader>
@@ -210,7 +204,7 @@ function SuratJalanContent() {
 
 export default function SuratJalanPage() {
   return (
-    <React.Suspense fallback={<div>Loading...</div>}>
+    <React.Suspense fallback={<FullPageSpinner />}>
       <SuratJalanContent />
     </React.Suspense>
   )

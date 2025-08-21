@@ -78,6 +78,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { FullPageSpinner } from "@/components/full-page-spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 type GroupedPO = {
   poNumber: string;
@@ -106,6 +109,7 @@ function PreOrdersContent() {
   const [poPrice, setPoPrice] = React.useState<number | string>("");
   const [activePoNumber, setActivePoNumber] = React.useState<string>("");
   const [isCreatingNewPo, setIsCreatingNewPo] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   // States for editing/deleting individual items
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
@@ -118,6 +122,10 @@ function PreOrdersContent() {
   const [selectedItemName, setSelectedItemName] = React.useState<string>("Select an item...");
   
   React.useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    }
     const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
     const unsubscribePreOrders = onSnapshot(qPreOrders, (querySnapshot) => {
       const orders: PreOrder[] = [];
@@ -125,7 +133,8 @@ function PreOrdersContent() {
         orders.push({ id: doc.id, ...doc.data() } as PreOrder);
       });
       setPreOrders(orders);
-    });
+      setLoading(false);
+    }, () => setLoading(false));
 
     const qInventory = query(collection(db, "inventory"), orderBy("name"));
     const unsubscribeInventory = onSnapshot(qInventory, (querySnapshot) => {
@@ -180,6 +189,7 @@ function PreOrdersContent() {
 
   const handleCreatePreOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!db) return;
     const formData = new FormData(e.currentTarget);
     const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
 
@@ -216,7 +226,7 @@ function PreOrdersContent() {
   
   const handleEditOrderItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedOrderItem) return;
+    if (!selectedOrderItem || !db) return;
 
     const formData = new FormData(e.currentTarget);
     const updatedData = {
@@ -238,7 +248,7 @@ function PreOrdersContent() {
   };
 
   const handleDeleteOrderItem = async () => {
-    if (!selectedOrderItem) return;
+    if (!selectedOrderItem || !db) return;
     await deleteDoc(doc(db, "pre-orders", selectedOrderItem.id));
     toast({
       title: "Item Deleted",
@@ -249,7 +259,7 @@ function PreOrdersContent() {
   };
 
   const handleDeletePreOrder = async () => {
-    if (!selectedPo) return;
+    if (!selectedPo || !db) return;
     
     const batch = writeBatch(db);
     selectedPo.orders.forEach(order => {
@@ -267,6 +277,7 @@ function PreOrdersContent() {
   }
 
   const updateStatus = async (orders: PreOrder[], status: PreOrder['status']) => {
+    if (!db) return;
     const batch = writeBatch(db);
     orders.forEach(order => {
         const orderRef = doc(db, "pre-orders", order.id);
@@ -280,6 +291,7 @@ function PreOrdersContent() {
   };
 
   const handleRequestApproval = async () => {
+    if (!db) return;
     const posToApprove = groupedPreOrders.filter(po => selectedRows.includes(po.poNumber) && po.status === 'Pending');
 
     if (posToApprove.length === 0) {
@@ -411,6 +423,24 @@ function PreOrdersContent() {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
   }
+  
+  if (loading) {
+    return <FullPageSpinner />;
+  }
+
+  if (!db) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertDescription>
+            Please configure your Firebase credentials in the environment variables to use this application.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -816,7 +846,7 @@ function PreOrdersContent() {
 
 export default function PreOrdersPage() {
     return (
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<FullPageSpinner />}>
             <PreOrdersContent />
         </React.Suspense>
     )

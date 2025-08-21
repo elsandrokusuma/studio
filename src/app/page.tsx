@@ -89,6 +89,37 @@ export default function DashboardPage() {
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
   const [selectedItemName, setSelectedItemName] = React.useState<string>("Select an item...");
 
+  const monthlyStockData = React.useMemo(() => {
+    const data: { [key: string]: { month: string; stockIn: number; stockOut: number } } = {};
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    const filteredTransactions = selectedChartItem === 'all'
+      ? transactions
+      : transactions.filter(t => t.itemId === selectedChartItem);
+
+    filteredTransactions.forEach(t => {
+      const date = new Date(t.date);
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+      const monthLabel = `${monthNames[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
+
+      if (!data[monthKey]) {
+        data[monthKey] = { month: monthLabel, stockIn: 0, stockOut: 0 };
+      }
+
+      if (t.type === 'in' || t.type === 'add') {
+        data[monthKey].stockIn += t.quantity;
+      } else if (t.type === 'out') {
+        data[monthKey].stockOut += t.quantity;
+      }
+    });
+
+    return Object.values(data).sort((a, b) => {
+        const aDate = new Date(a.month.split(" '")[0] + " 1, 20" + a.month.split(" '")[1]);
+        const bDate = new Date(b.month.split(" '")[0] + " 1, 20" + b.month.split(" '")[1]);
+        return aDate.getTime() - bDate.getTime();
+    }).slice(-6); // Get last 6 months
+  }, [transactions, selectedChartItem]);
+
 
   React.useEffect(() => {
     if (!db) {
@@ -158,37 +189,6 @@ export default function DashboardPage() {
       unsubscribePreOrders();
     }
   }, []);
-
-  const monthlyStockData = React.useMemo(() => {
-    const data: { [key: string]: { month: string; stockIn: number; stockOut: number } } = {};
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    
-    const filteredTransactions = selectedChartItem === 'all'
-      ? transactions
-      : transactions.filter(t => t.itemId === selectedChartItem);
-
-    filteredTransactions.forEach(t => {
-      const date = new Date(t.date);
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      const monthLabel = `${monthNames[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
-
-      if (!data[monthKey]) {
-        data[monthKey] = { month: monthLabel, stockIn: 0, stockOut: 0 };
-      }
-
-      if (t.type === 'in' || t.type === 'add') {
-        data[monthKey].stockIn += t.quantity;
-      } else if (t.type === 'out') {
-        data[monthKey].stockOut += t.quantity;
-      }
-    });
-
-    return Object.values(data).sort((a, b) => {
-        const aDate = new Date(a.month.split(" '")[0] + " 1, 20" + a.month.split(" '")[1]);
-        const bDate = new Date(b.month.split(" '")[0] + " 1, 20" + b.month.split(" '")[1]);
-        return aDate.getTime() - bDate.getTime();
-    }).slice(-6); // Get last 6 months
-  }, [transactions, selectedChartItem]);
 
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
     if (!db) return;
@@ -721,7 +721,7 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isStockInOpen} onOpenChange={setStockInOpen}>
+      <Dialog open={isStockInOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setStockInOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Record Stock In</DialogTitle>
@@ -792,7 +792,7 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isStockOutOpen} onOpenChange={setStockOutOpen}>
+      <Dialog open={isStockOutOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setStockOutOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Record Stock Out</DialogTitle>
@@ -863,7 +863,7 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
+      <Dialog open={isCreatePoOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setCreatePoOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Pre-Order</DialogTitle>

@@ -924,7 +924,6 @@ export default function InventoryPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={() => {
-                            setSelectedItem(item);
                             setSelectedItemId(item.id);
                             setSelectedItemName(item.name);
                             setStockInOpen(true);
@@ -934,7 +933,6 @@ export default function InventoryPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={() => {
-                            setSelectedItem(item);
                             setSelectedItemId(item.id);
                             setSelectedItemName(item.name);
                             setStockOutOpen(true);
@@ -1063,10 +1061,10 @@ export default function InventoryPage() {
 
 
       {/* Stock In Dialog */}
-      <Dialog open={isStockInOpen} onOpenChange={setStockInOpen}>
+      <Dialog open={isStockInOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setStockInOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Record Stock In: {selectedItem?.name}</DialogTitle>
+            <DialogTitle>Record Stock In</DialogTitle>
             <DialogDescription>
               Add new stock received for this item.
             </DialogDescription>
@@ -1135,10 +1133,10 @@ export default function InventoryPage() {
       </Dialog>
 
       {/* Stock Out Dialog */}
-      <Dialog open={isStockOutOpen} onOpenChange={setStockOutOpen}>
+      <Dialog open={isStockOutOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setStockOutOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Record Stock Out: {selectedItem?.name}</DialogTitle>
+            <DialogTitle>Record Stock Out</DialogTitle>
             <DialogDescription>
               Record stock that has been sold or used.
             </DialogDescription>
