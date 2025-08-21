@@ -146,7 +146,7 @@ function SuratJalanContent() {
                   </div>
                   <div className="text-right">
                     <h3 className="font-bold text-lg">Stationery Inventory</h3>
-                    <p className="text-sm text-muted-foreground">Jakarta, {today}</p>
+                    <p className="text-sm text-muted-foreground">Surakarta, {today}</p>
                   </div>
               </div>
             </header>
@@ -158,9 +158,11 @@ function SuratJalanContent() {
                   {/* Recipient area */}
                 </div>
               </div>
-              <p className="mb-4 text-muted-foreground">Dengan hormat,</p>
               <p className="mb-4">
-                Bersama ini kami kirimkan barang-barang sebagai berikut:
+                Dengan hormat,
+              </p>
+              <p className="mb-4">
+                Bersama ini kami membuat re-order barang-barang ATK sebagai berikut:
               </p>
               <Table>
                 <TableHeader>
@@ -187,16 +189,13 @@ function SuratJalanContent() {
             </main>
 
             <footer className="pt-12">
-              <p className="mb-12">
-                Harap diterima dengan baik. Atas perhatiannya, kami ucapkan terima kasih.
-              </p>
               <div className="flex justify-between text-center">
                 <div>
-                  <p className="mb-16">Penerima,</p>
+                  <p className="mb-16">Hormat Kami,</p>
                   <p>(.........................)</p>
                 </div>
                 <div>
-                  <p className="mb-16">Hormat Kami,</p>
+                  <p className="mb-16">Approval HRD,</p>
                   <p>(.........................)</p>
                 </div>
               </div>
