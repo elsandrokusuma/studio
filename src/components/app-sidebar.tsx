@@ -32,15 +32,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="flex items-center justify-center group-data-[state=expanded]:justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="shrink-0" asChild>
-            <Link href="/" aria-label="Home">
-              <Warehouse className="size-5 text-primary" />
-            </Link>
-          </Button>
-          <span className="font-semibold text-lg text-sidebar-foreground group-data-[state=collapsed]:hidden">StockPilot</span>
-        </div>
+      <SidebarHeader className="flex items-center justify-center">
+        <Button variant="ghost" size="icon" className="shrink-0" asChild>
+          <Link href="/" aria-label="Home">
+            <Warehouse className="size-5 text-primary" />
+          </Link>
+        </Button>
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
