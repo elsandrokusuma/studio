@@ -290,6 +290,27 @@ function PreOrdersContent() {
     });
   };
 
+  const handleItemStatusUpdate = async (orderItem: PreOrder, status: PreOrder['status']) => {
+    if (!db) return;
+    const itemRef = doc(db, "pre-orders", orderItem.id);
+    await updateDoc(itemRef, { status });
+    toast({
+      title: 'Item Status Updated',
+      description: `${orderItem.itemName} marked as ${status}.`
+    });
+
+    // Check if all items in the PO are fulfilled
+    const po = groupedPreOrders.find(p => p.poNumber === orderItem.poNumber);
+    if (po) {
+      const allItems = preOrders.filter(o => o.poNumber === po.poNumber);
+      const allFulfilled = allItems.every(item => item.id === orderItem.id ? status === 'Fulfilled' : item.status === 'Fulfilled');
+      if (allFulfilled) {
+        await updateStatus(po.orders, 'Fulfilled');
+      }
+    }
+  };
+
+
   const handleRequestApproval = async () => {
     if (!db) return;
     const posToApprove = groupedPreOrders.filter(po => selectedRows.includes(po.poNumber) && po.status === 'Pending');
@@ -397,16 +418,34 @@ function PreOrdersContent() {
         groups[order.poNumber].push(order);
     });
 
-    return Object.entries(groups).map(([poNumber, orders]) => ({
+    return Object.entries(groups).map(([poNumber, orders]) => {
+      const allFulfilled = orders.every(o => o.status === 'Fulfilled');
+      const anyApproved = orders.some(o => o.status === 'Approved');
+
+      let overallStatus: PreOrder['status'] = orders[0]?.status || 'Pending';
+      if (allFulfilled) {
+        overallStatus = 'Fulfilled';
+      } else if (anyApproved) {
+        // If some are approved but not all fulfilled, the PO is still considered 'Approved' at a high level
+        // to allow fulfilling other items. The single status on GroupedPO is a simplification.
+        // We will show 'Approved' if not all are Fulfilled.
+        const firstNonFulfilled = orders.find(o => o.status !== 'Fulfilled');
+        if (firstNonFulfilled) {
+          overallStatus = firstNonFulfilled.status;
+        }
+      }
+
+      return {
         poNumber,
         orders,
         totalItems: orders.length,
         totalValue: orders.reduce((sum, item) => sum + (item.price * item.quantity), 0),
         totalQuantity: orders.reduce((sum, item) => sum + item.quantity, 0),
-        status: orders[0]?.status || 'Pending',
+        status: allFulfilled ? 'Fulfilled' : orders[0]?.status,
         orderDate: orders[0]?.orderDate,
         expectedDate: orders[0]?.expectedDate,
-    })).filter(po => po.orders.length > 0); // Filter out empty POs
+      };
+    }).filter(po => po.orders.length > 0); // Filter out empty POs
   }, [preOrders]);
 
   const filteredPreOrders = groupedPreOrders.filter(po => {
@@ -641,12 +680,14 @@ function PreOrdersContent() {
                                 <Badge
                                     variant={
                                     po.status === 'Approved' ? 'default' :
+                                    po.status === 'Fulfilled' ? 'default' :
                                     po.status === 'Rejected' || po.status === 'Cancelled' ? 'destructive' :
                                     po.status === 'Pending' ? 'secondary' :
                                     po.status === 'Awaiting Approval' ? 'warning' : 'outline'
                                     }
                                     className={
                                     po.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                    po.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
                                     po.status === 'Rejected' || po.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
                                     po.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
                                     po.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
@@ -695,10 +736,11 @@ function PreOrdersContent() {
                         <TableRow>
                           <TableHead>Item</TableHead>
                           <TableHead>Unit</TableHead>
+                          <TableHead>Status</TableHead>
                           <TableHead className="text-right">Qty</TableHead>
                           <TableHead className="text-right">Price</TableHead>
                           <TableHead className="text-right">Total</TableHead>
-                          {po.status === 'Pending' && <TableHead><span className="sr-only">Actions</span></TableHead>}
+                          <TableHead><span className="sr-only">Actions</span></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -706,21 +748,48 @@ function PreOrdersContent() {
                           <TableRow key={order.id}>
                             <TableCell className="font-medium">{order.itemName}</TableCell>
                             <TableCell>{order.unit}</TableCell>
+                            <TableCell>
+                               <Badge
+                                    variant={
+                                    order.status === 'Approved' ? 'default' :
+                                    order.status === 'Fulfilled' ? 'default' :
+                                    order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
+                                    order.status === 'Pending' ? 'secondary' :
+                                    order.status === 'Awaiting Approval' ? 'warning' : 'outline'
+                                    }
+                                    className={
+                                    order.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                    order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
+                                    order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                                    order.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
+                                    order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
+                                    }
+                                >
+                                    {order.status}
+                                </Badge>
+                            </TableCell>
                             <TableCell className="text-right">{order.quantity}</TableCell>
                             <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
                             <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
-                            {po.status === 'Pending' && (
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="icon" onClick={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                  <Pencil className="h-4 w-4" />
-                                  <span className="sr-only">Edit</span>
+                            <TableCell className="text-right">
+                              {order.status === 'Approved' && (
+                                <Button size="sm" variant="outline" onClick={() => handleItemStatusUpdate(order, 'Fulfilled')}>
+                                  Mark as Fulfilled
                                 </Button>
-                                <Button variant="ghost" size="icon" onClick={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                  <Trash2 className="h-4 w-4 text-red-500" />
-                                  <span className="sr-only">Delete</span>
-                                </Button>
-                              </TableCell>
-                            )}
+                              )}
+                              {po.status === 'Pending' && (
+                                <>
+                                  <Button variant="ghost" size="icon" onClick={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                    <Pencil className="h-4 w-4" />
+                                    <span className="sr-only">Edit</span>
+                                  </Button>
+                                  <Button variant="ghost" size="icon" onClick={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                    <span className="sr-only">Delete</span>
+                                  </Button>
+                                </>
+                              )}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
