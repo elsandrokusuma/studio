@@ -60,7 +60,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle } from "lucide-react";
 import type { PreOrder, InventoryItem } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -772,23 +772,34 @@ function PreOrdersContent() {
                             <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
                             <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
                             <TableCell className="text-right">
-                              {order.status === 'Approved' && (
-                                <Button size="sm" variant="outline" onClick={() => handleItemStatusUpdate(order, 'Fulfilled')}>
-                                  Mark as Fulfilled
-                                </Button>
-                              )}
-                              {po.status === 'Pending' && (
-                                <>
-                                  <Button variant="ghost" size="icon" onClick={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                    <Pencil className="h-4 w-4" />
-                                    <span className="sr-only">Edit</span>
+                               <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button size="icon" variant="ghost">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Item Actions</span>
                                   </Button>
-                                  <Button variant="ghost" size="icon" onClick={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                    <span className="sr-only">Delete</span>
-                                  </Button>
-                                </>
-                              )}
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {order.status === 'Approved' && (
+                                    <DropdownMenuItem onSelect={() => handleItemStatusUpdate(order, 'Fulfilled')}>
+                                      <CheckCircle className="mr-2 h-4 w-4" />
+                                      Mark as Fulfilled
+                                    </DropdownMenuItem>
+                                  )}
+                                  {po.status === 'Pending' && (
+                                    <>
+                                      <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                        <Pencil className="mr-2 h-4 w-4" />
+                                        Edit
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </TableCell>
                           </TableRow>
                         ))}
