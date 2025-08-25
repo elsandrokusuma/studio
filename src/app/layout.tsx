@@ -11,7 +11,7 @@ import { AppHeader } from '@/components/app-header';
 export const metadata: Metadata = {
   title: 'Stationery Inventory',
   description: 'Comprehensive inventory and stock management ERP',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  icons: [{ rel: 'icon', url: '/favicon.ico?v=2' }],
 };
 
 export default function RootLayout({
