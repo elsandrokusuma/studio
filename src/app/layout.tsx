@@ -9,7 +9,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { AppHeader } from '@/components/app-header';
 
 export const metadata: Metadata = {
-  title: 'StockPilot',
+  title: 'Stationery Inventory',
   description: 'Comprehensive inventory and stock management ERP',
 };
 
