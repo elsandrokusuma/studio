@@ -731,80 +731,82 @@ function PreOrdersContent() {
                  </CardHeader>
                 <AccordionContent>
                   <CardContent className="p-4 pt-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Item</TableHead>
-                          <TableHead>Unit</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Qty</TableHead>
-                          <TableHead className="text-right">Price</TableHead>
-                          <TableHead className="text-right">Total</TableHead>
-                          <TableHead><span className="sr-only">Actions</span></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {po.orders.map(order => (
-                          <TableRow key={order.id}>
-                            <TableCell className="font-medium">{order.itemName}</TableCell>
-                            <TableCell>{order.unit}</TableCell>
-                            <TableCell>
-                               <Badge
-                                    variant={
-                                    order.status === 'Approved' ? 'default' :
-                                    order.status === 'Fulfilled' ? 'default' :
-                                    order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
-                                    order.status === 'Pending' ? 'secondary' :
-                                    order.status === 'Awaiting Approval' ? 'warning' : 'outline'
-                                    }
-                                    className={
-                                    order.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                    order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
-                                    order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                    order.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
-                                    order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
-                                    }
-                                >
-                                    {order.status}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">{order.quantity}</TableCell>
-                            <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
-                            <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
-                            <TableCell className="text-right">
-                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button size="icon" variant="ghost">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Item Actions</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  {order.status === 'Approved' && (
-                                    <DropdownMenuItem onSelect={() => handleItemStatusUpdate(order, 'Fulfilled')}>
-                                      <CheckCircle className="mr-2 h-4 w-4" />
-                                      Mark as Fulfilled
-                                    </DropdownMenuItem>
-                                  )}
-                                  {po.status === 'Pending' && (
-                                    <>
-                                      <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                        <Pencil className="mr-2 h-4 w-4" />
-                                        Edit
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete
-                                      </DropdownMenuItem>
-                                    </>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Item</TableHead>
+                            <TableHead>Unit</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Qty</TableHead>
+                            <TableHead className="text-right">Price</TableHead>
+                            <TableHead className="text-right">Total</TableHead>
+                            <TableHead><span className="sr-only">Actions</span></TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {po.orders.map(order => (
+                            <TableRow key={order.id}>
+                              <TableCell className="font-medium">{order.itemName}</TableCell>
+                              <TableCell>{order.unit}</TableCell>
+                              <TableCell>
+                                 <Badge
+                                      variant={
+                                      order.status === 'Approved' ? 'default' :
+                                      order.status === 'Fulfilled' ? 'default' :
+                                      order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
+                                      order.status === 'Pending' ? 'secondary' :
+                                      order.status === 'Awaiting Approval' ? 'warning' : 'outline'
+                                      }
+                                      className={
+                                      order.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                      order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
+                                      order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                                      order.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
+                                      order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
+                                      }
+                                  >
+                                      {order.status}
+                                  </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">{order.quantity}</TableCell>
+                              <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
+                              <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
+                              <TableCell className="text-right">
+                                 <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button size="icon" variant="ghost">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                      <span className="sr-only">Item Actions</span>
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    {order.status === 'Approved' && (
+                                      <DropdownMenuItem onSelect={() => handleItemStatusUpdate(order, 'Fulfilled')}>
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        Mark as Fulfilled
+                                      </DropdownMenuItem>
+                                    )}
+                                    {po.status === 'Pending' && (
+                                      <>
+                                        <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                          <Pencil className="mr-2 h-4 w-4" />
+                                          Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                          <Trash2 className="mr-2 h-4 w-4" />
+                                          Delete
+                                        </DropdownMenuItem>
+                                      </>
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </CardContent>
                   <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
                        <div className="flex items-center gap-2">

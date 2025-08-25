@@ -243,28 +243,30 @@ export default function ApprovalPage() {
           {selectedPo && (
             <div className="flex-1 min-h-0">
               <ScrollArea className="h-full">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Item Name</TableHead>
-                      <TableHead>Unit</TableHead>
-                      <TableHead className="text-right">Quantity</TableHead>
-                      <TableHead className="text-right">Price</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedPo.orders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.itemName}</TableCell>
-                        <TableCell>{order.unit}</TableCell>
-                        <TableCell className="text-right">{order.quantity}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(order.price * order.quantity)}</TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item Name</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead className="text-right">Quantity</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedPo.orders.map((order) => (
+                        <TableRow key={order.id}>
+                          <TableCell className="font-medium">{order.itemName}</TableCell>
+                          <TableCell>{order.unit}</TableCell>
+                          <TableCell className="text-right">{order.quantity}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(order.price * order.quantity)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </ScrollArea>
             </div>
           )}

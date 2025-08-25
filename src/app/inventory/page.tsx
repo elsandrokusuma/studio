@@ -843,120 +843,122 @@ export default function InventoryPage() {
       
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px] hidden sm:table-cell">Photo</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead className="hidden md:table-cell">Unit</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Quantity</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map((item) => {
-                const { src, isPlaceholder } = getDisplayImage(item.photoUrl);
-                return (
-                <TableRow key={item.id}>
-                  <TableCell className="hidden sm:table-cell">
-                    <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
-                      {isPlaceholder ? (
-                        <Image
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px] hidden sm:table-cell">Photo</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead className="hidden md:table-cell">Unit</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Quantity</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item) => {
+                  const { src, isPlaceholder } = getDisplayImage(item.photoUrl);
+                  return (
+                  <TableRow key={item.id}>
+                    <TableCell className="hidden sm:table-cell">
+                      <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
+                        {isPlaceholder ? (
+                          <Image
+                              alt={item.name}
+                              className="aspect-square rounded-md object-cover"
+                              height="64"
+                              src={src}
+                              width="64"
+                              data-ai-hint="product image"
+                            />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
                             alt={item.name}
                             className="aspect-square rounded-md object-cover"
                             height="64"
                             src={src}
                             width="64"
-                            data-ai-hint="product image"
                           />
-                      ) : (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          alt={item.name}
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src={src}
-                          width="64"
-                        />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>{formatCurrency(item.price || 0)}</TableCell>
-                  <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
-                  <TableCell className="text-center">
-                    <Badge
-                      variant={item.quantity > 5 ? "outline" : item.quantity > 0 ? "warning" : "destructive"}
-                       className={
-                        item.quantity > 5 ? 'border-green-600 text-green-600' : 
-                        item.quantity > 0 ? 'bg-orange-100 text-orange-800' : 
-                        'bg-red-100 text-red-800'
-                      }
-                    >
-                      {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">{item.quantity}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
-                          <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={() => {
-                            setSelectedItem(item);
-                            setEditItemOpen(true);
-                          }}
-                        >
-                          <Pencil className="mr-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={() => {
-                            setSelectedItemId(item.id);
-                            setSelectedItemName(item.name);
-                            setStockInOpen(true);
-                          }}
-                        >
-                          <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={() => {
-                            setSelectedItemId(item.id);
-                            setSelectedItemName(item.name);
-                            setStockOutOpen(true);
-                          }}
-                        >
-                          <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-red-600 focus:text-red-700"
-                          onSelect={() => {
-                            setSelectedItem(item);
-                            setDeleteOpen(true);
-                          }}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete Item
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              )})}
-            </TableBody>
-          </Table>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell>{formatCurrency(item.price || 0)}</TableCell>
+                    <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge
+                        variant={item.quantity > 5 ? "outline" : item.quantity > 0 ? "warning" : "destructive"}
+                         className={
+                          item.quantity > 5 ? 'border-green-600 text-green-600' : 
+                          item.quantity > 0 ? 'bg-orange-100 text-orange-800' : 
+                          'bg-red-100 text-red-800'
+                        }
+                      >
+                        {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">{item.quantity}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
+                            <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setSelectedItem(item);
+                              setEditItemOpen(true);
+                            }}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setSelectedItemId(item.id);
+                              setSelectedItemName(item.name);
+                              setStockInOpen(true);
+                            }}
+                          >
+                            <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setSelectedItemId(item.id);
+                              setSelectedItemName(item.name);
+                              setStockOutOpen(true);
+                            }}
+                          >
+                            <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-700"
+                            onSelect={() => {
+                              setSelectedItem(item);
+                              setDeleteOpen(true);
+                            }}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                )})}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       

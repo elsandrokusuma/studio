@@ -535,45 +535,47 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
              {recentTransactions.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead className="text-right hidden sm:table-cell">Type</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentTransactions.map((transaction) => (
-                    <TableRow key={transaction.id} onClick={() => handleTransactionClick(transaction)} className="cursor-pointer">
-                      <TableCell>
-                        <div className="font-medium">{transaction.itemName}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">{transaction.quantity}</TableCell>
-                      <TableCell className="text-right hidden sm:table-cell">
-                        <Badge
-                          variant={
-                            transaction.type === 'in' || transaction.type === 'add' ? 'default' :
-                            transaction.type === 'edit' ? 'secondary' :
-                            'destructive'
-                          }
-                          className={
-                            transaction.type === 'in' || transaction.type === 'add' ? 'bg-green-100 text-green-800' :
-                            transaction.type === 'edit' ? 'bg-gray-100 text-gray-800' :
-                            'bg-red-100 text-red-800'
-                          }
-                        >
-                          {transaction.type === 'in' || transaction.type === 'add' ? <ArrowDownLeft className="mr-1 h-3 w-3" /> : <ArrowUpRight className="mr-1 h-3 w-3" />}
-                          {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                        </Badge>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Item</TableHead>
+                      <TableHead className="text-right">Qty</TableHead>
+                      <TableHead className="text-right hidden sm:table-cell">Type</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {recentTransactions.map((transaction) => (
+                      <TableRow key={transaction.id} onClick={() => handleTransactionClick(transaction)} className="cursor-pointer">
+                        <TableCell>
+                          <div className="font-medium">{transaction.itemName}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(transaction.date).toLocaleDateString()}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">{transaction.quantity}</TableCell>
+                        <TableCell className="text-right hidden sm:table-cell">
+                          <Badge
+                            variant={
+                              transaction.type === 'in' || transaction.type === 'add' ? 'default' :
+                              transaction.type === 'edit' ? 'secondary' :
+                              'destructive'
+                            }
+                            className={
+                              transaction.type === 'in' || transaction.type === 'add' ? 'bg-green-100 text-green-800' :
+                              transaction.type === 'edit' ? 'bg-gray-100 text-gray-800' :
+                              'bg-red-100 text-red-800'
+                            }
+                          >
+                            {transaction.type === 'in' || transaction.type === 'add' ? <ArrowDownLeft className="mr-1 h-3 w-3" /> : <ArrowUpRight className="mr-1 h-3 w-3" />}
+                            {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
              ) : (
                 <div className="text-center text-sm text-muted-foreground py-8">
                     No transactions recorded yet.
