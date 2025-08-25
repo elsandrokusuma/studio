@@ -32,7 +32,7 @@ export default function RootLayout({
           <AppSidebar />
           <SidebarInset>
             <AppHeader />
-            <div className="container mx-auto px-4 w-full">
+            <div className="mx-auto px-4 w-full max-w-full">
               {children}
             </div>
           </SidebarInset>

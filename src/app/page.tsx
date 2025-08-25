@@ -506,23 +506,25 @@ export default function DashboardPage() {
               </div>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <BarChart accessibilityLayer data={monthlyStockData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value}
-                />
-                  <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Legend />
-                <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={[4, 4, 0, 0]} name="Stock In" />
-                <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={[4, 4, 0, 0]} name="Stock Out" />
-              </BarChart>
-            </ChartContainer>
+            <div className="overflow-x-auto">
+              <ChartContainer config={chartConfig} className="h-[300px] w-full min-w-[600px]">
+                <BarChart accessibilityLayer data={monthlyStockData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickFormatter={(value) => value}
+                  />
+                    <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={[4, 4, 0, 0]} name="Stock In" />
+                  <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={[4, 4, 0, 0]} name="Stock Out" />
+                </BarChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
