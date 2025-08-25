@@ -11,6 +11,7 @@ import { AppHeader } from '@/components/app-header';
 export const metadata: Metadata = {
   title: 'Stationery Inventory',
   description: 'Comprehensive inventory and stock management ERP',
+  icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
 export default function RootLayout({
@@ -26,7 +27,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased')}>
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={false}>
           <AppSidebar />
           <SidebarInset>
             <AppHeader />
