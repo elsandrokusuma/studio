@@ -352,34 +352,37 @@ function PreOrdersContent() {
   };
   
   const handleExportPdf = () => {
-     if (selectedRows.length === 0) {
+    if (selectedRows.length === 0) {
       toast({
         variant: "destructive",
         title: "No items selected",
-        description: "Please select one or more approved items to export.",
+        description: "Please select one or more approved or fulfilled items to export.",
       });
       return;
     }
 
-    const selectedApprovedOrders = preOrders.filter(order => selectedRows.includes(order.poNumber) && order.status === 'Approved');
+    const selectedOrdersToExport = preOrders.filter(order => 
+      selectedRows.includes(order.poNumber) && 
+      (order.status === 'Approved' || order.status === 'Fulfilled')
+    );
 
-    if (selectedApprovedOrders.length === 0) {
+    if (selectedOrdersToExport.length === 0) {
       toast({
         variant: "destructive",
-        title: "No approved POs selected",
-        description: "Only approved pre-orders can be exported to a delivery order.",
+        title: "No Approved or Fulfilled POs selected",
+        description: "Only approved or fulfilled pre-orders can be exported.",
       });
       return;
     }
 
-    const ids = selectedApprovedOrders.map(o => o.id).join(',');
+    const ids = selectedOrdersToExport.map(o => o.id).join(',');
     router.push(`/surat-jalan?ids=${ids}`);
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const selectableRows = groupedPreOrders
-        .filter(po => po.status === 'Pending' || po.status === 'Approved')
+        .filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')
         .map(po => po.poNumber);
       setSelectedRows(selectableRows);
     } else {
@@ -454,10 +457,13 @@ function PreOrdersContent() {
     return statusMatch && dateMatch;
   });
   
-  const selectableRowCount = filteredPreOrders.filter(po => po.status === 'Pending' || po.status === 'Approved').length;
+  const selectableRowCount = filteredPreOrders.filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled').length;
   const isAllSelected = selectedRows.length > 0 && selectableRowCount > 0 && selectedRows.length === selectableRowCount;
   const canRequestApproval = selectedRows.some(poNumber => groupedPreOrders.find(po => po.poNumber === poNumber)?.status === 'Pending');
-  const canExport = selectedRows.some(poNumber => groupedPreOrders.find(po => po.poNumber === poNumber)?.status === 'Approved');
+  const canExport = selectedRows.some(poNumber => {
+    const po = groupedPreOrders.find(p => p.poNumber === poNumber);
+    return po?.status === 'Approved' || po?.status === 'Fulfilled';
+  });
   
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
@@ -666,7 +672,7 @@ function PreOrdersContent() {
                           checked={selectedRows.includes(po.poNumber)}
                           onCheckedChange={() => handleSelectRow(po.poNumber)}
                           aria-label="Select PO"
-                          disabled={!(po.status === 'Pending' || po.status === 'Approved')}
+                          disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
                         />
                          <div className="p-3 bg-primary/10 rounded-lg">
                            <Folder className="h-6 w-6 text-primary" />
