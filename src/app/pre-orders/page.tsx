@@ -449,7 +449,7 @@ function PreOrdersContent() {
   }, [preOrders]);
 
   const filteredPreOrders = groupedPreOrders.filter(po => {
-    const statusMatch = statusFilter === 'all' || po.status === statusFilter;
+    const statusMatch = statusFilter === 'all' || po.orders.some(order => order.status === statusFilter);
     const dateMatch = !dateFilter || format(new Date(po.expectedDate), 'yyyy-MM-dd') === format(dateFilter, 'yyyy-MM-dd');
     return statusMatch && dateMatch;
   });
