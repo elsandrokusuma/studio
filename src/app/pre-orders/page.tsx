@@ -110,6 +110,7 @@ function PreOrdersContent() {
   const [activePoNumber, setActivePoNumber] = React.useState<string>("");
   const [isCreatingNewPo, setIsCreatingNewPo] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+  const [openAccordion, setOpenAccordion] = React.useState<string | undefined>();
 
   // States for editing/deleting individual items
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
@@ -451,11 +452,16 @@ function PreOrdersContent() {
     }).filter(po => po.orders.length > 0); // Filter out empty POs
   }, [preOrders]);
 
-  const filteredPreOrders = groupedPreOrders.filter(po => {
-    const statusMatch = statusFilter === 'all' || po.orders.some(order => order.status === statusFilter);
-    const dateMatch = !dateFilter || format(new Date(po.expectedDate), 'yyyy-MM-dd') === format(dateFilter, 'yyyy-MM-dd');
-    return statusMatch && dateMatch;
-  });
+  const filteredPreOrders = React.useMemo(() => {
+    return groupedPreOrders.filter(po => {
+      // If an accordion is open, don't filter the main list
+      if (openAccordion) return true;
+      
+      const statusMatch = statusFilter === 'all' || po.orders.some(order => order.status === statusFilter);
+      const dateMatch = !dateFilter || format(new Date(po.expectedDate), 'yyyy-MM-dd') === format(dateFilter, 'yyyy-MM-dd');
+      return statusMatch && dateMatch;
+    });
+  }, [groupedPreOrders, statusFilter, dateFilter, openAccordion]);
   
   const selectableRowCount = filteredPreOrders.filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled').length;
   const isAllSelected = selectedRows.length > 0 && selectableRowCount > 0 && selectedRows.length === selectableRowCount;
@@ -662,179 +668,187 @@ function PreOrdersContent() {
               />
               <span className="text-sm text-muted-foreground">Select all</span>
         </div>
-        {filteredPreOrders.length > 0 ? filteredPreOrders.map((po) => (
-          <Accordion key={po.poNumber} type="single" collapsible>
-            <AccordionItem value={po.poNumber} className="border-0">
-               <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary">
-                 <CardHeader className="p-4">
-                    <div className="flex items-center gap-4">
-                         <Checkbox
-                          checked={selectedRows.includes(po.poNumber)}
-                          onCheckedChange={() => handleSelectRow(po.poNumber)}
-                          aria-label="Select PO"
-                          disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
-                        />
-                         <div className="p-3 bg-primary/10 rounded-lg">
-                           <Folder className="h-6 w-6 text-primary" />
-                         </div>
-                        <div className="flex-grow">
-                            <div className="flex flex-col sm:flex-row justify-between">
-                                <h3 className="font-semibold text-lg">{po.poNumber}</h3>
-                                <div className="text-sm text-muted-foreground">{format(new Date(po.orderDate), "MMM d, yyyy")}</div>
+        {filteredPreOrders.length > 0 ? (
+          <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+            {filteredPreOrders.map((po) => {
+               const itemsToDisplay =
+                openAccordion === po.poNumber && statusFilter !== "all"
+                  ? po.orders.filter((order) => order.status === statusFilter)
+                  : po.orders;
+
+              return (
+                <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
+                   <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary">
+                     <CardHeader className="p-4">
+                        <div className="flex items-center gap-4">
+                             <Checkbox
+                              checked={selectedRows.includes(po.poNumber)}
+                              onCheckedChange={() => handleSelectRow(po.poNumber)}
+                              aria-label="Select PO"
+                              disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
+                            />
+                             <div className="p-3 bg-primary/10 rounded-lg">
+                               <Folder className="h-6 w-6 text-primary" />
+                             </div>
+                            <div className="flex-grow">
+                                <div className="flex flex-col sm:flex-row justify-between">
+                                    <h3 className="font-semibold text-lg">{po.poNumber}</h3>
+                                    <div className="text-sm text-muted-foreground">{format(new Date(po.orderDate), "MMM d, yyyy")}</div>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Badge
+                                        variant={
+                                        po.status === 'Approved' ? 'default' :
+                                        po.status === 'Fulfilled' ? 'default' :
+                                        po.status === 'Rejected' || po.status === 'Cancelled' ? 'destructive' :
+                                        po.status === 'Pending' ? 'secondary' :
+                                        po.status === 'Awaiting Approval' ? 'warning' : 'outline'
+                                        }
+                                        className={
+                                        po.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                        po.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
+                                        po.status === 'Rejected' || po.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                                        po.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
+                                        po.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
+                                        }
+                                    >
+                                        {po.status}
+                                    </Badge>
+                                    <span>•</span>
+                                    <span>{po.totalItems} {po.totalItems > 1 ? 'items' : 'item'}</span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Badge
-                                    variant={
-                                    po.status === 'Approved' ? 'default' :
-                                    po.status === 'Fulfilled' ? 'default' :
-                                    po.status === 'Rejected' || po.status === 'Cancelled' ? 'destructive' :
-                                    po.status === 'Pending' ? 'secondary' :
-                                    po.status === 'Awaiting Approval' ? 'warning' : 'outline'
-                                    }
-                                    className={
-                                    po.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                    po.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
-                                    po.status === 'Rejected' || po.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                    po.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
-                                    po.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
-                                    }
-                                >
-                                    {po.status}
-                                </Badge>
-                                <span>•</span>
-                                <span>{po.totalItems} {po.totalItems > 1 ? 'items' : 'item'}</span>
+                            <div className="text-right hidden sm:block">
+                                <div className="font-semibold text-lg">{formatCurrency(po.totalValue)}</div>
                             </div>
+                            <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button aria-haspopup="true" size="icon" variant="ghost">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                  {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
+                                  {(po.status === 'Approved' || po.status === 'Rejected') && (
+                                    <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
+                                      <Undo2 className="mr-2 h-4 w-4" />
+                                      Undo Decision
+                                    </DropdownMenuItem>
+                                  )}
+                                  {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                         </div>
-                        <div className="text-right hidden sm:block">
-                            <div className="font-semibold text-lg">{formatCurrency(po.totalValue)}</div>
+                     </CardHeader>
+                    <AccordionContent>
+                      <CardContent className="p-4 pt-0">
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Item</TableHead>
+                                <TableHead>Unit</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Qty</TableHead>
+                                <TableHead className="text-right">Price</TableHead>
+                                <TableHead className="text-right">Total</TableHead>
+                                <TableHead><span className="sr-only">Actions</span></TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {itemsToDisplay.map(order => (
+                                <TableRow key={order.id}>
+                                  <TableCell className="font-medium">{order.itemName}</TableCell>
+                                  <TableCell>{order.unit}</TableCell>
+                                  <TableCell>
+                                     <Badge
+                                          variant={
+                                          order.status === 'Approved' ? 'default' :
+                                          order.status === 'Fulfilled' ? 'default' :
+                                          order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
+                                          order.status === 'Pending' ? 'secondary' :
+                                          order.status === 'Awaiting Approval' ? 'warning' : 'outline'
+                                          }
+                                          className={
+                                          order.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                          order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
+                                          order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                                          order.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
+                                          order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
+                                          }
+                                      >
+                                          {order.status}
+                                      </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-right">{order.quantity}</TableCell>
+                                  <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
+                                  <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
+                                  <TableCell className="text-right">
+                                     <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button size="icon" variant="ghost">
+                                          <MoreHorizontal className="h-4 w-4" />
+                                          <span className="sr-only">Item Actions</span>
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        {order.status === 'Approved' && (
+                                          <DropdownMenuItem onSelect={() => handleItemStatusUpdate(order, 'Fulfilled')}>
+                                            <CheckCircle className="mr-2 h-4 w-4" />
+                                            Mark as Fulfilled
+                                          </DropdownMenuItem>
+                                        )}
+                                        {po.status === 'Pending' && (
+                                          <>
+                                            <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                              <Pencil className="mr-2 h-4 w-4" />
+                                              Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                              <Trash2 className="mr-2 h-4 w-4" />
+                                              Delete
+                                            </DropdownMenuItem>
+                                          </>
+                                        )}
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
                         </div>
-                        <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
-                              {(po.status === 'Approved' || po.status === 'Rejected') && (
-                                <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
-                                  <Undo2 className="mr-2 h-4 w-4" />
-                                  Undo Decision
-                                </DropdownMenuItem>
-                              )}
-                              {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                    </div>
-                 </CardHeader>
-                <AccordionContent>
-                  <CardContent className="p-4 pt-0">
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Item</TableHead>
-                            <TableHead>Unit</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Qty</TableHead>
-                            <TableHead className="text-right">Price</TableHead>
-                            <TableHead className="text-right">Total</TableHead>
-                            <TableHead><span className="sr-only">Actions</span></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {po.orders.map(order => (
-                            <TableRow key={order.id}>
-                              <TableCell className="font-medium">{order.itemName}</TableCell>
-                              <TableCell>{order.unit}</TableCell>
-                              <TableCell>
-                                 <Badge
-                                      variant={
-                                      order.status === 'Approved' ? 'default' :
-                                      order.status === 'Fulfilled' ? 'default' :
-                                      order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
-                                      order.status === 'Pending' ? 'secondary' :
-                                      order.status === 'Awaiting Approval' ? 'warning' : 'outline'
-                                      }
-                                      className={
-                                      order.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                      order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
-                                      order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                      order.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
-                                      order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
-                                      }
-                                  >
-                                      {order.status}
-                                  </Badge>
-                              </TableCell>
-                              <TableCell className="text-right">{order.quantity}</TableCell>
-                              <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
-                              <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
-                              <TableCell className="text-right">
-                                 <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button size="icon" variant="ghost">
-                                      <MoreHorizontal className="h-4 w-4" />
-                                      <span className="sr-only">Item Actions</span>
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    {order.status === 'Approved' && (
-                                      <DropdownMenuItem onSelect={() => handleItemStatusUpdate(order, 'Fulfilled')}>
-                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                        Mark as Fulfilled
-                                      </DropdownMenuItem>
-                                    )}
-                                    {po.status === 'Pending' && (
-                                      <>
-                                        <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                          <Pencil className="mr-2 h-4 w-4" />
-                                          Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                          <Trash2 className="mr-2 h-4 w-4" />
-                                          Delete
-                                        </DropdownMenuItem>
-                                      </>
-                                    )}
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
-                       <div className="flex items-center gap-2">
-                         <Box className="h-4 w-4 text-muted-foreground" />
-                         <div>
-                            <p className="text-muted-foreground text-xs">Total Quantity</p>
-                            <p className="font-medium">{po.totalQuantity} units</p>
-                         </div>
-                      </div>
-                       <div className="flex items-center gap-2">
-                         <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                         <div>
-                            <p className="text-muted-foreground text-xs">Expected Delivery</p>
-                            <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p>
-                         </div>
-                      </div>
-                  </CardFooter>
-                </AccordionContent>
-               </Card>
-            </AccordionItem>
+                      </CardContent>
+                      <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
+                           <div className="flex items-center gap-2">
+                             <Box className="h-4 w-4 text-muted-foreground" />
+                             <div>
+                                <p className="text-muted-foreground text-xs">Total Quantity</p>
+                                <p className="font-medium">{po.totalQuantity} units</p>
+                             </div>
+                          </div>
+                           <div className="flex items-center gap-2">
+                             <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                             <div>
+                                <p className="text-muted-foreground text-xs">Expected Delivery</p>
+                                <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p>
+                             </div>
+                          </div>
+                      </CardFooter>
+                    </AccordionContent>
+                   </Card>
+                </AccordionItem>
+              )})}
           </Accordion>
-        )) : (
+        ) : (
             <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-24">
               <div className="flex flex-col items-center gap-1 text-center">
                 <h3 className="text-2xl font-bold tracking-tight">
