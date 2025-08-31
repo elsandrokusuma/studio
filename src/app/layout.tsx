@@ -4,14 +4,11 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
 import { AppHeader } from '@/components/app-header';
 
 export const metadata: Metadata = {
   title: 'Stationery Inventory',
   description: 'Comprehensive inventory and stock management ERP',
-  icons: [{ rel: 'icon', url: '/favicon.ico?v=2' }],
 };
 
 export default function RootLayout({
@@ -28,16 +25,15 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased')}>
-        <SidebarProvider defaultOpen={false}>
-          <AppSidebar />
-          <SidebarInset>
-            <AppHeader />
-            <div className="mx-auto px-4 w-full">
+        <div className="flex flex-col min-h-screen">
+          <AppHeader />
+          <main className="flex-grow p-4 md:p-8">
+            <div className="mx-auto w-full">
               {children}
             </div>
-          </SidebarInset>
-          <Toaster />
-        </SidebarProvider>
+          </main>
+        </div>
+        <Toaster />
       </body>
     </html>
   );
