@@ -680,7 +680,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="w-full overflow-x-auto">
+            <div className="overflow-x-auto">
               <ChartContainer
                 config={chartConfig}
                 className="h-[300px] min-w-[300px] w-full"
