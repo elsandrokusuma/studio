@@ -78,9 +78,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('font-body antialiased bg-background text-foreground')}>
+      <body className={cn('font-body antialiased')}>
         <ThemeProvider>
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen bg-background text-foreground">
             <AppHeader />
             <main className="flex-grow p-4 md:p-8">
               <div className="mx-auto w-full max-w-full">
