@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   ClipboardCheck,
   Menu,
+  Settings,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/inventory", label: "Inventory", icon: Boxes },
   { href: "/pre-orders", label: "Pre-Orders", icon: ShoppingCart },
   { href: "/approval", label: "Approval", icon: ClipboardCheck },
+  { href: "/settings", label: "Settings", icon: Settings },
 ]
 
 export function AppHeader() {
@@ -54,7 +56,7 @@ export function AppHeader() {
   )
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 md:px-6">
       <div className="flex w-full items-center justify-between">
         <Link href="/" className="flex items-center">
           <Image src="https://i.imgur.com/q4XftkP.jpeg" alt="Logo" width={32} height={32} className="h-8 w-8" />
