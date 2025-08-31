@@ -42,6 +42,9 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     const root = window.document.documentElement;
+    // Using a CSS variable for the theme color to avoid direct style manipulation
+    // which can also contribute to hydration issues if not handled carefully.
+    // This assumes your globals.css can use var(--theme-primary) for the primary color.
     root.style.setProperty('--primary', colorThemes[color]);
   }, [color]);
 
@@ -78,9 +81,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('font-body antialiased')}>
+      <body className={cn('font-body antialiased bg-background text-foreground')}>
         <ThemeProvider>
-          <div className="flex flex-col min-h-screen bg-background text-foreground">
+          <div className="flex flex-col min-h-screen">
             <AppHeader />
             <main className="flex-grow p-4 md:p-8">
               <div className="mx-auto w-full max-w-full">
