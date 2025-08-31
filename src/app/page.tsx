@@ -1,3 +1,4 @@
+
 "use client";
 import * as React from "react";
 import {
@@ -584,7 +585,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center gap-3">
             <div className="bg-purple-100 p-2 rounded-full">
@@ -682,7 +683,7 @@ export default function DashboardPage() {
             <div className="w-full overflow-x-auto">
               <ChartContainer
                 config={chartConfig}
-                className="h-[300px] md:w-full w-[44dvh]"
+                className="h-[300px] min-w-[300px] w-full"
               >
                 <BarChart accessibilityLayer data={monthlyStockData}>
                   <CartesianGrid vertical={false} />
