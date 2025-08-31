@@ -5,7 +5,7 @@ import * as React from 'react';
 import Cookies from 'js-cookie';
 
 type Theme = 'light' | 'dark';
-type Color = 'green' | 'blue' | 'orange' | 'red' | 'purple';
+type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
 
 type ThemeContextType = {
   theme: Theme;
@@ -15,14 +15,6 @@ type ThemeContextType = {
 };
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
-
-export const colorThemes: Record<Color, string> = {
-  green: '142 71% 45%',
-  blue: '221 83% 53%',
-  orange: '25 95% 53%',
-  red: '0 84% 60%',
-  purple: '262 83% 58%',
-};
 
 export function useTheme() {
   const context = React.useContext(ThemeContext);

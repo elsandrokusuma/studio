@@ -503,15 +503,15 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <Card className="bg-green-50 border-green-200">
+      <Card className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800/50">
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="bg-green-100 p-3 rounded-full">
-              <Sun className="h-6 w-6 text-green-700" />
+            <div className="bg-green-100 dark:bg-green-800/30 p-3 rounded-full">
+              <Sun className="h-6 w-6 text-green-700 dark:text-green-300" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-green-900">{`${greeting}!`}</h1>
-              <p className="text-green-800">
+              <h1 className="text-2xl font-bold text-green-900 dark:text-green-200">{`${greeting}!`}</h1>
+              <p className="text-green-800 dark:text-green-300/80">
                 Here's what's happening with your inventory today.
               </p>
             </div>
@@ -519,10 +519,11 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card
           onClick={() => router.push("/inventory")}
-          className="cursor-pointer hover:shadow-lg transition-shadow bg-blue-500 text-white"
+          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Items</CardTitle>
@@ -534,7 +535,10 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-green-500 text-white">
+        <Card 
+            className="text-white"
+            style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Stock Value</CardTitle>
             <DollarSign className="h-4 w-4" />
@@ -547,7 +551,8 @@ export default function DashboardPage() {
         </Card>
         <Card
           onClick={handleShowLowStock}
-          className="cursor-pointer hover:shadow-lg transition-shadow bg-orange-400 text-white"
+          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+           style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
@@ -559,7 +564,8 @@ export default function DashboardPage() {
         </Card>
         <Card
           onClick={handleShowOutOfStock}
-          className="cursor-pointer hover:shadow-lg transition-shadow bg-red-500 text-white"
+          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
@@ -571,7 +577,8 @@ export default function DashboardPage() {
         </Card>
         <Card
           onClick={() => router.push("/approval")}
-          className="cursor-pointer hover:shadow-lg transition-shadow bg-purple-500 text-white"
+          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -588,8 +595,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center gap-3">
-            <div className="bg-purple-100 p-2 rounded-full">
-              <Zap className="h-6 w-6 text-purple-600" />
+            <div className="bg-primary/10 p-2 rounded-full">
+              <Zap className="h-6 w-6 text-primary" />
             </div>
             <div>
               <CardTitle>Quick Actions</CardTitle>
@@ -653,8 +660,8 @@ export default function DashboardPage() {
           <CardHeader>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className="bg-blue-100 p-2 rounded-md">
-                  <BarChart4 className="h-6 w-6 text-blue-600" />
+                <div className="bg-primary/10 p-2 rounded-md">
+                  <BarChart4 className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <CardTitle>Stock Movement Trends</CardTitle>

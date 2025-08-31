@@ -9,7 +9,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/app-header';
-import { ThemeContext, colorThemes, type Theme, type Color } from '@/hooks/use-theme';
+import { ThemeContext, type Theme, type Color } from '@/hooks/use-theme';
 
 // We can't export this from the layout, so we define it here.
 // Still, to get the metadata to work, we'll need to define it statically.
@@ -42,10 +42,8 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     const root = window.document.documentElement;
-    // Using a CSS variable for the theme color to avoid direct style manipulation
-    // which can also contribute to hydration issues if not handled carefully.
-    // This assumes your globals.css can use var(--theme-primary) for the primary color.
-    root.style.setProperty('--primary', colorThemes[color]);
+    root.classList.remove('theme-green', 'theme-blue', 'theme-orange', 'theme-rose', 'theme-violet');
+    root.classList.add(`theme-${color}`);
   }, [color]);
 
   const setTheme = (newTheme: Theme) => {

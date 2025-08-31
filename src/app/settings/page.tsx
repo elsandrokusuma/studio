@@ -8,15 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme, type Color } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 
-const colors = [
+const colors: { name: Color, bgColor: string }[] = [
     { name: 'green', bgColor: 'bg-green-500' },
     { name: 'blue', bgColor: 'bg-blue-500' },
     { name: 'orange', bgColor: 'bg-orange-500' },
-    { name: 'red', bgColor: 'bg-red-500' },
-    { name: 'purple', bgColor: 'bg-purple-500' },
+    { name: 'rose', bgColor: 'bg-rose-500' },
+    { name: 'violet', bgColor: 'bg-violet-500' },
 ];
 
 export default function SettingsPage() {
@@ -70,7 +70,7 @@ export default function SettingsPage() {
                                     variant="outline"
                                     size="icon"
                                     className={cn('h-8 w-8 rounded-full', c.bgColor, color === c.name && 'ring-2 ring-offset-2 ring-primary')}
-                                    onClick={() => setColor(c.name as typeof color)}
+                                    onClick={() => setColor(c.name)}
                                 >
                                     {color === c.name && <Check className="h-4 w-4 text-white" />}
                                 </Button>
