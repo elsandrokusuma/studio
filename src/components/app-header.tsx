@@ -2,13 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Boxes,
   ShoppingCart,
   ClipboardCheck,
-  Warehouse,
   Menu,
 } from "lucide-react"
 
@@ -44,7 +44,7 @@ export function AppHeader() {
               : "text-muted-foreground",
              inSheet ? "p-2 rounded-md hover:bg-accent w-full" : ""
           )}
-          onClick={() => setIsMobileMenuOpen(false)}
+          onClick={() => inSheet && setIsMobileMenuOpen(false)}
         >
          <item.icon className="h-4 w-4" />
           {item.label}
@@ -54,36 +54,35 @@ export function AppHeader() {
   )
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-      <div className="flex items-center gap-2 lg:gap-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <Warehouse className="h-6 w-6 text-primary" />
-          <span className="hidden sm:inline-block">Stationery Inventory</span>
+    <header className="sticky top-0 z-30 flex h-16 items-center border-b bg-background px-4 md:px-6">
+      <div className="flex w-full items-center justify-between">
+        <Link href="/" className="flex items-center">
+          <Image src="https://i.imgur.com/q4XftkP.jpeg" alt="Logo" width={32} height={32} className="h-8 w-8" />
         </Link>
-         <div className="hidden md:flex">
-            <NavLinks />
+
+        <div className="hidden flex-1 justify-center md:flex">
+          <NavLinks />
         </div>
-      </div>
 
-
-      <div className="md:hidden flex-1 flex justify-end">
-         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <div className="flex flex-col gap-6 pt-8">
-               <Link href="/" className="flex items-center gap-2 font-semibold text-lg px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Warehouse className="h-6 w-6 text-primary" />
-                  <span>Stationery Inventory</span>
+        <div className="md:hidden">
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <div className="flex flex-col gap-6 pt-8">
+                <Link href="/" className="flex items-center gap-2 font-semibold text-lg px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                   <Image src="https://i.imgur.com/q4XftkP.jpeg" alt="Logo" width={32} height={32} className="h-8 w-8" />
+                  <span>Stationery Inv.</span>
                 </Link>
-              <NavLinks className="flex-col items-start gap-2" inSheet={true} />
-            </div>
-          </SheetContent>
-        </Sheet>
+                <NavLinks className="flex-col items-start gap-2" inSheet={true} />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   )
