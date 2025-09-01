@@ -11,6 +11,7 @@ import {
   ClipboardCheck,
   Menu,
   Settings,
+  Wrench,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -26,6 +27,7 @@ const navItems = [
   { href: "/inventory", label: "Inventory", icon: Boxes },
   { href: "/pre-orders", label: "Pre-Orders", icon: ShoppingCart },
   { href: "/approval", label: "Approval", icon: ClipboardCheck },
+  { href: "/approval-sparepart", label: "Approval Sparepart", icon: Wrench },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 
