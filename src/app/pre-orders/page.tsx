@@ -783,6 +783,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                             </div>
                             <div className="text-right text-sm">
                                 <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy")}</div>
+                                <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center">
                                 <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
