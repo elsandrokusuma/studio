@@ -91,7 +91,6 @@ type GroupedRequest = {
   requests: SparepartRequest[];
   totalItems: number;
   totalQuantity: number;
-  totalValue: number;
   status: SparepartRequest['status'];
   requester: string;
   requestDate: string;
@@ -102,7 +101,6 @@ type POItem = {
   itemName: string;
   company: string;
   quantity: number | string;
-  price: number | string;
 };
 
 export default function ApprovalSparepartPage() {
@@ -112,7 +110,7 @@ export default function ApprovalSparepartPage() {
   const [loading, setLoading] = React.useState(true);
 
   // State for Create PO Dialog
-  const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1, price: 0 }]);
+  const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
   const [requesterName, setRequesterName] = React.useState('');
   const [location, setLocation] = React.useState('Jakarta');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -183,7 +181,7 @@ export default function ApprovalSparepartPage() {
   
   // Handlers for Create PO Dialog
   const handleAddItem = () => {
-    setPoItems([...poItems, { id: Date.now(), itemName: '', company: '', quantity: 1, price: 0 }]);
+    setPoItems([...poItems, { id: Date.now(), itemName: '', company: '', quantity: 1 }]);
   };
 
   const handleRemoveItem = (id: number) => {
@@ -197,7 +195,7 @@ export default function ApprovalSparepartPage() {
   const resetPoForm = () => {
     setRequesterName('');
     setLocation('Jakarta');
-    setPoItems([{ id: 1, itemName: '', company: '', quantity: 1, price: 0 }]);
+    setPoItems([{ id: 1, itemName: '', company: '', quantity: 1 }]);
   };
 
   const handleCreateRequest = async (e: React.FormEvent) => {
@@ -232,7 +230,6 @@ export default function ApprovalSparepartPage() {
           itemName: item.itemName,
           company: item.company,
           quantity: Number(item.quantity),
-          price: Number(item.price),
           requester: `${requesterName} (${location})`,
           requestDate: new Date().toISOString(),
           status: 'Awaiting Approval'
@@ -283,14 +280,12 @@ export default function ApprovalSparepartPage() {
             const itemName = findValue(['itemName', 'item name', 'Name Item', 'nama barang']);
             const company = findValue(['company', 'Company', 'perusahaan']);
             const quantity = findValue(['quantity', 'qty', 'Quantity', 'jumlah']);
-            const price = findValue(['price', 'harga']);
 
             return {
               id: Date.now() + index,
               itemName: itemName,
               company: company,
               quantity: quantity || 1,
-              price: price || 0,
             };
         }).filter(item => item.itemName);
         
@@ -298,7 +293,7 @@ export default function ApprovalSparepartPage() {
             toast({
               variant: 'destructive',
               title: 'Invalid Data',
-              description: 'Could not find valid item data in the CSV. Make sure columns are named correctly (e.g., itemName, company, quantity, price).',
+              description: 'Could not find valid item data in the CSV. Make sure columns are named correctly (e.g., itemName, company, quantity).',
             });
             return;
         }
@@ -324,10 +319,6 @@ export default function ApprovalSparepartPage() {
     }
   };
   
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
-  };
-  
   const groupedRequests = React.useMemo(() => {
     const groups: { [key: string]: SparepartRequest[] } = {};
     allRequests.forEach(order => {
@@ -342,7 +333,6 @@ export default function ApprovalSparepartPage() {
         requests,
         totalItems: requests.length,
         totalQuantity: requests.reduce((sum, item) => sum + item.quantity, 0),
-        totalValue: requests.reduce((sum, item) => sum + (item.price * item.quantity), 0),
         status: requests[0].status,
         requester: requests[0].requester,
         requestDate: requests[0].requestDate,
@@ -366,7 +356,6 @@ export default function ApprovalSparepartPage() {
 
   const totalRequestsCount = new Set(allRequests.map(r => r.requestNumber)).size;
   const totalLineItems = allRequests.length;
-  const totalValue = allRequests.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const pendingCount = groupedRequests.filter(g => g.status === 'Awaiting Approval').length;
   
   const handleSelectAll = (checked: boolean) => {
@@ -411,7 +400,7 @@ export default function ApprovalSparepartPage() {
             Approval Sparepart
           </h1>
           <p className="text-muted-foreground text-sm">
-            {totalRequestsCount} PO groups • {totalLineItems} line items • {formatCurrency(totalValue)}
+            {totalRequestsCount} PO groups • {totalLineItems} line items
           </p>
         </div>
         <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
@@ -472,10 +461,9 @@ export default function ApprovalSparepartPage() {
                         <ScrollArea className="h-48 w-full rounded-md border p-2">
                              <div className="space-y-3">
                                 {poItems.map((item) => (
-                                    <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto_auto] gap-2 items-center">
+                                    <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center">
                                         <Input placeholder="Name item" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
                                         <Input placeholder="Company" value={item.company} onChange={(e) => handleItemChange(item.id, 'company', e.target.value)} />
-                                        <Input type="number" min="0" className="w-24" placeholder="Price" value={item.price} onChange={(e) => handleItemChange(item.id, 'price', e.target.value)} />
                                         <Input type="number" min="1" className="w-24" placeholder="Qty" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
                                         <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} disabled={poItems.length === 1}>
                                             <Trash2 className="h-4 w-4 text-red-500" />
@@ -499,7 +487,7 @@ export default function ApprovalSparepartPage() {
 
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-1))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
@@ -516,15 +504,6 @@ export default function ApprovalSparepartPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{totalLineItems}</div>
-          </CardContent>
-        </Card>
-         <Card className="text-white bg-purple-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-            <DollarSign className="h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{formatCurrency(totalValue)}</div>
           </CardContent>
         </Card>
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-3))' }}>
@@ -610,9 +589,6 @@ export default function ApprovalSparepartPage() {
                                     <span className="hidden sm:inline">• by {req.requester}</span>
                                 </div>
                             </div>
-                             <div className="text-right hidden sm:block">
-                                <div className="font-semibold text-lg">{formatCurrency(req.totalValue)}</div>
-                            </div>
                              <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -644,8 +620,6 @@ export default function ApprovalSparepartPage() {
                                     <TableHead>Item Name</TableHead>
                                     <TableHead>Company</TableHead>
                                     <TableHead className="text-right">Quantity</TableHead>
-                                    <TableHead className="text-right">Price</TableHead>
-                                    <TableHead className="text-right">Total</TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -654,8 +628,6 @@ export default function ApprovalSparepartPage() {
                                       <TableCell className="font-medium">{order.itemName}</TableCell>
                                       <TableCell>{order.company}</TableCell>
                                       <TableCell className="text-right">{order.quantity}</TableCell>
-                                      <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
-                                      <TableCell className="text-right">{formatCurrency(order.price * order.quantity)}</TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
