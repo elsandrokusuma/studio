@@ -450,7 +450,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
 
   const handleSelectRow = (poNumber: string) => {
     setSelectedRows(prev =>
-      prev.includes(poNumber) ? prev.filter(rowId => rowId !== poNumber) : [...prev, rowId]
+      prev.includes(poNumber) ? prev.filter(rowId => rowId !== poNumber) : [...prev, poNumber]
     );
   };
   
