@@ -12,7 +12,8 @@ import {
   writeBatch,
   query,
   orderBy,
-  deleteDoc
+  deleteDoc,
+  runTransaction
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -116,6 +117,12 @@ function PreOrdersContent() {
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
   const [isDeleteItemOpen, setDeleteItemOpen] = React.useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = React.useState<PreOrder | null>(null);
+  
+  // States for fulfilling an order
+  const [isFulfillOpen, setFulfillOpen] = React.useState(false);
+  const [itemToFulfill, setItemToFulfill] = React.useState<PreOrder | null>(null);
+  const [fulfillQuantity, setFulfillQuantity] = React.useState<number | string>('');
+
 
   // State for combobox
   const [comboPoOpen, setComboPoOpen] = React.useState(false);
@@ -258,6 +265,71 @@ function PreOrdersContent() {
     setDeleteItemOpen(false);
     setSelectedOrderItem(null);
   };
+  
+  const handleFulfillItem = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!itemToFulfill || !db) return;
+
+    const finalQuantity = Number(fulfillQuantity);
+    if (isNaN(finalQuantity) || finalQuantity <= 0) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Quantity",
+        description: "Please enter a valid number greater than 0.",
+      });
+      return;
+    }
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const inventoryItemRef = doc(db, "inventory", itemToFulfill.itemId);
+        const inventoryItemDoc = await transaction.get(inventoryItemRef);
+
+        if (!inventoryItemDoc.exists()) {
+          throw new Error("Inventory item not found!");
+        }
+
+        const currentQuantity = inventoryItemDoc.data().quantity;
+        const newQuantity = currentQuantity + finalQuantity;
+        
+        // 1. Update inventory stock
+        transaction.update(inventoryItemRef, { quantity: newQuantity });
+
+        // 2. Add 'in' transaction log
+        const transactionRef = doc(collection(db, "transactions"));
+        transaction.set(transactionRef, {
+          itemId: itemToFulfill.itemId,
+          itemName: itemToFulfill.itemName,
+          type: 'in',
+          quantity: finalQuantity,
+          date: new Date().toISOString(),
+          person: `From PO ${itemToFulfill.poNumber}`,
+        });
+
+        // 3. Update pre-order item status
+        const preOrderItemRef = doc(db, "pre-orders", itemToFulfill.id);
+        transaction.update(preOrderItemRef, { status: 'Fulfilled' });
+      });
+
+      toast({
+        title: "Item Fulfilled!",
+        description: `${finalQuantity}x ${itemToFulfill.itemName} have been added to inventory.`,
+      });
+
+      setFulfillOpen(false);
+      setItemToFulfill(null);
+      setFulfillQuantity('');
+
+    } catch (error) {
+      console.error("Failed to fulfill item:", error);
+      toast({
+        variant: "destructive",
+        title: "Fulfillment Failed",
+        description: "Could not update inventory and pre-order status.",
+      });
+    }
+  };
+
 
   const handleDeletePreOrder = async () => {
     if (!selectedPo || !db) return;
@@ -291,24 +363,10 @@ function PreOrdersContent() {
     });
   };
 
-  const handleItemStatusUpdate = async (orderItem: PreOrder, status: PreOrder['status']) => {
-    if (!db) return;
-    const itemRef = doc(db, "pre-orders", orderItem.id);
-    await updateDoc(itemRef, { status });
-    toast({
-      title: 'Item Status Updated',
-      description: `${orderItem.itemName} marked as ${status}.`
-    });
-
-    // Check if all items in the PO are fulfilled
-    const po = groupedPreOrders.find(p => p.poNumber === orderItem.poNumber);
-    if (po) {
-      const allItems = preOrders.filter(o => o.poNumber === po.poNumber);
-      const allFulfilled = allItems.every(item => item.id === orderItem.id ? status === 'Fulfilled' : item.status === 'Fulfilled');
-      if (allFulfilled) {
-        await updateStatus(po.orders, 'Fulfilled');
-      }
-    }
+  const handleOpenFulfillDialog = (orderItem: PreOrder) => {
+    setItemToFulfill(orderItem);
+    setFulfillQuantity(orderItem.quantity);
+    setFulfillOpen(true);
   };
 
 
@@ -801,7 +859,7 @@ function PreOrdersContent() {
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
                                         {order.status === 'Approved' && (
-                                          <DropdownMenuItem onSelect={() => handleItemStatusUpdate(order, 'Fulfilled')}>
+                                          <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
                                             <CheckCircle className="mr-2 h-4 w-4" />
                                             Mark as Fulfilled
                                           </DropdownMenuItem>
@@ -942,6 +1000,40 @@ function PreOrdersContent() {
           </AlertDialogContent>
         </AlertDialog>
 
+        <Dialog open={isFulfillOpen} onOpenChange={setFulfillOpen}>
+          <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Fulfill Item: {itemToFulfill?.itemName}</DialogTitle>
+                <DialogDescription>
+                  Confirm the quantity of items received to add them to your inventory.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleFulfillItem}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="fulfill-quantity" className="text-right">
+                      Quantity Received
+                    </Label>
+                    <Input
+                      id="fulfill-quantity"
+                      name="fulfill-quantity"
+                      type="number"
+                      min="1"
+                      className="col-span-3"
+                      value={fulfillQuantity}
+                      onChange={(e) => setFulfillQuantity(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>Cancel</Button>
+                  <Button type="submit">Confirm & Add to Stock</Button>
+                </DialogFooter>
+              </form>
+          </DialogContent>
+        </Dialog>
+
     </div>
   );
 }
@@ -953,3 +1045,5 @@ export default function PreOrdersPage() {
         </React.Suspense>
     )
 }
+
+    
