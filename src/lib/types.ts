@@ -30,3 +30,16 @@ export type PreOrder = {
   expectedDate: string;
   status: 'Pending' | 'Awaiting Approval' | 'Approved' | 'Rejected' | 'Fulfilled' | 'Cancelled';
 };
+
+export type SparepartRequest = {
+  id: string;
+  requestNumber: string;
+  itemName: string;
+  itemCode: string;
+  quantity: number;
+  requester: string;
+  requestDate: string;
+  status: 'Awaiting Approval' | 'Approved' | 'Rejected';
+};
+
+    
