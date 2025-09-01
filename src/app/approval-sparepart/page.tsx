@@ -9,6 +9,7 @@ import {
   onSnapshot,
   doc,
   writeBatch,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -29,6 +30,8 @@ import {
     Check,
     X,
     Eye,
+    PlusCircle,
+    Trash2
 } from "lucide-react";
 import {
   Table,
@@ -45,6 +48,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
@@ -52,6 +57,9 @@ import type { SparepartRequest } from "@/lib/types";
 import { format } from "date-fns";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 
 type GroupedRequest = {
@@ -64,13 +72,27 @@ type GroupedRequest = {
   requestDate: string;
 };
 
+type POItem = {
+  id: number;
+  itemName: string;
+  itemCode: string;
+  quantity: number | string;
+};
+
 export default function ApprovalSparepartPage() {
   const [approvalItems, setApprovalItems] = React.useState<GroupedRequest[]>([]);
   const [allRequests, setAllRequests] = React.useState<SparepartRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = React.useState<GroupedRequest | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
+  const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(true);
+
+  // State for Create PO Dialog
+  const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', itemCode: '', quantity: 1 }]);
+  const [requesterName, setRequesterName] = React.useState('');
+  const [location, setLocation] = React.useState('Jakarta');
+
 
   React.useEffect(() => {
     if (!db) {
@@ -78,7 +100,6 @@ export default function ApprovalSparepartPage() {
       return;
     }
     
-    // Listener for all requests to populate summary cards
     const qAll = query(collection(db, "sparepart-requests"));
     const unsubscribeAll = onSnapshot(qAll, (querySnapshot) => {
       const requests: SparepartRequest[] = [];
@@ -90,7 +111,6 @@ export default function ApprovalSparepartPage() {
       console.error("Error fetching all sparepart requests:", error);
     });
 
-    // Listener for requests awaiting approval
     const qApproval = query(collection(db, "sparepart-requests"), where("status", "==", "Awaiting Approval"));
     const unsubscribeApproval = onSnapshot(qApproval, (querySnapshot) => {
       const orders: SparepartRequest[] = [];
@@ -165,6 +185,70 @@ export default function ApprovalSparepartPage() {
     setSelectedRequest(req);
     setDetailsOpen(true);
   };
+  
+  // Handlers for Create PO Dialog
+  const handleAddItem = () => {
+    setPoItems([...poItems, { id: Date.now(), itemName: '', itemCode: '', quantity: 1 }]);
+  };
+
+  const handleRemoveItem = (id: number) => {
+    setPoItems(poItems.filter(item => item.id !== id));
+  };
+
+  const handleItemChange = (id: number, field: keyof Omit<POItem, 'id'>, value: string) => {
+    setPoItems(poItems.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const resetPoForm = () => {
+    setRequesterName('');
+    setLocation('Jakarta');
+    setPoItems([{ id: 1, itemName: '', itemCode: '', quantity: 1 }]);
+  };
+
+  const handleCreateRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!db) return;
+    
+    if (!requesterName.trim() || poItems.some(item => !item.itemName.trim() || !item.itemCode.trim() || Number(item.quantity) <= 0)) {
+      toast({ variant: "destructive", title: "Validation Error", description: "Please fill all required fields." });
+      return;
+    }
+
+    try {
+      const highestReqNum = allRequests
+          .map(req => parseInt(req.requestNumber.replace('SP-', ''), 10))
+          .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
+        
+      const newReqNum = highestReqNum + 1;
+      const formattedReqNum = `SP-${String(newReqNum).padStart(3, '0')}`;
+
+      const batch = writeBatch(db);
+
+      poItems.forEach(item => {
+        const docRef = doc(collection(db, "sparepart-requests"));
+        const newRequest: Omit<SparepartRequest, 'id'> = {
+          requestNumber: formattedReqNum,
+          itemName: item.itemName,
+          itemCode: item.itemCode,
+          quantity: Number(item.quantity),
+          requester: `${requesterName} (${location})`,
+          requestDate: new Date().toISOString(),
+          status: 'Awaiting Approval'
+        };
+        batch.set(docRef, newRequest);
+      });
+      
+      await batch.commit();
+      
+      toast({ title: "Request Created", description: `Request ${formattedReqNum} has been submitted for approval.` });
+      setCreatePoOpen(false);
+      resetPoForm();
+    } catch (error) {
+      console.error("Error creating request:", error);
+      toast({ variant: "destructive", title: "Failed to create request." });
+    }
+  };
+
 
   const totalRequestsCount = new Set(allRequests.map(r => r.requestNumber)).size;
   const totalItemsCount = allRequests.reduce((sum, item) => sum + item.quantity, 0);
@@ -202,6 +286,70 @@ export default function ApprovalSparepartPage() {
             </p>
           </div>
         </div>
+        <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Request
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create Sparepart Request</DialogTitle>
+                <DialogDescription>
+                  Fill in the details to create a new sparepart request.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreateRequest}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="requesterName">Requester Name</Label>
+                            <Input id="requesterName" placeholder="e.g. John Doe" value={requesterName} onChange={(e) => setRequesterName(e.target.value)} />
+                        </div>
+                        <div>
+                            <Label>Location</Label>
+                             <RadioGroup defaultValue="Jakarta" className="flex items-center gap-4 pt-2" value={location} onValueChange={setLocation}>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="Jakarta" id="jakarta" />
+                                    <Label htmlFor="jakarta">Jakarta</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="Surabaya" id="surabaya" />
+                                    <Label htmlFor="surabaya">Surabaya</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <Label>Items</Label>
+                        <ScrollArea className="h-48 w-full rounded-md border p-2">
+                             <div className="space-y-3">
+                                {poItems.map((item, index) => (
+                                    <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center">
+                                        <Input placeholder="Item Name" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
+                                        <Input placeholder="Item Code" value={item.itemCode} onChange={(e) => handleItemChange(item.id, 'itemCode', e.target.value)} />
+                                        <Input type="number" min="1" className="w-16" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} disabled={poItems.length === 1}>
+                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                        <Button type="button" variant="outline" className="w-full" onClick={handleAddItem}>
+                            <PlusCircle className="mr-2 h-4 w-4" /> Add Item
+                        </Button>
+                    </div>
+                </div>
+                 <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setCreatePoOpen(false)}>Cancel</Button>
+                    <Button type="submit">Create Request</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
