@@ -94,7 +94,7 @@ type GroupedPO = {
   expectedDate: string;
 };
 
-function PreOrdersContent({ searchParams }: { searchParams: URLSearchParams }) {
+function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const [preOrders, setPreOrders] = React.useState<PreOrder[]>([]);
   const [inventoryItems, setInventoryItems] = React.useState<InventoryItem[]>([]);
   const [isCreateOpen, setCreateOpen] = React.useState(false);
@@ -159,11 +159,11 @@ function PreOrdersContent({ searchParams }: { searchParams: URLSearchParams }) {
   }, []);
   
   React.useEffect(() => {
-    const create = searchParams.get('create');
-    const itemId = searchParams.get('itemId');
+    const create = searchParams?.create;
+    const itemId = searchParams?.itemId;
 
     if (create === 'true' && itemId) {
-        setSelectedItemId(itemId);
+        setSelectedItemId(itemId as string);
         const item = inventoryItems.find(i => i.id === itemId);
         if (item) {
           setSelectedItemName(item.name);
@@ -1037,7 +1037,11 @@ function PreOrdersContent({ searchParams }: { searchParams: URLSearchParams }) {
   );
 }
 
-export default function PreOrdersPage() {
-    const searchParams = useSearchParams();
-    return <PreOrdersContent searchParams={searchParams} />;
+// This page will now be a Server Component to handle searchParams correctly.
+export default function PreOrdersPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+    return (
+      <React.Suspense fallback={<FullPageSpinner />}>
+        <PreOrdersContent searchParams={searchParams} />
+      </React.Suspense>
+    );
 }

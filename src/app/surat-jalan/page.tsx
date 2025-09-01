@@ -28,7 +28,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 
 
-function SuratJalanContent({ searchParams }: { searchParams: URLSearchParams }) {
+function SuratJalanContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const [orders, setOrders] = React.useState<PreOrder[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -41,7 +41,9 @@ function SuratJalanContent({ searchParams }: { searchParams: URLSearchParams }) 
             return;
         }
 
-        const ids = searchParams.get("ids")?.split(",");
+        const idsParam = searchParams?.ids;
+        const ids = typeof idsParam === 'string' ? idsParam.split(",") : [];
+
         if (!ids || ids.length === 0) {
             setOrders([]);
             setLoading(false);
@@ -200,10 +202,8 @@ function SuratJalanContent({ searchParams }: { searchParams: URLSearchParams }) 
   );
 }
 
-
-export default function SuratJalanPage() {
-  const searchParams = useSearchParams();
-
+// This page will now be a Server Component to handle searchParams correctly.
+export default function SuratJalanPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   return (
     <React.Suspense fallback={<FullPageSpinner />}>
       <SuratJalanContent searchParams={searchParams} />
