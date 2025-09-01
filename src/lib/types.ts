@@ -35,7 +35,7 @@ export type SparepartRequest = {
   id: string;
   requestNumber: string;
   itemName: string;
-  itemCode: string;
+  company: string;
   quantity: number;
   requester: string;
   requestDate: string;

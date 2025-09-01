@@ -75,7 +75,7 @@ type GroupedRequest = {
 type POItem = {
   id: number;
   itemName: string;
-  itemCode: string;
+  company: string;
   quantity: number | string;
 };
 
@@ -89,7 +89,7 @@ export default function ApprovalSparepartPage() {
   const [loading, setLoading] = React.useState(true);
 
   // State for Create PO Dialog
-  const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', itemCode: '', quantity: 1 }]);
+  const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
   const [requesterName, setRequesterName] = React.useState('');
   const [location, setLocation] = React.useState('Jakarta');
 
@@ -188,7 +188,7 @@ export default function ApprovalSparepartPage() {
   
   // Handlers for Create PO Dialog
   const handleAddItem = () => {
-    setPoItems([...poItems, { id: Date.now(), itemName: '', itemCode: '', quantity: 1 }]);
+    setPoItems([...poItems, { id: Date.now(), itemName: '', company: '', quantity: 1 }]);
   };
 
   const handleRemoveItem = (id: number) => {
@@ -202,14 +202,14 @@ export default function ApprovalSparepartPage() {
   const resetPoForm = () => {
     setRequesterName('');
     setLocation('Jakarta');
-    setPoItems([{ id: 1, itemName: '', itemCode: '', quantity: 1 }]);
+    setPoItems([{ id: 1, itemName: '', company: '', quantity: 1 }]);
   };
 
   const handleCreateRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db) return;
     
-    if (!requesterName.trim() || poItems.some(item => !item.itemName.trim() || !item.itemCode.trim() || Number(item.quantity) <= 0)) {
+    if (!requesterName.trim() || poItems.some(item => !item.itemName.trim() || !item.company.trim() || Number(item.quantity) <= 0)) {
       toast({ variant: "destructive", title: "Validation Error", description: "Please fill all required fields." });
       return;
     }
@@ -229,7 +229,7 @@ export default function ApprovalSparepartPage() {
         const newRequest: Omit<SparepartRequest, 'id'> = {
           requestNumber: formattedReqNum,
           itemName: item.itemName,
-          itemCode: item.itemCode,
+          company: item.company,
           quantity: Number(item.quantity),
           requester: `${requesterName} (${location})`,
           requestDate: new Date().toISOString(),
@@ -327,9 +327,9 @@ export default function ApprovalSparepartPage() {
                              <div className="space-y-3">
                                 {poItems.map((item, index) => (
                                     <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center">
-                                        <Input placeholder="Item Name" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
-                                        <Input placeholder="Item Code" value={item.itemCode} onChange={(e) => handleItemChange(item.id, 'itemCode', e.target.value)} />
-                                        <Input type="number" min="1" className="w-16" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
+                                        <Input placeholder="Name item" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
+                                        <Input placeholder="Company" value={item.company} onChange={(e) => handleItemChange(item.id, 'company', e.target.value)} />
+                                        <Input type="number" min="1" className="w-24" placeholder="qty request" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
                                         <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} disabled={poItems.length === 1}>
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </Button>
@@ -453,7 +453,7 @@ export default function ApprovalSparepartPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Item Name</TableHead>
-                        <TableHead>Item Code</TableHead>
+                        <TableHead>Company</TableHead>
                         <TableHead className="text-right">Quantity</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -461,7 +461,7 @@ export default function ApprovalSparepartPage() {
                       {selectedRequest.requests.map((order) => (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium">{order.itemName}</TableCell>
-                          <TableCell>{order.itemCode}</TableCell>
+                          <TableCell>{order.company}</TableCell>
                           <TableCell className="text-right">{order.quantity}</TableCell>
                         </TableRow>
                       ))}
