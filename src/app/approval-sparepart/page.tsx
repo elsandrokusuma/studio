@@ -267,7 +267,7 @@ export default function ApprovalSparepartPage() {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
-        const parsedData = results.data as { itemName: string; company: string; quantity: string }[];
+        const parsedData = results.data as { [key: string]: string }[];
         
         if (parsedData.length === 0) {
           toast({
@@ -278,12 +278,34 @@ export default function ApprovalSparepartPage() {
           return;
         }
 
-        const newItems = parsedData.map((row, index) => ({
-          id: Date.now() + index,
-          itemName: row.itemName || '',
-          company: row.company || '',
-          quantity: row.quantity || 1,
-        }));
+        const newItems = parsedData.map((row, index) => {
+            const findValue = (keys: string[]) => {
+                for (const key of keys) {
+                    if (row[key]) return row[key];
+                }
+                return '';
+            };
+            
+            const itemName = findValue(['itemName', 'item name', 'Name Item', 'nama barang']);
+            const company = findValue(['company', 'Company', 'perusahaan']);
+            const quantity = findValue(['quantity', 'qty', 'Quantity', 'jumlah']);
+
+            return {
+              id: Date.now() + index,
+              itemName: itemName,
+              company: company,
+              quantity: quantity || 1,
+            };
+        }).filter(item => item.itemName); // Only include items that have an item name
+        
+        if (newItems.length === 0) {
+            toast({
+              variant: 'destructive',
+              title: 'Invalid Data',
+              description: 'Could not find valid item data in the CSV. Make sure columns are named correctly (e.g., itemName, company, quantity).',
+            });
+            return;
+        }
         
         setPoItems(newItems);
 
