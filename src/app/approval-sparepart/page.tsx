@@ -10,8 +10,10 @@ import {
   doc,
   writeBatch,
   addDoc,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Papa from "papaparse";
 
 import {
   Card,
@@ -31,7 +33,9 @@ import {
     X,
     Eye,
     PlusCircle,
-    Trash2
+    Trash2,
+    Upload,
+    ChevronDown
 } from "lucide-react";
 import {
   Table,
@@ -51,6 +55,12 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import type { SparepartRequest } from "@/lib/types";
@@ -85,6 +95,7 @@ export default function ApprovalSparepartPage() {
   const [selectedRequest, setSelectedRequest] = React.useState<GroupedRequest | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
   const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
+  const [isImportOpen, setImportOpen] = React.useState(false);
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(true);
 
@@ -92,6 +103,10 @@ export default function ApprovalSparepartPage() {
   const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
   const [requesterName, setRequesterName] = React.useState('');
   const [location, setLocation] = React.useState('Jakarta');
+
+  // State for CSV import
+  const [csvFile, setCsvFile] = React.useState<File | null>(null);
+  const [isImporting, setIsImporting] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -248,6 +263,86 @@ export default function ApprovalSparepartPage() {
       toast({ variant: "destructive", title: "Failed to create request." });
     }
   };
+  
+  const handleImportCsv = async () => {
+    if (!csvFile) {
+        toast({ variant: "destructive", title: "No file selected" });
+        return;
+    }
+    if (!db) return;
+
+    setIsImporting(true);
+
+    Papa.parse(csvFile, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (results) => {
+            const newRequests = results.data as { itemName: string; company: string; quantity: string; requester: string; location: string }[];
+
+            if (!newRequests || newRequests.length === 0) {
+                toast({ variant: "destructive", title: "CSV is empty or invalid" });
+                setIsImporting(false);
+                return;
+            }
+
+            try {
+                const highestReqNum = allRequests
+                  .map(req => parseInt(req.requestNumber.replace('SP-', ''), 10))
+                  .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
+                
+                const newReqNum = highestReqNum + 1;
+                const formattedReqNum = `SP-${String(newReqNum).padStart(3, '0')}`;
+                
+                const batch = writeBatch(db);
+                newRequests.forEach(req => {
+                    if (typeof req !== 'object' || req === null || !req.itemName || !req.requester) {
+                      return; // Skip empty or invalid rows
+                    }
+                    const docRef = doc(collection(db, "sparepart-requests"));
+                    
+                    const newRequestData: Omit<SparepartRequest, 'id'> = {
+                        requestNumber: formattedReqNum,
+                        itemName: req.itemName || "",
+                        company: req.company || "",
+                        quantity: Number(req.quantity) || 0,
+                        requester: `${req.requester} (${req.location || 'Jakarta'})`,
+                        requestDate: new Date().toISOString(),
+                        status: 'Awaiting Approval'
+                    };
+
+                    batch.set(docRef, newRequestData);
+                });
+
+                await batch.commit();
+
+                toast({
+                    title: "Import Successful",
+                    description: `${newRequests.length} requests have been added with PO Number ${formattedReqNum}.`,
+                });
+
+                setImportOpen(false);
+                setCsvFile(null);
+            } catch (error) {
+                console.error("Error importing data: ", error);
+                toast({
+                    variant: "destructive",
+                    title: "Import Failed",
+                    description: "Could not write data to the database. Check console for details.",
+                });
+            } finally {
+                setIsImporting(false);
+            }
+        },
+        error: (error) => {
+            toast({
+                variant: "destructive",
+                title: "CSV Parsing Error",
+                description: error.message,
+            });
+            setIsImporting(false);
+        },
+    });
+  };
 
 
   const totalRequestsCount = new Set(allRequests.map(r => r.requestNumber)).size;
@@ -286,13 +381,30 @@ export default function ApprovalSparepartPage() {
             </p>
           </div>
         </div>
-        <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Create Request
-              </Button>
-            </DialogTrigger>
+        <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  Actions
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setCreatePoOpen(true)}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Request
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import from CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+
+      </header>
+      
+      <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create Sparepart Request</DialogTitle>
@@ -349,8 +461,31 @@ export default function ApprovalSparepartPage() {
               </form>
             </DialogContent>
           </Dialog>
-
-      </header>
+          
+           <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Import from CSV</DialogTitle>
+                <DialogDescription>
+                  Upload a CSV file to add sparepart requests in bulk. The file must have columns: `itemName`, `company`, `quantity`, `requester`, `location`.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                  <Label htmlFor="csv-file">CSV File</Label>
+                  <Input 
+                    id="csv-file" 
+                    type="file" 
+                    accept=".csv"
+                    onChange={(e) => setCsvFile(e.target.files ? e.target.files[0] : null)}
+                  />
+              </div>
+              <DialogFooter>
+                <Button onClick={handleImportCsv} disabled={!csvFile || isImporting}>
+                  {isImporting ? 'Importing...' : 'Import Data'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-1))' }}>
@@ -476,5 +611,3 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
-
-    
