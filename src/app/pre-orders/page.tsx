@@ -94,7 +94,7 @@ type GroupedPO = {
   expectedDate: string;
 };
 
-function PreOrdersContent() {
+function PreOrdersContent({ searchParams }: { searchParams: URLSearchParams }) {
   const [preOrders, setPreOrders] = React.useState<PreOrder[]>([]);
   const [inventoryItems, setInventoryItems] = React.useState<InventoryItem[]>([]);
   const [isCreateOpen, setCreateOpen] = React.useState(false);
@@ -105,7 +105,6 @@ function PreOrdersContent() {
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [dateFilter, setDateFilter] = React.useState<Date | undefined>(undefined);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [selectedUnit, setSelectedUnit] = React.useState<string | undefined>();
   const [poPrice, setPoPrice] = React.useState<number | string>("");
   const [activePoNumber, setActivePoNumber] = React.useState<string>("");
@@ -1039,11 +1038,6 @@ function PreOrdersContent() {
 }
 
 export default function PreOrdersPage() {
-    return (
-        <React.Suspense fallback={<FullPageSpinner />}>
-            <PreOrdersContent />
-        </React.Suspense>
-    )
+    const searchParams = useSearchParams();
+    return <PreOrdersContent searchParams={searchParams} />;
 }
-
-    

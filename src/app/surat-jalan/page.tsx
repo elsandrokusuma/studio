@@ -28,8 +28,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 
 
-function SuratJalanContent() {
-  const searchParams = useSearchParams();
+function SuratJalanContent({ searchParams }: { searchParams: URLSearchParams }) {
   const [orders, setOrders] = React.useState<PreOrder[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -203,9 +202,11 @@ function SuratJalanContent() {
 
 
 export default function SuratJalanPage() {
+  const searchParams = useSearchParams();
+
   return (
     <React.Suspense fallback={<FullPageSpinner />}>
-      <SuratJalanContent />
+      <SuratJalanContent searchParams={searchParams} />
     </React.Suspense>
   )
 }
