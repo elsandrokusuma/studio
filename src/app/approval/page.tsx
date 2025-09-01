@@ -165,7 +165,7 @@ export default function ApprovalPage() {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">Approval Queue</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Approval Stationery</h1>
         <p className="text-muted-foreground">
           Review and approve or reject pending pre-orders.
         </p>
