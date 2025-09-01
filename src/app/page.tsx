@@ -133,6 +133,7 @@ export default function DashboardPage() {
   const [isStockOutOpen, setStockOutOpen] = React.useState(false);
   const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
   const [selectedUnit, setSelectedUnit] = React.useState<string | undefined>();
+  const [activePoNumber, setActivePoNumber] = React.useState<string>("");
 
   // States for stock status dialog
   const [isStockStatusOpen, setStockStatusOpen] = React.useState(false);
@@ -295,6 +296,22 @@ export default function DashboardPage() {
     };
   }, []);
 
+  React.useEffect(() => {
+    const pendingPO = preOrders.find(po => po.status === 'Pending');
+    
+    if (pendingPO) {
+        setActivePoNumber(pendingPO.poNumber);
+    } else {
+        const highestPoNum = preOrders
+          .map(po => parseInt(po.poNumber.replace('POATK-', ''), 10))
+          .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
+        
+        const newPoNum = highestPoNum + 1;
+        const formattedPoNum = `POATK-${String(newPoNum).padStart(3, '0')}`;
+        setActivePoNumber(formattedPoNum);
+    }
+  }, [preOrders]);
+
   const addTransaction = async (
     transaction: Omit<Transaction, "id" | "date">
   ) => {
@@ -399,7 +416,7 @@ export default function DashboardPage() {
     }
 
     const newPreOrderData: Omit<PreOrder, "id"> = {
-      poNumber: formData.get("poNumber") as string,
+      poNumber: activePoNumber,
       itemId: selectedItem.id,
       itemName: selectedItem.name,
       price: Number(formData.get("price")),
@@ -1229,7 +1246,9 @@ export default function DashboardPage() {
                 id="poNumber"
                 name="poNumber"
                 className="col-span-3"
-                required
+                value={activePoNumber}
+                readOnly
+                disabled
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
