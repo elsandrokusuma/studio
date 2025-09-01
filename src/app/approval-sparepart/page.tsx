@@ -269,6 +269,7 @@ export default function ApprovalSparepartPage() {
           requestDate: new Date().toISOString(),
           status: 'Pending',
           itemStatus: 'Pending',
+          location: location,
         };
         batch.set(docRef, newRequest);
       });
@@ -376,7 +377,7 @@ export default function ApprovalSparepartPage() {
       }
 
       const requester = requests[0]?.requester || '';
-      const location = requestNumber.includes('-JKT-') ? 'Jakarta' : requestNumber.includes('-SBY-') ? 'Surabaya' : 'Unknown';
+      const location = requests[0]?.location || 'Unknown';
 
       return {
           requestNumber,

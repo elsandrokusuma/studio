@@ -42,6 +42,7 @@ export type SparepartRequest = {
   requestDate: string;
   status: 'Awaiting Approval' | 'Approved' | 'Rejected' | 'Pending';
   itemStatus?: 'Pending' | 'Approved' | 'Rejected';
+  location: string;
 };
 
     
