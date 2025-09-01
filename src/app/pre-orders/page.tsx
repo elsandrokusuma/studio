@@ -61,7 +61,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, MapPin } from "lucide-react";
 import type { PreOrder, InventoryItem } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -450,7 +450,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
 
   const handleSelectRow = (poNumber: string) => {
     setSelectedRows(prev =>
-      prev.includes(poNumber) ? prev.filter(rowId => rowId !== poNumber) : [...prev, poNumber]
+      prev.includes(poNumber) ? prev.filter(rowId => rowId !== poNumber) : [...prev, rowId]
     );
   };
   
@@ -732,26 +732,33 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                 openAccordion === po.poNumber && statusFilter !== "all"
                   ? po.orders.filter((order) => order.status === statusFilter)
                   : po.orders;
+               
+               const statusColor = {
+                'Pending': 'bg-yellow-500',
+                'Awaiting Approval': 'bg-yellow-500',
+                'Approved': 'bg-green-500',
+                'Fulfilled': 'bg-green-500',
+                'Rejected': 'bg-red-500',
+                'Cancelled': 'bg-red-500',
+               }[po.status] || 'bg-gray-500';
 
               return (
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
-                   <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary">
-                     <CardHeader className="p-4">
-                        <div className="flex items-center gap-4">
+                   <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
+                     <div className={cn("absolute left-0 top-0 h-full w-1.5", statusColor)}></div>
+                     <CardHeader className="p-4 pl-8">
+                        <div className="flex items-start gap-4">
                              <Checkbox
                               checked={selectedRows.includes(po.poNumber)}
                               onCheckedChange={() => handleSelectRow(po.poNumber)}
                               aria-label="Select PO"
                               disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
                             />
-                             <div className="p-3 bg-primary/10 rounded-lg">
-                               <Folder className="h-6 w-6 text-primary" />
+                             <div className="p-2 bg-primary/10 rounded-lg">
+                               <FileText className="h-5 w-5 text-primary" />
                              </div>
                             <div className="flex-grow">
-                                <div className="flex flex-col sm:flex-row justify-between">
-                                    <h3 className="font-semibold text-lg">{po.poNumber}</h3>
-                                    <div className="text-sm text-muted-foreground">{format(new Date(po.orderDate), "MMM d, yyyy")}</div>
-                                </div>
+                                <h3 className="font-semibold text-base">{po.poNumber}</h3>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Badge
                                         variant={
@@ -765,48 +772,49 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                                         po.status === 'Approved' ? 'bg-green-100 text-green-800' :
                                         po.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
                                         po.status === 'Rejected' || po.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                        po.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
+                                        po.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
                                         po.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
                                         }
                                     >
                                         {po.status}
                                     </Badge>
-                                    <span>•</span>
-                                    <span>{po.totalItems} {po.totalItems > 1 ? 'items' : 'item'}</span>
+                                    <span>• {po.totalQuantity} units</span>
                                 </div>
                             </div>
-                            <div className="text-right hidden sm:block">
-                                <div className="font-semibold text-lg">{formatCurrency(po.totalValue)}</div>
+                            <div className="text-right text-sm">
+                                <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy")}</div>
                             </div>
-                            <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button aria-haspopup="true" size="icon" variant="ghost">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
-                                  {(po.status === 'Approved' || po.status === 'Rejected') && (
-                                    <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
-                                      <Undo2 className="mr-2 h-4 w-4" />
-                                      Undo Decision
-                                    </DropdownMenuItem>
-                                  )}
-                                  {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                            <div className="flex items-center">
+                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">Toggle menu</span>
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                      {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
+                                      {(po.status === 'Approved' || po.status === 'Rejected') && (
+                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
+                                          <Undo2 className="mr-2 h-4 w-4" />
+                                          Undo Decision
+                                        </DropdownMenuItem>
+                                      )}
+                                      {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                            </div>
                         </div>
                      </CardHeader>
                     <AccordionContent>
-                      <CardContent className="p-4 pt-0">
+                      <CardContent className="p-4 pt-0 pl-8">
                         <div className="overflow-x-auto">
                           <Table>
                             <TableHeader>
