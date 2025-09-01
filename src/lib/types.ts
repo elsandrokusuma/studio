@@ -1,3 +1,4 @@
+
 export type InventoryItem = {
   id: string;
   name: string;
@@ -45,4 +46,15 @@ export type SparepartRequest = {
   location: string;
 };
 
-    
+export type SparepartOrder = {
+  id: string;
+  requestNumber: string;
+  requester: string;
+  location: string;
+  requestDate: string;
+  items: {
+    itemName: string;
+    company: string;
+    quantity: number;
+  }[];
+};

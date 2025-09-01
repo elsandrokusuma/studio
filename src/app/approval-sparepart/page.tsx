@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   collection,
   query,
@@ -43,6 +44,7 @@ import {
     MoreHorizontal,
     Pencil,
     MapPin,
+    FileDown,
 } from "lucide-react";
 import {
   Table,
@@ -124,6 +126,7 @@ export default function ApprovalSparepartPage() {
   const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(true);
+  const router = useRouter();
 
   // State for Create PO Dialog
   const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
@@ -470,6 +473,45 @@ export default function ApprovalSparepartPage() {
   
   const isAllSelected = selectedRows.length > 0 && selectedRows.length === filteredRequests.length;
 
+  const handleExportPdf = () => {
+    if (selectedRows.length === 0) {
+      toast({ variant: "destructive", title: "No POs selected to export" });
+      return;
+    }
+    const selectedRequests = allRequests.filter(req => selectedRows.includes(req.requestNumber));
+    const ids = selectedRequests.map(req => req.id).join(',');
+    router.push(`/sparepart-order?ids=${ids}`);
+  };
+
+  const handleExportCsv = () => {
+    if (selectedRows.length === 0) {
+      toast({ variant: "destructive", title: "No POs selected to export" });
+      return;
+    }
+    const dataToExport = allRequests
+      .filter(req => selectedRows.includes(req.requestNumber))
+      .map(req => ({
+        'Request Number': req.requestNumber,
+        'Item Name': req.itemName,
+        'Company': req.company,
+        'Quantity': req.quantity,
+        'Revised Quantity': req.revisedQuantity ?? '-',
+        'Requester': req.requester,
+        'Location': req.location,
+        'Request Date': format(new Date(req.requestDate), "yyyy-MM-dd"),
+        'Item Status': req.itemStatus,
+      }));
+    
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "sparepart_requests_export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   if (loading) {
     return <FullPageSpinner />;
@@ -499,87 +541,103 @@ export default function ApprovalSparepartPage() {
             {totalRequestsCount} PO groups • {totalLineItems} line items
           </p>
         </div>
-        <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Create Request
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle>Create Sparepart Request</DialogTitle>
-                <DialogDescription>
-                  Fill in the details to create a new sparepart request. You can also import items from a CSV file.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleCreateRequest}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 py-4">
-                    <div className="space-y-4">
-                        <div>
-                            <Label htmlFor="requesterName">Requester Name</Label>
-                            <Input id="requesterName" placeholder="e.g. John Doe" value={requesterName} onChange={(e) => setRequesterName(e.target.value)} />
-                        </div>
-                        <div>
-                            <Label>Location</Label>
-                             <RadioGroup defaultValue="Jakarta" className="flex items-center gap-4 pt-2" value={location} onValueChange={setLocation}>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Jakarta" id="jakarta" />
-                                    <Label htmlFor="jakarta">Jakarta</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Surabaya" id="surabaya" />
-                                    <Label htmlFor="surabaya">Surabaya</Label>
-                                </div>
-                            </RadioGroup>
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                         <div className="flex justify-between items-center">
-                            <Label>Items</Label>
-                             <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => fileInputRef.current?.click()}
-                              >
-                                <Upload className="mr-2 h-4 w-4" />
-                                Import from File
-                              </Button>
-                              <Input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept=".csv"
-                                onChange={handleFileSelect}
-                              />
-                         </div>
-                        <ScrollArea className="h-48 w-full rounded-md border p-2">
-                             <div className="space-y-3">
-                                {poItems.map((item) => (
-                                    <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center">
-                                        <Input placeholder="Name item" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
-                                        <Input placeholder="Company" value={item.company} onChange={(e) => handleItemChange(item.id, 'company', e.target.value)} />
-                                        <Input type="number" min="1" className="w-24" placeholder="Qty" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} disabled={poItems.length === 1}>
-                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                        </Button>
-                                    </div>
-                                ))}
+        <div className="flex items-center gap-2">
+            {selectedRows.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={handleExportCsv}>Export as CSV</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={handleExportPdf}>Export as PDF</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create Request
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Create Sparepart Request</DialogTitle>
+                    <DialogDescription>
+                      Fill in the details to create a new sparepart request. You can also import items from a CSV file.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateRequest}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 py-4">
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="requesterName">Requester Name</Label>
+                                <Input id="requesterName" placeholder="e.g. John Doe" value={requesterName} onChange={(e) => setRequesterName(e.target.value)} />
                             </div>
-                        </ScrollArea>
-                        <Button type="button" variant="outline" className="w-full" onClick={handleAddItem}>
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Item
-                        </Button>
+                            <div>
+                                <Label>Location</Label>
+                                 <RadioGroup defaultValue="Jakarta" className="flex items-center gap-4 pt-2" value={location} onValueChange={setLocation}>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="Jakarta" id="jakarta" />
+                                        <Label htmlFor="jakarta">Jakarta</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="Surabaya" id="surabaya" />
+                                        <Label htmlFor="surabaya">Surabaya</Label>
+                                    </div>
+                                </RadioGroup>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                             <div className="flex justify-between items-center">
+                                <Label>Items</Label>
+                                 <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => fileInputRef.current?.click()}
+                                  >
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Import from File
+                                  </Button>
+                                  <Input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept=".csv"
+                                    onChange={handleFileSelect}
+                                  />
+                             </div>
+                            <ScrollArea className="h-48 w-full rounded-md border p-2">
+                                 <div className="space-y-3">
+                                    {poItems.map((item) => (
+                                        <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center">
+                                            <Input placeholder="Name item" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
+                                            <Input placeholder="Company" value={item.company} onChange={(e) => handleItemChange(item.id, 'company', e.target.value)} />
+                                            <Input type="number" min="1" className="w-24" placeholder="Qty" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} disabled={poItems.length === 1}>
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                            <Button type="button" variant="outline" className="w-full" onClick={handleAddItem}>
+                                <PlusCircle className="mr-2 h-4 w-4" /> Add Item
+                            </Button>
+                        </div>
                     </div>
-                </div>
-                 <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={() => { setCreatePoOpen(false); resetPoForm(); }}>Cancel</Button>
-                    <Button type="submit">Create Request</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                     <DialogFooter>
+                        <Button type="button" variant="ghost" onClick={() => { setCreatePoOpen(false); resetPoForm(); }}>Cancel</Button>
+                        <Button type="submit">Create Request</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+        </div>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -853,5 +911,3 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
-
-    
