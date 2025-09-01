@@ -10,6 +10,7 @@ import {
   doc,
   writeBatch,
   getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Papa from "papaparse";
@@ -39,6 +40,8 @@ import {
     Search,
     Calendar as CalendarIcon,
     MoreHorizontal,
+    Pencil,
+    MapPin,
 } from "lucide-react";
 import {
   Table,
@@ -94,6 +97,7 @@ type GroupedRequest = {
   status: SparepartRequest['status'];
   requester: string;
   requestDate: string;
+  location: string;
 };
 
 type POItem = {
@@ -121,6 +125,11 @@ export default function ApprovalSparepartPage() {
   const [dateFilter, setDateFilter] = React.useState<Date | undefined>();
   const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
   const [openAccordion, setOpenAccordion] = React.useState<string | undefined>();
+  
+  // States for editing individual items
+  const [isEditItemOpen, setEditItemOpen] = React.useState(false);
+  const [selectedOrderItem, setSelectedOrderItem] = React.useState<SparepartRequest | null>(null);
+  const [revisedQuantity, setRevisedQuantity] = React.useState<number | string>('');
 
 
   React.useEffect(() => {
@@ -152,30 +161,54 @@ export default function ApprovalSparepartPage() {
     };
   }, [toast]);
   
-  const handleDecision = async (req: GroupedRequest, decision: "approved" | "rejected") => {
+  const handleItemDecision = async (item: SparepartRequest, decision: 'Approved' | 'Rejected') => {
     if (!db) return;
-    const newStatus = decision === "approved" ? "Approved" : "Rejected";
-    
-    try {
-        const batch = writeBatch(db);
-        req.requests.forEach(order => {
-            if (!db) return;
-            const orderRef = doc(db, "sparepart-requests", order.id);
-            batch.update(orderRef, { status: newStatus });
-        });
-        await batch.commit();
 
-        toast({
-          title: `Request ${decision}`,
-          description: `The request ${req.requestNumber} has been ${decision}.`,
-        });
+    try {
+        const itemRef = doc(db, "sparepart-requests", item.id);
+        await updateDoc(itemRef, { itemStatus: decision });
         
+        toast({
+          title: `Item ${decision}`,
+          description: `Item ${item.itemName} has been ${decision}.`,
+        });
+
     } catch(error) {
-        console.error("Failed to update request status", error);
+        console.error("Failed to update item status", error);
         toast({
             variant: "destructive",
-            title: "Error updating request status",
+            title: "Error updating item status",
         });
+    }
+  };
+
+  const handleEditItem = (item: SparepartRequest) => {
+    setSelectedOrderItem(item);
+    setRevisedQuantity(item.revisedQuantity || item.quantity);
+    setEditItemOpen(true);
+  };
+  
+  const handleSaveRevisedQuantity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrderItem || !db) return;
+    
+    const newQuantity = Number(revisedQuantity);
+    if (isNaN(newQuantity) || newQuantity < 0) {
+      toast({ variant: "destructive", title: "Invalid Quantity", description: "Please enter a valid number." });
+      return;
+    }
+
+    try {
+      const itemRef = doc(db, "sparepart-requests", selectedOrderItem.id);
+      await updateDoc(itemRef, { revisedQuantity: newQuantity });
+      
+      toast({ title: "Quantity Revised", description: `Quantity for ${selectedOrderItem.itemName} updated.` });
+      setEditItemOpen(false);
+      setSelectedOrderItem(null);
+      setRevisedQuantity('');
+    } catch (error) {
+      console.error("Failed to revise quantity", error);
+      toast({ variant: "destructive", title: "Error revising quantity" });
     }
   };
   
@@ -215,11 +248,12 @@ export default function ApprovalSparepartPage() {
       });
       
       const highestReqNum = existingRequests
-          .map(req => parseInt(req.requestNumber.replace('SP-', ''), 10))
+          .map(req => parseInt(req.requestNumber.split('-')[2], 10))
           .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
         
       const newReqNum = highestReqNum + 1;
-      const formattedReqNum = `SP-${String(newReqNum).padStart(3, '0')}`;
+      const locationPrefix = location === 'Jakarta' ? 'JKT' : 'SBY';
+      const formattedReqNum = `PO-${locationPrefix}-${String(newReqNum).padStart(3, '0')}`;
 
       const batch = writeBatch(db);
 
@@ -230,9 +264,10 @@ export default function ApprovalSparepartPage() {
           itemName: item.itemName,
           company: item.company,
           quantity: Number(item.quantity),
-          requester: `${requesterName} (${location})`,
+          requester: requesterName,
           requestDate: new Date().toISOString(),
-          status: 'Awaiting Approval'
+          status: 'Pending',
+          itemStatus: 'Pending',
         };
         batch.set(docRef, newRequest);
       });
@@ -328,15 +363,31 @@ export default function ApprovalSparepartPage() {
         groups[order.requestNumber].push(order);
     });
 
-    return Object.entries(groups).map(([requestNumber, requests]) => ({
-        requestNumber,
-        requests,
-        totalItems: requests.length,
-        totalQuantity: requests.reduce((sum, item) => sum + item.quantity, 0),
-        status: requests[0].status,
-        requester: requests[0].requester,
-        requestDate: requests[0].requestDate,
-    })).filter(req => req.requests.length > 0);
+    return Object.entries(groups).map(([requestNumber, requests]) => {
+      const allApproved = requests.every(r => r.itemStatus === 'Approved');
+      const anyRejected = requests.some(r => r.itemStatus === 'Rejected');
+      let overallStatus: SparepartRequest['status'] = 'Pending';
+
+      if (allApproved) {
+        overallStatus = 'Approved';
+      } else if (anyRejected) {
+        overallStatus = 'Rejected';
+      }
+
+      const requester = requests[0]?.requester || '';
+      const location = requestNumber.includes('-JKT-') ? 'Jakarta' : requestNumber.includes('-SBY-') ? 'Surabaya' : 'Unknown';
+
+      return {
+          requestNumber,
+          requests,
+          totalItems: requests.length,
+          totalQuantity: requests.reduce((sum, item) => sum + (item.revisedQuantity ?? item.quantity), 0),
+          status: overallStatus,
+          requester,
+          requestDate: requests[0].requestDate,
+          location: location
+      }
+    }).filter(req => req.requests.length > 0);
   }, [allRequests]);
   
   const filteredRequests = React.useMemo(() => {
@@ -356,7 +407,7 @@ export default function ApprovalSparepartPage() {
 
   const totalRequestsCount = new Set(allRequests.map(r => r.requestNumber)).size;
   const totalLineItems = allRequests.length;
-  const pendingCount = groupedRequests.filter(g => g.status === 'Awaiting Approval').length;
+  const pendingCount = groupedRequests.filter(g => g.status === 'Pending').length;
   
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -484,13 +535,12 @@ export default function ApprovalSparepartPage() {
               </form>
             </DialogContent>
           </Dialog>
-
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-1))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+            <CardTitle className="text-sm font-medium">Total POs</CardTitle>
             <Folder className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -523,7 +573,7 @@ export default function ApprovalSparepartPage() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search PO, item, or company..."
+              placeholder="Search PO or item..."
               className="pl-8 w-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -531,13 +581,21 @@ export default function ApprovalSparepartPage() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Awaiting Approval">Awaiting Approval</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
               <SelectItem value="Approved">Approved</SelectItem>
               <SelectItem value="Rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="All Time" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all-time">All Time</SelectItem>
             </SelectContent>
           </Select>
           <Popover>
@@ -564,88 +622,106 @@ export default function ApprovalSparepartPage() {
         <Accordion type="single" collapsible className="w-full space-y-4" value={openAccordion} onValueChange={setOpenAccordion}>
           {filteredRequests.map((req) => (
              <AccordionItem value={req.requestNumber} key={req.requestNumber} className="border-0">
-                <Card data-state={selectedRows.includes(req.requestNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary">
-                    <CardHeader className="p-4">
-                        <div className="flex items-center gap-4">
+                <Card data-state={selectedRows.includes(req.requestNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
+                    <div className={cn("absolute left-0 top-0 h-full w-1.5", 
+                        req.status === 'Approved' ? 'bg-green-500' :
+                        req.status === 'Rejected' ? 'bg-red-500' :
+                        'bg-yellow-500'
+                    )}></div>
+                    <CardHeader className="p-4 pl-8">
+                        <div className="flex items-start gap-4">
                             <Checkbox
                                 checked={selectedRows.includes(req.requestNumber)}
                                 onCheckedChange={() => handleSelectRow(req.requestNumber)}
                                 aria-label={`Select request ${req.requestNumber}`}
                             />
-                            <div className="p-3 bg-primary/10 rounded-lg">
-                                <Folder className="h-6 w-6 text-primary" />
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <FileText className="h-5 w-5 text-primary" />
                             </div>
                             <div className="flex-grow">
-                                <div className="flex flex-col sm:flex-row justify-between">
-                                    <h3 className="font-semibold text-lg">{req.requestNumber}</h3>
-                                     <div className="text-sm text-muted-foreground">{format(new Date(req.requestDate), "MMM d, yyyy")}</div>
-                                </div>
-                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <h3 className="font-semibold text-base">{req.requestNumber}</h3>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Badge variant={req.status === 'Approved' ? 'default' : req.status === 'Rejected' ? 'destructive' : 'warning'} className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
                                         {req.status}
                                     </Badge>
-                                    <span>•</span>
-                                    <span>{req.totalItems} {req.totalItems > 1 ? 'items' : 'item'}</span>
-                                    <span className="hidden sm:inline">• by {req.requester}</span>
+                                    <span>• {req.totalQuantity} units</span>
+                                    <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
                                 </div>
                             </div>
-                             <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {req.status === "Awaiting Approval" && (
-                                    <>
-                                        <DropdownMenuItem className="text-green-600 focus:text-green-700" onClick={() => handleDecision(req, "approved")}>
-                                            <Check className="mr-2 h-4 w-4" /> Approve
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className="text-red-600 focus:text-red-700" onClick={() => handleDecision(req, "rejected")}>
-                                            <X className="mr-2 h-4 w-4" /> Reject
-                                        </DropdownMenuItem>
-                                    </>
-                                )}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="text-right text-sm">
+                                <div className="font-medium">{format(new Date(req.requestDate), "MMMM dd, yyyy")}</div>
+                                <div className="text-muted-foreground">Req: {req.requester}</div>
+                            </div>
+                            <div className="flex items-center">
+                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem>Mark as Approved</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </CardHeader>
                     <AccordionContent>
-                        <CardContent className="p-4 pt-0">
+                        <CardContent className="p-4 pt-0 pl-8">
                              <Table>
                                 <TableHeader>
                                   <TableRow>
                                     <TableHead>Item Name</TableHead>
                                     <TableHead>Company</TableHead>
-                                    <TableHead className="text-right">Quantity</TableHead>
+                                    <TableHead>Qty Request</TableHead>
+                                    <TableHead>Revisi Qty Request</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="w-[50px]"><span className="sr-only">Actions</span></TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                  {req.requests.map((order) => (
-                                    <TableRow key={order.id}>
-                                      <TableCell className="font-medium">{order.itemName}</TableCell>
-                                      <TableCell>{order.company}</TableCell>
-                                      <TableCell className="text-right">{order.quantity}</TableCell>
+                                  {req.requests.map((item) => (
+                                    <TableRow key={item.id}>
+                                      <TableCell className="font-medium">{item.itemName}</TableCell>
+                                      <TableCell>{item.company}</TableCell>
+                                      <TableCell>{item.quantity}</TableCell>
+                                      <TableCell>{item.revisedQuantity ?? '-'}</TableCell>
+                                      <TableCell>
+                                        <Badge variant={
+                                            item.itemStatus === 'Approved' ? 'default' :
+                                            item.itemStatus === 'Rejected' ? 'destructive' :
+                                            'warning'
+                                        } className={item.itemStatus === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
+                                          {item.itemStatus || 'Pending'}
+                                        </Badge>
+                                      </TableCell>
+                                      <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => handleEditItem(item)}>
+                                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-green-600 focus:text-green-700" onClick={() => handleItemDecision(item, "Approved")}>
+                                                <Check className="mr-2 h-4 w-4" /> Approve
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-600 focus:text-red-700" onClick={() => handleItemDecision(item, "Rejected")}>
+                                                <X className="mr-2 h-4 w-4" /> Reject
+                                            </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                      </TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
                               </Table>
                         </CardContent>
-                         <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
-                           <div className="flex items-center gap-2">
-                             <p className="text-muted-foreground">Requester:</p>
-                             <p className="font-medium">{req.requester}</p>
-                           </div>
-                           <div className="flex items-center gap-2">
-                             <Boxes className="h-4 w-4 text-muted-foreground" />
-                             <div>
-                                <p className="text-muted-foreground text-xs">Total Quantity</p>
-                                <p className="font-medium">{req.totalQuantity} units</p>
-                             </div>
-                          </div>
-                      </CardFooter>
                     </AccordionContent>
                 </Card>
              </AccordionItem>
@@ -666,6 +742,41 @@ export default function ApprovalSparepartPage() {
           </div>
         </div>
       )}
+
+      {/* Edit Item Dialog */}
+      <Dialog open={isEditItemOpen} onOpenChange={setEditItemOpen}>
+        <DialogContent>
+            <DialogHeader>
+            <DialogTitle>Edit Quantity: {selectedOrderItem?.itemName}</DialogTitle>
+            <DialogDescription>
+                Revise the quantity for this item. The original request will be preserved.
+            </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSaveRevisedQuantity}>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="revised-quantity" className="text-right">
+                    Revised Quantity
+                </Label>
+                <Input
+                    id="revised-quantity"
+                    type="number"
+                    min="0"
+                    className="col-span-3"
+                    value={revisedQuantity}
+                    onChange={(e) => setRevisedQuantity(e.target.value)}
+                    required
+                />
+                </div>
+            </div>
+            <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditItemOpen(false)}>Cancel</Button>
+                <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+            </form>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
