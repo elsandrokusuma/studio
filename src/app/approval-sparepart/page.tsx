@@ -303,7 +303,7 @@ export default function ApprovalSparepartPage() {
                 const formattedReqNum = `SP-${String(newReqNum).padStart(3, '0')}`;
                 
                 const batch = writeBatch(db);
-                const validNewRequests = newRequests.filter(req => typeof req === 'object' && req !== null && req.itemName && req.requester);
+                const validNewRequests = newRequests.filter(req => typeof req === 'object' && req !== null && req.itemName);
 
                 validNewRequests.forEach(req => {
                     const docRef = doc(collection(db, "sparepart-requests"));
@@ -313,7 +313,7 @@ export default function ApprovalSparepartPage() {
                         itemName: req.itemName || "",
                         company: req.company || "",
                         quantity: Number(req.quantity) || 0,
-                        requester: `${req.requester} (${req.location || 'Jakarta'})`,
+                        requester: `${req.requester || 'N/A'} (${req.location || 'Jakarta'})`,
                         requestDate: new Date().toISOString(),
                         status: 'Awaiting Approval'
                     };
