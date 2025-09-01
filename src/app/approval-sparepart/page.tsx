@@ -87,6 +87,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 
 type GroupedRequest = {
@@ -622,7 +623,7 @@ export default function ApprovalSparepartPage() {
         <Accordion type="single" collapsible className="w-full space-y-4" value={openAccordion} onValueChange={setOpenAccordion}>
           {filteredRequests.map((req) => (
              <AccordionItem value={req.requestNumber} key={req.requestNumber} className="border-0">
-                <Card data-state={selectedRows.includes(req.requestNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
+                <Card data-state={selectedRows.includes(req.requestNumber) ? "selected" : "unselected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
                     <div className={cn("absolute left-0 top-0 h-full w-1.5", 
                         req.status === 'Approved' ? 'bg-green-500' :
                         req.status === 'Rejected' ? 'bg-red-500' :
