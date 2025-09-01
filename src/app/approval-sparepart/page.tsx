@@ -475,11 +475,23 @@ export default function ApprovalSparepartPage() {
 
   const handleExportPdf = () => {
     if (selectedRows.length === 0) {
-      toast({ variant: "destructive", title: "No POs selected to export" });
-      return;
+        toast({ variant: "destructive", title: "No POs selected to export" });
+        return;
     }
-    const selectedRequests = allRequests.filter(req => selectedRows.includes(req.requestNumber));
-    const ids = selectedRequests.map(req => req.id).join(',');
+    const selectedApprovedRequests = allRequests.filter(req => 
+        selectedRows.includes(req.requestNumber) && req.itemStatus === 'Approved'
+    );
+
+    if (selectedApprovedRequests.length === 0) {
+        toast({
+            variant: "destructive",
+            title: "No approved items to export",
+            description: "Please select POs that contain approved items.",
+        });
+        return;
+    }
+
+    const ids = selectedApprovedRequests.map(req => req.id).join(',');
     router.push(`/sparepart-order?ids=${ids}`);
   };
 

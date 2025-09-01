@@ -184,9 +184,9 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
                 <Table>
                     <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[50%]">Nama Barang</TableHead>
+                        <TableHead className="w-[50%]">Item Name</TableHead>
                         <TableHead>Company</TableHead>
-                        <TableHead className="text-right">Jumlah</TableHead>
+                        <TableHead className="text-right">Quantity</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
