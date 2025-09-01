@@ -602,14 +602,18 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
             )}
            </div>
           
-          <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
-            <Send className="mr-2 h-4 w-4" />
-            Request Approval
-          </Button>
-           <Button onClick={handleExportPdf} disabled={!canExport}>
-            <FileDown className="mr-2 h-4 w-4" />
-            Export
-          </Button>
+          {selectedRows.length > 0 && (
+            <>
+              <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
+                <Send className="mr-2 h-4 w-4" />
+                Request Approval
+              </Button>
+              <Button onClick={handleExportPdf} disabled={!canExport}>
+                <FileDown className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </>
+          )}
 
           <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName("Select an item..."); setPoPrice("")} }}>
             <DialogTrigger asChild>
