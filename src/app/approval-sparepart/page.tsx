@@ -9,7 +9,6 @@ import {
   onSnapshot,
   doc,
   writeBatch,
-  addDoc,
   getDocs,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -45,7 +44,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +51,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -230,7 +227,13 @@ export default function ApprovalSparepartPage() {
     }
 
     try {
-      const highestReqNum = allRequests
+      const querySnapshot = await getDocs(query(collection(db, "sparepart-requests")));
+      const existingRequests: SparepartRequest[] = [];
+      querySnapshot.forEach((doc) => {
+        existingRequests.push(doc.data() as SparepartRequest);
+      });
+      
+      const highestReqNum = existingRequests
           .map(req => parseInt(req.requestNumber.replace('SP-', ''), 10))
           .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
         
@@ -286,7 +289,13 @@ export default function ApprovalSparepartPage() {
             }
 
             try {
-                const highestReqNum = allRequests
+                const querySnapshot = await getDocs(query(collection(db, "sparepart-requests")));
+                const existingRequests: SparepartRequest[] = [];
+                querySnapshot.forEach((doc) => {
+                  existingRequests.push(doc.data() as SparepartRequest);
+                });
+
+                const highestReqNum = existingRequests
                   .map(req => parseInt(req.requestNumber.replace('SP-', ''), 10))
                   .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
                 
@@ -294,10 +303,9 @@ export default function ApprovalSparepartPage() {
                 const formattedReqNum = `SP-${String(newReqNum).padStart(3, '0')}`;
                 
                 const batch = writeBatch(db);
-                newRequests.forEach(req => {
-                    if (typeof req !== 'object' || req === null || !req.itemName || !req.requester) {
-                      return; // Skip empty or invalid rows
-                    }
+                const validNewRequests = newRequests.filter(req => typeof req === 'object' && req !== null && req.itemName && req.requester);
+
+                validNewRequests.forEach(req => {
                     const docRef = doc(collection(db, "sparepart-requests"));
                     
                     const newRequestData: Omit<SparepartRequest, 'id'> = {
@@ -317,7 +325,7 @@ export default function ApprovalSparepartPage() {
 
                 toast({
                     title: "Import Successful",
-                    description: `${newRequests.length} requests have been added with PO Number ${formattedReqNum}.`,
+                    description: `${validNewRequests.length} requests have been added with PO Number ${formattedReqNum}.`,
                 });
 
                 setImportOpen(false);
