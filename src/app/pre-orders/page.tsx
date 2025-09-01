@@ -750,9 +750,9 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
                    <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
                      <div className={cn("absolute left-0 top-0 h-full w-1.5", statusColor)}></div>
-                     <CardHeader className="p-4 pl-8">
-                       <div className="grid grid-cols-[auto_1fr_auto] sm:flex sm:items-start gap-4">
-                          <div className="flex items-center pt-1 sm:pt-0">
+                      <CardHeader className="p-4 pl-8">
+                        <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
+                          <div className="flex items-center self-start pt-1">
                             <Checkbox
                                 checked={selectedRows.includes(po.poNumber)}
                                 onCheckedChange={() => handleSelectRow(po.poNumber)}
@@ -760,13 +760,13 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                                 disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
                               />
                           </div>
-                          <div className="flex items-start gap-4">
+                          <div className="flex-grow flex items-start gap-4">
                             <div className="p-2 bg-primary/10 rounded-lg">
                                <FileText className="h-5 w-5 text-primary" />
                             </div>
                             <div className="flex-grow">
                                 <h3 className="font-semibold text-base">{po.poNumber}</h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
                                     <Badge
                                         variant={
                                         po.status === 'Approved' ? 'default' :
@@ -789,11 +789,11 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                                 </div>
                             </div>
                           </div>
-                          <div className="col-start-2 sm:col-auto text-left sm:text-right text-sm">
+                          <div className="text-left sm:text-right text-sm ml-auto sm:ml-0 whitespace-nowrap">
                               <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy")}</div>
                               <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                           </div>
-                          <div className="col-start-3 row-start-1 sm:col-auto sm:row-auto flex items-center justify-end">
+                          <div className="flex items-center">
                               <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
