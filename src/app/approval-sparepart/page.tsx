@@ -11,6 +11,7 @@ import {
   writeBatch,
   getDocs,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Papa from "papaparse";
@@ -60,6 +61,16 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Accordion,
   AccordionContent,
@@ -131,6 +142,10 @@ export default function ApprovalSparepartPage() {
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = React.useState<SparepartRequest | null>(null);
   const [revisedQuantity, setRevisedQuantity] = React.useState<number | string>('');
+  
+  // States for deleting a PO
+  const [isDeleteOpen, setDeleteOpen] = React.useState(false);
+  const [selectedPo, setSelectedPo] = React.useState<GroupedRequest | null>(null);
 
 
   React.useEffect(() => {
@@ -356,6 +371,34 @@ export default function ApprovalSparepartPage() {
     }
   };
   
+   const handleDeleteRequest = async () => {
+    if (!selectedPo || !db) return;
+    
+    try {
+      const batch = writeBatch(db);
+      selectedPo.requests.forEach(request => {
+        const docRef = doc(db, "sparepart-requests", request.id);
+        batch.delete(docRef);
+      });
+      await batch.commit();
+
+      toast({
+        title: "Request Deleted",
+        description: `Request ${selectedPo.requestNumber} has been deleted.`,
+      });
+
+    } catch (error) {
+      console.error("Error deleting request:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to delete request.",
+      });
+    } finally {
+      setDeleteOpen(false);
+      setSelectedPo(null);
+    }
+  };
+
   const groupedRequests = React.useMemo(() => {
     const groups: { [key: string]: SparepartRequest[] } = {};
     allRequests.forEach(order => {
@@ -663,8 +706,19 @@ export default function ApprovalSparepartPage() {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuItem>Mark as Approved</DropdownMenuItem>
+                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                        <DropdownMenuItem>Mark as Approved</DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                            className="text-red-600 focus:text-red-700"
+                                            onSelect={() => {
+                                            setSelectedPo(req);
+                                            setDeleteOpen(true);
+                                            }}
+                                        >
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            Delete
+                                        </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
@@ -778,7 +832,26 @@ export default function ApprovalSparepartPage() {
             </form>
         </DialogContent>
       </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the request{' '}
+              <span className="font-semibold">{selectedPo?.requestNumber}</span> and all its items.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedPo(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteRequest}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );
 }
+
+    
