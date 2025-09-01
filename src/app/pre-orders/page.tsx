@@ -751,16 +751,19 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                    <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
                      <div className={cn("absolute left-0 top-0 h-full w-1.5", statusColor)}></div>
                      <CardHeader className="p-4 pl-8">
-                        <div className="flex items-start gap-4">
-                             <Checkbox
-                              checked={selectedRows.includes(po.poNumber)}
-                              onCheckedChange={() => handleSelectRow(po.poNumber)}
-                              aria-label="Select PO"
-                              disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
-                            />
-                             <div className="p-2 bg-primary/10 rounded-lg">
+                       <div className="grid grid-cols-[auto_1fr_auto] sm:flex sm:items-start gap-4">
+                          <div className="flex items-center pt-1 sm:pt-0">
+                            <Checkbox
+                                checked={selectedRows.includes(po.poNumber)}
+                                onCheckedChange={() => handleSelectRow(po.poNumber)}
+                                aria-label="Select PO"
+                                disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
+                              />
+                          </div>
+                          <div className="flex items-start gap-4">
+                            <div className="p-2 bg-primary/10 rounded-lg">
                                <FileText className="h-5 w-5 text-primary" />
-                             </div>
+                            </div>
                             <div className="flex-grow">
                                 <h3 className="font-semibold text-base">{po.poNumber}</h3>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -785,37 +788,38 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                                     <span>• {po.totalQuantity} units</span>
                                 </div>
                             </div>
-                            <div className="text-right text-sm">
-                                <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy")}</div>
-                                <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
-                            </div>
-                            <div className="flex items-center">
-                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Toggle menu</span>
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
-                                      {(po.status === 'Approved' || po.status === 'Rejected') && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
-                                          <Undo2 className="mr-2 h-4 w-4" />
-                                          Undo Decision
-                                        </DropdownMenuItem>
-                                      )}
-                                      {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
-                                      <DropdownMenuSeparator />
-                                      <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete
+                          </div>
+                          <div className="col-start-2 sm:col-auto text-left sm:text-right text-sm">
+                              <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy")}</div>
+                              <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
+                          </div>
+                          <div className="col-start-3 row-start-1 sm:col-auto sm:row-auto flex items-center justify-end">
+                              <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                      <span className="sr-only">Toggle menu</span>
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
+                                    {(po.status === 'Approved' || po.status === 'Rejected') && (
+                                      <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
+                                        <Undo2 className="mr-2 h-4 w-4" />
+                                        Undo Decision
                                       </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                            </div>
+                                    )}
+                                    {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                          </div>
                         </div>
                      </CardHeader>
                     <AccordionContent>
