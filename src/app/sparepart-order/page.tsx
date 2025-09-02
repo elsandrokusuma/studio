@@ -165,12 +165,12 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
                 <header className="mb-12">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h2 className="text-2xl font-bold text-primary">SPAREPART ORDER</h2>
+                        <h2 className="text-2xl font-bold text-primary">SURAT JALAN</h2>
                         <p className="text-muted-foreground">{orderGroup.requestNumber}</p>
                     </div>
                     <div className="text-right">
-                        <h3 className="font-bold text-lg">Stationery Inventory</h3>
-                        <p className="text-sm text-muted-foreground">{orderGroup.location}, {today}</p>
+                        <h3 className="font-bold text-lg">Sparepart Inventory</h3>
+                        <p className="text-sm text-muted-foreground">Surakarta, {today}</p>
                     </div>
                 </div>
                 </header>
@@ -212,7 +212,7 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
                     <p>(.........................)</p>
                     </div>
                     <div>
-                    <p className="mb-16">Approval HRD,</p>
+                    <p className="mb-16">Approval,</p>
                     <p>(.........................)</p>
                     </div>
                 </div>
