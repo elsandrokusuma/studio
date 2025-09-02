@@ -175,19 +175,17 @@ export default function ApprovalPage() {
         <div className="space-y-4">
           {approvalItems.map((po) => (
             <Card key={po.poNumber}>
-              <CardHeader className="flex flex-row items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-3">
-                     <div className="p-3 bg-primary/10 rounded-lg">
-                        <Box className="h-6 w-6 text-primary" />
-                     </div>
-                     <div>
-                        <CardTitle>{po.poNumber}</CardTitle>
-                         <Badge variant="warning">{po.status}</Badge>
-                     </div>
-                  </div>
+              <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-y-2">
+                <div className="flex items-center gap-3">
+                   <div className="p-3 bg-primary/10 rounded-lg">
+                      <Box className="h-6 w-6 text-primary" />
+                   </div>
+                   <div>
+                      <CardTitle>{po.poNumber}</CardTitle>
+                       <Badge variant="warning">{po.status}</Badge>
+                   </div>
                 </div>
-                 <div className="text-right text-sm text-muted-foreground">
+                 <div className="text-left sm:text-right text-sm text-muted-foreground w-full sm:w-auto">
                     <div>{format(new Date(po.orderDate), "MMM d, yyyy")}</div>
                     <div>{format(new Date(po.orderDate), "p")}</div>
                   </div>
@@ -204,7 +202,7 @@ export default function ApprovalPage() {
                     </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end gap-2">
+              <CardFooter className="flex flex-wrap justify-end gap-2">
                  <Button variant="outline" onClick={() => handleViewDetails(po)}>
                   <Eye className="mr-2 h-4 w-4" />
                   View Details
