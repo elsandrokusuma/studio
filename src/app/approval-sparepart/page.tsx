@@ -495,7 +495,7 @@ export default function ApprovalSparepartPage() {
         return;
     }
 
-    const allItemsToExport = groupedRequests
+    const allItemsToExport = filteredRequests
         .filter(po => selectedRows.includes(po.requestNumber) && po.status === 'Approved')
         .flatMap(po => po.requests);
 
@@ -957,3 +957,4 @@ export default function ApprovalSparepartPage() {
     
 
     
+
