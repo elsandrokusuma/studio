@@ -418,13 +418,12 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
       });
       return;
     }
-
-    const selectedOrdersToExport = preOrders.filter(order => 
-      selectedRows.includes(order.poNumber) && 
-      (order.status === 'Approved' || order.status === 'Fulfilled')
+  
+    const selectedPOs = groupedPreOrders.filter(po =>
+      selectedRows.includes(po.poNumber) && (po.status === 'Approved' || po.status === 'Fulfilled')
     );
-
-    if (selectedOrdersToExport.length === 0) {
+  
+    if (selectedPOs.length === 0) {
       toast({
         variant: "destructive",
         title: "No Approved or Fulfilled POs selected",
@@ -432,8 +431,10 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
       });
       return;
     }
-
-    const ids = selectedOrdersToExport.map(o => o.id).join(',');
+  
+    const allItemsToExport = selectedPOs.flatMap(po => po.orders);
+    const ids = allItemsToExport.map(item => item.id).join(',');
+    
     router.push(`/surat-jalan?ids=${ids}`);
   };
 
@@ -751,7 +752,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                    <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
                      <div className={cn("absolute left-0 top-0 h-full w-1.5", statusColor)}></div>
                       <CardHeader className="p-4 pl-8">
-                        <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
+                      <div className="flex flex-col sm:flex-row items-start gap-4">
                           <div className="flex items-center self-start pt-1">
                             <Checkbox
                                 checked={selectedRows.includes(po.poNumber)}
