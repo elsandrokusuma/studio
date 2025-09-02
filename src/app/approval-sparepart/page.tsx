@@ -200,6 +200,29 @@ export default function ApprovalSparepartPage() {
     }
   };
 
+  const handleMarkAsApproved = async (po: GroupedRequest) => {
+    if (!db) return;
+
+    try {
+        const batch = writeBatch(db);
+        po.requests.forEach(request => {
+            const docRef = doc(db, "sparepart-requests", request.id);
+            batch.update(docRef, { status: 'Approved' });
+        });
+        await batch.commit();
+        toast({
+            title: "PO Approved",
+            description: `Request ${po.requestNumber} has been marked as Approved.`
+        });
+    } catch (error) {
+        console.error("Error marking PO as approved:", error);
+        toast({
+            variant: "destructive",
+            title: "Failed to approve PO."
+        });
+    }
+  };
+
   const handleEditItem = (item: SparepartRequest) => {
     setSelectedOrderItem(item);
     setRevisedQuantity(item.revisedQuantity || item.quantity);
@@ -411,15 +434,9 @@ export default function ApprovalSparepartPage() {
     });
 
     return Object.entries(groups).map(([requestNumber, requests]) => {
-      const allApproved = requests.every(r => r.itemStatus === 'Approved');
-      const anyRejected = requests.some(r => r.itemStatus === 'Rejected');
-      let overallStatus: SparepartRequest['status'] = 'Pending';
-
-      if (allApproved) {
-        overallStatus = 'Approved';
-      } else if (anyRejected) {
-        overallStatus = 'Rejected';
-      }
+      // The overall status is determined by the status field of the first item in the group.
+      // This enforces the new workflow where status is changed for the whole group.
+      const overallStatus = requests[0]?.status || 'Pending';
 
       const requester = requests[0]?.requester || '';
       const location = requests[0]?.location || 'Unknown';
@@ -474,24 +491,23 @@ export default function ApprovalSparepartPage() {
 
   const handleExportPdf = () => {
     if (selectedRows.length === 0) {
-      toast({ variant: 'destructive', title: 'No POs selected to export' });
-      return;
+        toast({ variant: 'destructive', title: 'No POs selected to export' });
+        return;
     }
-  
+
     const allItemsToExport = groupedRequests
-      .filter(po => selectedRows.includes(po.requestNumber))
-      .flatMap(po => po.requests)
-      .filter(item => item.itemStatus === 'Approved');
-  
+        .filter(po => selectedRows.includes(po.requestNumber) && po.status === 'Approved')
+        .flatMap(po => po.requests);
+
     if (allItemsToExport.length === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'No approved items in selected POs',
-        description: 'Please select POs containing approved items to export.',
-      });
-      return;
+        toast({
+            variant: 'destructive',
+            title: 'No approved items in selected POs',
+            description: 'Please select POs that have been marked as "Approved" to export.',
+        });
+        return;
     }
-  
+
     const ids = allItemsToExport.map(item => item.id).join(',');
     router.push(`/sparepart-order?ids=${ids}`);
   };
@@ -781,7 +797,12 @@ export default function ApprovalSparepartPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        <DropdownMenuItem>Mark as Approved</DropdownMenuItem>
+                                        {req.status === 'Pending' && (
+                                            <DropdownMenuItem onSelect={() => handleMarkAsApproved(req)}>
+                                                <Check className="mr-2 h-4 w-4" />
+                                                Mark as Approved
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             className="text-red-600 focus:text-red-700"
@@ -829,24 +850,26 @@ export default function ApprovalSparepartPage() {
                                         </Badge>
                                       </TableCell>
                                       <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleEditItem(item)}>
-                                                <Pencil className="mr-2 h-4 w-4" /> Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="text-green-600 focus:text-green-700" onClick={() => handleItemDecision(item, "Approved")}>
-                                                <Check className="mr-2 h-4 w-4" /> Approve
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-600 focus:text-red-700" onClick={() => handleItemDecision(item, "Rejected")}>
-                                                <X className="mr-2 h-4 w-4" /> Reject
-                                            </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        {req.status === 'Pending' && (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => handleEditItem(item)}>
+                                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="text-green-600 focus:text-green-700" onClick={() => handleItemDecision(item, "Approved")}>
+                                                    <Check className="mr-2 h-4 w-4" /> Approve
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="text-red-600 focus:text-red-700" onClick={() => handleItemDecision(item, "Rejected")}>
+                                                    <X className="mr-2 h-4 w-4" /> Reject
+                                                </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        )}
                                       </TableCell>
                                     </TableRow>
                                   ))}
@@ -928,6 +951,8 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
+
+    
 
     
 
