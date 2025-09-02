@@ -414,21 +414,26 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
       toast({
         variant: "destructive",
         title: "No items selected",
-        description: "Please select one or more approved or fulfilled POs to export.",
+        description: "Please select one or more POs to export.",
       });
       return;
     }
   
-    const itemsToExport = groupedPreOrders
+    // 1. Get all individual orders from the selected PO groups.
+    const allItemsInSelectedPOs = groupedPreOrders
       .filter(po => selectedRows.includes(po.poNumber))
-      .flatMap(po => po.orders)
-      .filter(item => item.status === 'Approved' || item.status === 'Fulfilled');
+      .flatMap(po => po.orders);
+  
+    // 2. Filter these items to only include those that are 'Approved' or 'Fulfilled'.
+    const itemsToExport = allItemsInSelectedPOs.filter(
+      item => item.status === 'Approved' || item.status === 'Fulfilled'
+    );
   
     if (itemsToExport.length === 0) {
       toast({
         variant: "destructive",
-        title: "No Approved or Fulfilled items in selected POs",
-        description: "Only approved or fulfilled items can be exported.",
+        title: "No exportable items found",
+        description: "The selected POs do not contain any 'Approved' or 'Fulfilled' items.",
       });
       return;
     }
@@ -1062,7 +1067,3 @@ export default function PreOrdersPage({ searchParams }: { searchParams: { [key: 
       </React.Suspense>
     );
 }
-
-    
-
-    
