@@ -744,26 +744,30 @@ export default function ApprovalSparepartPage() {
                         'bg-yellow-500'
                     )}></div>
                     <CardHeader className="p-4 pl-8">
-                        <div className="flex items-start gap-4">
-                            <Checkbox
-                                checked={selectedRows.includes(req.requestNumber)}
-                                onCheckedChange={() => handleSelectRow(req.requestNumber)}
-                                aria-label={`Select request ${req.requestNumber}`}
-                            />
-                            <div className="p-2 bg-primary/10 rounded-lg">
-                                <FileText className="h-5 w-5 text-primary" />
-                            </div>
-                            <div className="flex-grow">
-                                <h3 className="font-semibold text-base">{req.requestNumber}</h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Badge variant={req.status === 'Approved' ? 'default' : req.status === 'Rejected' ? 'destructive' : 'warning'} className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
-                                        {req.status}
-                                    </Badge>
-                                    <span>• {req.totalQuantity} units</span>
-                                    <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
+                        <div className="flex flex-wrap items-start gap-4">
+                           <div className="flex items-center self-start pt-1">
+                                <Checkbox
+                                    checked={selectedRows.includes(req.requestNumber)}
+                                    onCheckedChange={() => handleSelectRow(req.requestNumber)}
+                                    aria-label={`Select request ${req.requestNumber}`}
+                                />
+                           </div>
+                           <div className="flex-grow flex items-start gap-4">
+                                <div className="p-2 bg-primary/10 rounded-lg">
+                                    <FileText className="h-5 w-5 text-primary" />
                                 </div>
-                            </div>
-                            <div className="text-right text-sm">
+                                <div className="flex-grow">
+                                    <h3 className="font-semibold text-base">{req.requestNumber}</h3>
+                                    <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
+                                        <Badge variant={req.status === 'Approved' ? 'default' : req.status === 'Rejected' ? 'destructive' : 'warning'} className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
+                                            {req.status}
+                                        </Badge>
+                                        <span>• {req.totalQuantity} units</span>
+                                        <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
+                                    </div>
+                                </div>
+                           </div>
+                            <div className="text-left sm:text-right text-sm ml-auto sm:ml-0 whitespace-nowrap">
                                 <div className="font-medium">{format(new Date(req.requestDate), "MMMM dd, yyyy")}</div>
                                 <div className="text-muted-foreground">Req: {req.requester}</div>
                             </div>
