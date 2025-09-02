@@ -208,7 +208,7 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
                 <footer className="pt-12">
                 <div className="flex justify-between text-center">
                     <div>
-                    <p className="mb-16">Hormat Kami,</p>
+                    <p className="mb-16">Admin</p>
                     <p>(.........................)</p>
                     </div>
                     <div>
