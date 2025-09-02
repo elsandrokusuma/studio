@@ -475,23 +475,28 @@ export default function ApprovalSparepartPage() {
 
   const handleExportPdf = () => {
     if (selectedRows.length === 0) {
-        toast({ variant: "destructive", title: "No POs selected to export" });
-        return;
+      toast({ variant: 'destructive', title: 'No POs selected to export' });
+      return;
     }
-    const selectedApprovedRequests = allRequests.filter(req => 
-        selectedRows.includes(req.requestNumber) && req.itemStatus === 'Approved'
+
+    const selectedPOs = groupedRequests.filter((g) =>
+      selectedRows.includes(g.requestNumber)
     );
 
-    if (selectedApprovedRequests.length === 0) {
-        toast({
-            variant: "destructive",
-            title: "No approved items to export",
-            description: "Please select POs that contain approved items.",
-        });
-        return;
+    const approvedPOItems = selectedPOs
+      .filter((po) => po.status === 'Approved')
+      .flatMap((po) => po.requests);
+
+    if (approvedPOItems.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No approved items to export',
+        description: 'Please select POs that have been approved.',
+      });
+      return;
     }
 
-    const ids = selectedApprovedRequests.map(req => req.id).join(',');
+    const ids = approvedPOItems.map((req) => req.id).join(',');
     router.push(`/sparepart-order?ids=${ids}`);
   };
 
@@ -744,7 +749,7 @@ export default function ApprovalSparepartPage() {
                         'bg-yellow-500'
                     )}></div>
                     <CardHeader className="p-4 pl-8">
-                        <div className="flex flex-wrap items-start gap-4">
+                        <div className="flex flex-col sm:flex-row items-start gap-4">
                            <div className="flex items-center self-start pt-1">
                                 <Checkbox
                                     checked={selectedRows.includes(req.requestNumber)}
