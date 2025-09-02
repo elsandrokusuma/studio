@@ -21,7 +21,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -479,31 +478,21 @@ export default function ApprovalSparepartPage() {
       return;
     }
   
-    const approvedGroups = groupedRequests.filter(
-      (po) => selectedRows.includes(po.requestNumber) && po.status === 'Approved'
-    );
+    const allItemsToExport = groupedRequests
+      .filter(po => selectedRows.includes(po.requestNumber))
+      .flatMap(po => po.requests)
+      .filter(item => item.itemStatus === 'Approved');
   
-    if (approvedGroups.length === 0) {
+    if (allItemsToExport.length === 0) {
       toast({
         variant: 'destructive',
-        title: 'No approved POs selected',
-        description: 'Please select POs with an "Approved" status to export.',
+        title: 'No approved items in selected POs',
+        description: 'Please select POs containing approved items to export.',
       });
       return;
     }
   
-    const allItemsToExport = approvedGroups.flatMap(po => po.requests);
     const ids = allItemsToExport.map(item => item.id).join(',');
-    
-    if (!ids) {
-        toast({
-            variant: 'destructive',
-            title: 'No items to export',
-            description: 'Could not find any items in the selected approved POs.',
-        });
-        return;
-    }
-
     router.push(`/sparepart-order?ids=${ids}`);
   };
 
@@ -939,5 +928,7 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
+
+    
 
     
