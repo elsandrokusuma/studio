@@ -44,6 +44,8 @@ import {
   Check,
   ChevronsUpDown,
   Sun,
+  Moon,
+  Sunset,
 } from "lucide-react";
 import {
   collection,
@@ -108,6 +110,11 @@ const chartConfig = {
   },
 };
 
+type GreetingInfo = {
+  text: string;
+  icon: React.ElementType;
+};
+
 export default function DashboardPage() {
   const [inventoryItems, setInventoryItems] = React.useState<InventoryItem[]>(
     []
@@ -122,7 +129,7 @@ export default function DashboardPage() {
   const [selectedTransaction, setSelectedTransaction] =
     React.useState<Transaction | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
-  const [greeting, setGreeting] = React.useState<string>("");
+  const [greetingInfo, setGreetingInfo] = React.useState<GreetingInfo>({ text: "", icon: Sun });
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const { toast } = useToast();
@@ -214,17 +221,25 @@ export default function DashboardPage() {
     }
     let active = true;
 
-    const getGreeting = () => {
-      const currentHour = new Date().getHours();
-      if (currentHour >= 4 && currentHour < 12) {
-        return "Good morning";
-      } else if (currentHour >= 12 && currentHour < 18) {
-        return "Good afternoon";
+    const getGreeting = (): GreetingInfo => {
+      // Get current time in WIB (UTC+7)
+      const now = new Date();
+      const utcOffset = now.getTimezoneOffset() * 60000;
+      const wibOffset = 7 * 3600000;
+      const wibTime = new Date(now.getTime() + utcOffset + wibOffset);
+      const currentHour = wibTime.getHours();
+
+      if (currentHour >= 1 && currentHour < 11) {
+        return { text: "Good morning", icon: Sun };
+      } else if (currentHour >= 11 && currentHour < 15) {
+        return { text: "Good afternoon", icon: Sun };
+      } else if (currentHour >= 15 && currentHour < 19) {
+        return { text: "Good evening", icon: Sunset };
       } else {
-        return "Good evening";
+        return { text: "Good night", icon: Moon };
       }
     };
-    setGreeting(getGreeting());
+    setGreetingInfo(getGreeting());
 
     const qInventory = query(collection(db, "inventory"), orderBy("name"));
     const unsubscribeInventory = onSnapshot(
@@ -517,6 +532,8 @@ export default function DashboardPage() {
   const selectedItemForStockOut = inventoryItems.find(
     (i) => i.id === selectedItemId
   );
+  
+  const GreetingIcon = greetingInfo.icon;
 
   return (
     <div className="flex flex-col gap-8">
@@ -524,10 +541,10 @@ export default function DashboardPage() {
         <CardHeader>
           <div className="flex items-center gap-4">
             <div className="bg-green-100 dark:bg-green-800/30 p-3 rounded-full">
-              <Sun className="h-6 w-6 text-green-700 dark:text-green-300" />
+              <GreetingIcon className="h-6 w-6 text-green-700 dark:text-green-300" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-green-900 dark:text-green-200">{`${greeting}!`}</h1>
+              <h1 className="text-2xl font-bold text-green-900 dark:text-green-200">{`${greetingInfo.text}!`}</h1>
               <p className="text-green-800 dark:text-green-300/80">
                 Here's what's happening with your inventory today.
               </p>
