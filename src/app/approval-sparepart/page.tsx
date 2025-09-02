@@ -478,25 +478,22 @@ export default function ApprovalSparepartPage() {
       toast({ variant: 'destructive', title: 'No POs selected to export' });
       return;
     }
-
-    const selectedPOs = groupedRequests.filter((g) =>
-      selectedRows.includes(g.requestNumber)
-    );
-
-    const approvedPOItems = selectedPOs
-      .filter((po) => po.status === 'Approved')
-      .flatMap((po) => po.requests);
-
-    if (approvedPOItems.length === 0) {
+  
+    const approvedItemsToExport = groupedRequests
+      .filter(po => selectedRows.includes(po.requestNumber)) // Filter for selected PO groups
+      .flatMap(po => po.requests) // Get all individual items from those groups
+      .filter(item => item.itemStatus === 'Approved'); // Filter for items that are actually approved
+  
+    if (approvedItemsToExport.length === 0) {
       toast({
         variant: 'destructive',
         title: 'No approved items to export',
-        description: 'Please select POs that have been approved.',
+        description: 'Please select POs that contain approved items.',
       });
       return;
     }
-
-    const ids = approvedPOItems.map((req) => req.id).join(',');
+  
+    const ids = approvedItemsToExport.map(item => item.id).join(',');
     router.push(`/sparepart-order?ids=${ids}`);
   };
 

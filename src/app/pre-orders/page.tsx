@@ -414,27 +414,26 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
       toast({
         variant: "destructive",
         title: "No items selected",
-        description: "Please select one or more approved or fulfilled items to export.",
+        description: "Please select one or more approved or fulfilled POs to export.",
       });
       return;
     }
   
-    const selectedPOs = groupedPreOrders.filter(po =>
-      selectedRows.includes(po.poNumber) && (po.status === 'Approved' || po.status === 'Fulfilled')
-    );
+    const itemsToExport = groupedPreOrders
+      .filter(po => selectedRows.includes(po.poNumber)) // Filter for selected PO groups
+      .flatMap(po => po.orders) // Get all individual items from those groups
+      .filter(item => item.status === 'Approved' || item.status === 'Fulfilled'); // Filter for items that are actually approved/fulfilled
   
-    if (selectedPOs.length === 0) {
+    if (itemsToExport.length === 0) {
       toast({
         variant: "destructive",
-        title: "No Approved or Fulfilled POs selected",
-        description: "Only approved or fulfilled pre-orders can be exported.",
+        title: "No Approved or Fulfilled items in selected POs",
+        description: "Only approved or fulfilled items can be exported.",
       });
       return;
     }
   
-    const allItemsToExport = selectedPOs.flatMap(po => po.orders);
-    const ids = allItemsToExport.map(item => item.id).join(',');
-    
+    const ids = itemsToExport.map(item => item.id).join(',');
     router.push(`/surat-jalan?ids=${ids}`);
   };
 
