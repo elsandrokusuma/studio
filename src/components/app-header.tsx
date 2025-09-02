@@ -59,7 +59,7 @@ export function AppHeader() {
   )
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 md:px-6 print:hidden">
       <div className="flex w-full items-center justify-between">
         <Link href="/" className="flex items-center">
           <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
