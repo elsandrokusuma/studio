@@ -479,21 +479,31 @@ export default function ApprovalSparepartPage() {
       return;
     }
   
-    const approvedItemsToExport = groupedRequests
-      .filter(po => selectedRows.includes(po.requestNumber)) // Filter for selected PO groups
-      .flatMap(po => po.requests) // Get all individual items from those groups
-      .filter(item => item.itemStatus === 'Approved'); // Filter for items that are actually approved
+    const approvedGroups = groupedRequests.filter(
+      (po) => selectedRows.includes(po.requestNumber) && po.status === 'Approved'
+    );
   
-    if (approvedItemsToExport.length === 0) {
+    if (approvedGroups.length === 0) {
       toast({
         variant: 'destructive',
-        title: 'No approved items to export',
-        description: 'Please select POs that contain approved items.',
+        title: 'No approved POs selected',
+        description: 'Please select POs with an "Approved" status to export.',
       });
       return;
     }
   
-    const ids = approvedItemsToExport.map(item => item.id).join(',');
+    const allItemsToExport = approvedGroups.flatMap(po => po.requests);
+    const ids = allItemsToExport.map(item => item.id).join(',');
+    
+    if (!ids) {
+        toast({
+            variant: 'destructive',
+            title: 'No items to export',
+            description: 'Could not find any items in the selected approved POs.',
+        });
+        return;
+    }
+
     router.push(`/sparepart-order?ids=${ids}`);
   };
 
@@ -746,34 +756,33 @@ export default function ApprovalSparepartPage() {
                         'bg-yellow-500'
                     )}></div>
                     <CardHeader className="p-4 pl-8">
-                        <div className="flex flex-col sm:flex-row items-start gap-4">
-                           <div className="flex items-center self-start pt-1">
-                                <Checkbox
-                                    checked={selectedRows.includes(req.requestNumber)}
-                                    onCheckedChange={() => handleSelectRow(req.requestNumber)}
-                                    aria-label={`Select request ${req.requestNumber}`}
-                                />
-                           </div>
-                           <div className="flex-grow flex items-start gap-4">
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                    <FileText className="h-5 w-5 text-primary" />
-                                </div>
-                                <div className="flex-grow">
-                                    <h3 className="font-semibold text-base">{req.requestNumber}</h3>
-                                    <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
-                                        <Badge variant={req.status === 'Approved' ? 'default' : req.status === 'Rejected' ? 'destructive' : 'warning'} className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
-                                            {req.status}
-                                        </Badge>
-                                        <span>• {req.totalQuantity} units</span>
-                                        <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
-                                    </div>
-                                </div>
-                           </div>
-                            <div className="text-left sm:text-right text-sm ml-auto sm:ml-0 whitespace-nowrap">
+                      <div className="flex flex-wrap items-start justify-between gap-y-2">
+                          <div className="flex items-center gap-4 flex-grow">
+                             <Checkbox
+                                  checked={selectedRows.includes(req.requestNumber)}
+                                  onCheckedChange={() => handleSelectRow(req.requestNumber)}
+                                  aria-label={`Select request ${req.requestNumber}`}
+                              />
+                              <div className="p-2 bg-primary/10 rounded-lg">
+                                  <FileText className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="flex-grow">
+                                  <h3 className="font-semibold text-base">{req.requestNumber}</h3>
+                                  <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
+                                      <Badge variant={req.status === 'Approved' ? 'default' : req.status === 'Rejected' ? 'destructive' : 'warning'} className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
+                                          {req.status}
+                                      </Badge>
+                                      <span>• {req.totalQuantity} units</span>
+                                      <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="w-full sm:w-auto flex items-start justify-between">
+                            <div className="text-left sm:text-right text-sm whitespace-nowrap sm:ml-4">
                                 <div className="font-medium">{format(new Date(req.requestDate), "MMMM dd, yyyy")}</div>
                                 <div className="text-muted-foreground">Req: {req.requester}</div>
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex items-center ml-auto">
                                 <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -798,7 +807,8 @@ export default function ApprovalSparepartPage() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
-                        </div>
+                          </div>
+                      </div>
                     </CardHeader>
                     <AccordionContent>
                         <CardContent className="p-4 pt-0 pl-8">
@@ -929,3 +939,5 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
+
+    
