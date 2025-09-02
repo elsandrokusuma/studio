@@ -1,8 +1,5 @@
 
-"use client";
-
 import * as React from "react";
-import { useSearchParams } from "next/navigation";
 import {
   collection,
   query,
@@ -35,64 +32,9 @@ type GroupedOrders = {
   items: SparepartRequest[];
 };
 
-function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-  const [groupedOrders, setGroupedOrders] = React.useState<GroupedOrders[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    const fetchOrders = async () => {
-        if (!db) {
-            setError("Firebase not configured. Please check your environment variables.");
-            setLoading(false);
-            return;
-        }
-
-        const idsParam = searchParams?.ids;
-        const ids = typeof idsParam === 'string' ? idsParam.split(",") : [];
-
-        if (!ids || ids.length === 0) {
-            setGroupedOrders([]);
-            setLoading(false);
-            return;
-        };
-
-        try {
-            const q = query(collection(db, "sparepart-requests"), where(documentId(), "in", ids));
-            const querySnapshot = await getDocs(q);
-            const selectedOrders: SparepartRequest[] = [];
-            querySnapshot.forEach((doc) => {
-                selectedOrders.push({ id: doc.id, ...doc.data() } as SparepartRequest);
-            });
-            
-            const groups: { [key: string]: SparepartRequest[] } = {};
-            selectedOrders.forEach(order => {
-                if (!groups[order.requestNumber]) {
-                    groups[order.requestNumber] = [];
-                }
-                groups[order.requestNumber].push(order);
-            });
-
-            const groupedData = Object.values(groups).map(items => ({
-              requestNumber: items[0].requestNumber,
-              requester: items[0].requester,
-              location: items[0].location,
-              requestDate: items[0].requestDate,
-              items: items,
-            }));
-
-            setGroupedOrders(groupedData);
-
-        } catch (error) {
-            console.error("Failed to fetch sparepart requests from Firestore", error);
-            setError("Failed to fetch order details.");
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    fetchOrders();
-  }, [searchParams]);
+// Client Component for interactive parts
+"use client";
+function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: GroupedOrders[] }) {
 
   const handlePrint = () => {
     window.print();
@@ -101,23 +43,6 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
   const today = new Date().toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
-
-  if (loading) {
-    return <FullPageSpinner />;
-  }
-  
-  if (error) {
-     return (
-      <div className="flex items-center justify-center h-full">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   if (groupedOrders.length === 0) {
     return (
@@ -212,7 +137,7 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
                     <p>(.........................)</p>
                     </div>
                     <div>
-                    <p className="mb-16">Approval,</p>
+                    <p className="mb-16">Approval</p>
                     <p>(.........................)</p>
                     </div>
                 </div>
@@ -225,10 +150,72 @@ function SparepartOrderContent({ searchParams }: { searchParams: { [key: string]
   );
 }
 
-export default function SparepartOrderPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+
+// Server Component for data fetching
+export default async function SparepartOrderPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  
+  const fetchOrders = async (): Promise<GroupedOrders[] | { error: string }> => {
+    if (!db) {
+        return { error: "Firebase not configured. Please check your environment variables." };
+    }
+
+    const idsParam = searchParams?.ids;
+    const ids = typeof idsParam === 'string' ? idsParam.split(",") : [];
+
+    if (!ids || ids.length === 0) {
+        return [];
+    };
+
+    try {
+        const q = query(collection(db, "sparepart-requests"), where(documentId(), "in", ids));
+        const querySnapshot = await getDocs(q);
+        const selectedOrders: SparepartRequest[] = [];
+        querySnapshot.forEach((doc) => {
+            selectedOrders.push({ id: doc.id, ...doc.data() } as SparepartRequest);
+        });
+        
+        const groups: { [key: string]: SparepartRequest[] } = {};
+        selectedOrders.forEach(order => {
+            if (!groups[order.requestNumber]) {
+                groups[order.requestNumber] = [];
+            }
+            groups[order.requestNumber].push(order);
+        });
+
+        const groupedData = Object.values(groups).map(items => ({
+          requestNumber: items[0].requestNumber,
+          requester: items[0].requester,
+          location: items[0].location,
+          requestDate: items[0].requestDate,
+          items: items,
+        }));
+
+        return groupedData;
+
+    } catch (err) {
+        console.error("Failed to fetch sparepart requests from Firestore", err);
+        return { error: "Failed to fetch order details." };
+    }
+  };
+
+  const result = await fetchOrders();
+
+  if ('error' in result) {
+    return (
+     <div className="flex items-center justify-center h-full">
+       <Alert variant="destructive" className="max-w-md">
+         <AlertTitle>Error</AlertTitle>
+         <AlertDescription>
+           {result.error}
+         </AlertDescription>
+       </Alert>
+     </div>
+   );
+  }
+
   return (
     <React.Suspense fallback={<FullPageSpinner />}>
-      <SparepartOrderContent searchParams={searchParams} />
+      <SparepartOrderClientContent groupedOrders={result} />
     </React.Suspense>
   )
 }
