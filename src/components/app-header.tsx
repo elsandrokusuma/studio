@@ -4,7 +4,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Boxes,
@@ -13,7 +13,13 @@ import {
   Menu,
   Settings,
   Wrench,
+  Bell,
+  AlertCircle,
+  Clock,
 } from "lucide-react"
+import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+import type { InventoryItem, PreOrder, SparepartRequest } from "@/lib/types"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -22,6 +28,8 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Badge } from "@/components/ui/badge"
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -29,8 +37,124 @@ const navItems = [
   { href: "/pre-orders", label: "Pre-Orders", icon: ShoppingCart },
   { href: "/approval", label: "Approval Stationery", icon: ClipboardCheck },
   { href: "/approval-sparepart", label: "Approval Sparepart", icon: Wrench },
-  { href: "/settings", label: "Settings", icon: Settings },
 ]
+
+type Notification = {
+    type: 'low_stock' | 'stationery_approval' | 'sparepart_approval';
+    title: string;
+    count: number;
+    href: string;
+    icon: React.ElementType;
+};
+
+
+function NotificationBell() {
+  const [notifications, setNotifications] = React.useState<Notification[]>([]);
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (!db) return;
+
+    const fetchNotifications = async () => {
+        const newNotifications: Notification[] = [];
+
+        // Low Stock
+        const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
+        const lowStockSnapshot = await getDocs(lowStockQuery);
+        if (!lowStockSnapshot.empty) {
+            newNotifications.push({
+                type: 'low_stock',
+                title: 'Low Stock Items',
+                count: lowStockSnapshot.size,
+                href: '/inventory',
+                icon: AlertCircle,
+            });
+        }
+
+        // Stationery Approval
+        const stationeryQuery = query(collection(db, "pre-orders"), where("status", "==", "Awaiting Approval"));
+        const stationerySnapshot = await getDocs(stationeryQuery);
+        const stationeryPOs = new Set(stationerySnapshot.docs.map(doc => doc.data().poNumber));
+        if (stationeryPOs.size > 0) {
+            newNotifications.push({
+                type: 'stationery_approval',
+                title: 'Stationery Approvals',
+                count: stationeryPOs.size,
+                href: '/approval',
+                icon: Clock,
+            });
+        }
+        
+        // Sparepart Approval
+        const sparepartQuery = query(collection(db, "sparepart-requests"), where("status", "==", "Pending"));
+        const sparepartSnapshot = await getDocs(sparepartQuery);
+        const sparepartPOs = new Set(sparepartSnapshot.docs.map(doc => doc.data().requestNumber));
+        if (sparepartPOs.size > 0) {
+             newNotifications.push({
+                type: 'sparepart_approval',
+                title: 'Sparepart Approvals',
+                count: sparepartPOs.size,
+                href: '/approval-sparepart',
+                icon: Clock,
+            });
+        }
+
+        setNotifications(newNotifications);
+    }
+    
+    // Using onSnapshot for real-time updates might be too much for a header component.
+    // Let's fetch on mount and maybe add a refresh mechanism later if needed.
+    fetchNotifications();
+    
+  }, []);
+
+  const totalNotifications = notifications.reduce((sum, notif) => sum + notif.count, 0);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          {totalNotifications > 0 && (
+            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 justify-center rounded-full p-0 text-xs">
+                {totalNotifications}
+            </Badge>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0">
+        <div className="p-4 font-medium border-b">
+            Notifications
+        </div>
+        <div className="p-2 space-y-1">
+            {notifications.length > 0 ? (
+                notifications.map((notif) => {
+                    const Icon = notif.icon;
+                    return (
+                        <Link href={notif.href} key={notif.type} className="block">
+                            <div className="p-3 rounded-md hover:bg-accent flex items-start gap-3">
+                                <Icon className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium">{notif.title}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        You have {notif.count} {notif.type === 'low_stock' ? 'items' : 'requests'} that need attention.
+                                    </p>
+                                </div>
+                            </div>
+                        </Link>
+                    );
+                })
+            ) : (
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                    You're all caught up!
+                </div>
+            )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 
 export function AppHeader() {
   const pathname = usePathname()
@@ -47,7 +171,7 @@ export function AppHeader() {
             pathname === item.href
               ? "text-primary"
               : "text-muted-foreground",
-             inSheet ? "p-2 rounded-md hover:bg-accent w-full" : ""
+             inSheet ? "p-2 rounded-md hover:bg-accent w-full text-base" : ""
           )}
           onClick={() => inSheet && setIsMobileMenuOpen(false)}
         >
@@ -61,32 +185,42 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 md:px-6 print:hidden">
       <div className="flex w-full items-center justify-between">
-        <Link href="/" className="flex items-center">
-          <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
-        </Link>
+        <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center">
+              <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
+            </Link>
+        </div>
 
         <div className="hidden flex-1 justify-center md:flex">
           <NavLinks />
         </div>
-
-        <div className="md:hidden">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <div className="flex flex-col gap-6 pt-8">
-                <Link href="/" className="flex items-center gap-2 font-semibold text-lg px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                   <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
-                  <span>Stationery Inv.</span>
-                </Link>
-                <NavLinks className="flex-col items-start gap-2" inSheet={true} />
-              </div>
-            </SheetContent>
-          </Sheet>
+        
+        <div className="flex items-center gap-2">
+            <NotificationBell />
+            <Link href="/settings">
+                <Button variant="ghost" size="icon">
+                    <Settings className="h-5 w-5" />
+                </Button>
+            </Link>
+            <div className="md:hidden">
+              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle navigation menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left">
+                  <div className="flex flex-col gap-6 pt-8">
+                    <Link href="/" className="flex items-center gap-2 font-semibold text-lg px-2" onClick={() => setIsMobileMenuOpen(false)}>
+                       <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
+                      <span>Stationery Inv.</span>
+                    </Link>
+                    <NavLinks className="flex-col items-start gap-2" inSheet={true} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
         </div>
       </div>
     </header>
