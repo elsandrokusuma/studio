@@ -110,6 +110,41 @@ const chartConfig = {
   },
 };
 
+const motivationalQuotes = [
+  "Setiap langkah kecil adalah kemajuan.",
+  "Fokus pada kemajuan, bukan kesempurnaan.",
+  "Hari ini adalah kesempatan baru untuk berkembang.",
+  "Kerja keras hari ini adalah kemenangan esok hari.",
+  "Jangan berhenti saat lelah, berhentilah saat selesai.",
+  "Mulai dari mana Anda berada. Gunakan apa yang Anda miliki.",
+  "Kesuksesan adalah jumlah dari usaha-usaha kecil.",
+  "Jadikan setiap hari mahakarya Anda.",
+  "Percayalah pada proses.",
+  "Satu-satunya batasan adalah pikiran Anda.",
+  "Terus bergerak maju, jangan melihat ke belakang.",
+  "Tindakan adalah kunci dasar untuk semua kesuksesan.",
+  "Semangatmu adalah apimu. Jaga agar tetap menyala.",
+  "Setiap pencapaian dimulai dengan keputusan untuk mencoba.",
+  "Jangan takut gagal, takutlah tidak mencoba.",
+  "Anda lebih kuat dari yang Anda kira.",
+  "Lakukan yang terbaik, dan lupakan sisanya.",
+  "Mimpi besar dimulai dengan satu langkah.",
+  "Jadilah versi terbaik dari dirimu hari ini.",
+  "Tantangan membuat hidup menarik.",
+  "Konsistensi lebih penting dari kesempurnaan.",
+  "Fokus pada tujuan, bukan rintangan.",
+  "Kesabaran adalah kunci kemenangan.",
+  "Setiap hari adalah halaman baru dalam ceritamu.",
+  "Jangan menunggu kesempatan, ciptakanlah.",
+  "Tetap positif, bekerja keras, dan wujudkan.",
+  "Belajar dari kemarin, hidup untuk hari ini.",
+  "Kekuatan tidak datang dari kemenangan, tapi dari perjuangan.",
+  "Keajaiban terjadi saat Anda tidak menyerah.",
+  "Lakukan sesuatu hari ini yang akan membuat dirimu di masa depan berterima kasih.",
+  "Jatuh tujuh kali, bangkit delapan kali."
+];
+
+
 type GreetingInfo = {
   text: string;
   icon: React.ElementType;
@@ -130,6 +165,7 @@ export default function DashboardPage() {
     React.useState<Transaction | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
   const [greetingInfo, setGreetingInfo] = React.useState<GreetingInfo>({ text: "", icon: Sun });
+  const [dailyQuote, setDailyQuote] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const { toast } = useToast();
@@ -222,24 +258,28 @@ export default function DashboardPage() {
     let active = true;
 
     const getGreeting = (): GreetingInfo => {
-      // Get current time in WIB (UTC+7)
-      const now = new Date();
-      const utcOffset = now.getTimezoneOffset() * 60000;
-      const wibOffset = 7 * 3600000;
-      const wibTime = new Date(now.getTime() + utcOffset + wibOffset);
-      const currentHour = wibTime.getHours();
+        const now = new Date();
+        const utcOffset = now.getTimezoneOffset() * 60000;
+        const wibOffset = 7 * 3600000;
+        const wibTime = new Date(now.getTime() + utcOffset + wibOffset);
+        const currentHour = wibTime.getHours();
 
-      if (currentHour >= 1 && currentHour < 11) {
-        return { text: "Good morning", icon: Sun };
-      } else if (currentHour >= 11 && currentHour < 15) {
-        return { text: "Good afternoon", icon: Sun };
-      } else if (currentHour >= 15 && currentHour < 19) {
-        return { text: "Good evening", icon: Sunset };
-      } else {
-        return { text: "Good night", icon: Moon };
-      }
+        if (currentHour >= 1 && currentHour < 11) {
+            return { text: "Good morning", icon: Sun };
+        } else if (currentHour >= 11 && currentHour < 15) {
+            return { text: "Good afternoon", icon: Sun };
+        } else if (currentHour >= 15 && currentHour < 19) {
+            return { text: "Good evening", icon: Sunset };
+        } else {
+            return { text: "Good night", icon: Moon };
+        }
     };
     setGreetingInfo(getGreeting());
+
+    // Set daily motivational quote
+    const dayOfMonth = new Date().getDate();
+    setDailyQuote(motivationalQuotes[dayOfMonth - 1]);
+
 
     const qInventory = query(collection(db, "inventory"), orderBy("name"));
     const unsubscribeInventory = onSnapshot(
@@ -546,7 +586,7 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold text-green-900 dark:text-green-200">{`${greetingInfo.text}!`}</h1>
               <p className="text-green-800 dark:text-green-300/80">
-                Here's what's happening with your inventory today.
+                {dailyQuote}
               </p>
             </div>
           </div>
