@@ -248,11 +248,21 @@ export default function ApprovalSparepartPage() {
 
       await batch.commit();
 
-      setSelectedRows([]);
       toast({
         title: 'Approval Requested',
         description: `${posToRequest.length} request(s) have been sent for approval.`,
       });
+      
+      // Send WhatsApp Notification
+      const phoneNumber = "6285536979866"; // Indonesian country code
+      const poList = posToRequest.map(po => `- ${po.requestNumber}`).join('\n');
+      const message = encodeURIComponent(
+        `Dengan hormat,\n\nMohon untuk ditinjau dan disetujui permintaan Sparepart berikut:\n\n${poList}\n\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\nhttps://stationeryinventory-gwk.vercel.app/approval-sparepart\n\nTerima kasih.`
+      );
+      
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+      
+      setSelectedRows([]);
     } catch (error) {
        console.error("Error requesting approval: ", error);
       toast({
@@ -580,7 +590,7 @@ export default function ApprovalSparepartPage() {
     document.body.removeChild(link);
   };
   
-  const canRequestApproval = selectedRows.some(poNumber => groupedRequests.find(po => po.poNumber === poNumber)?.status === 'Pending');
+  const canRequestApproval = selectedRows.some(poNumber => groupedRequests.find(po => po.requestNumber === poNumber)?.status === 'Pending');
 
 
   if (loading) {
