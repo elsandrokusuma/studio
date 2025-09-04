@@ -421,7 +421,16 @@ export default function DashboardPage() {
 
       const formData = new FormData(e.currentTarget);
       const quantity = Number(formData.get("quantity"));
-      const person = formData.get("person") as string | undefined;
+      const person = formData.get("person") as string;
+      
+      if (type === 'out' && !person.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Field Required",
+          description: "The 'To' field cannot be empty.",
+        });
+        return;
+      }
 
       const itemRef = doc(db, "inventory", selectedItem.id);
       const newQuantity =
@@ -1265,6 +1274,7 @@ export default function DashboardPage() {
                 name="person"
                 placeholder="e.g., Customer, Department"
                 className="col-span-3"
+                required
               />
             </div>
             <DialogFooter>

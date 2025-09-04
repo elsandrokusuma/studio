@@ -389,7 +389,16 @@ export default function InventoryPage() {
 
       const formData = new FormData(e.currentTarget);
       const quantity = Number(formData.get("quantity"));
-      const person = formData.get("person") as string | undefined;
+      const person = formData.get("person") as string;
+
+      if (type === 'out' && !person.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Field Required",
+          description: "The 'To' field cannot be empty.",
+        });
+        return;
+      }
 
       const itemRef = doc(db, "inventory", selectedItemToUpdate.id);
       const newQuantity = type === "in" ? selectedItemToUpdate.quantity + quantity : selectedItemToUpdate.quantity - quantity;
@@ -1197,7 +1206,7 @@ export default function InventoryPage() {
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="person" className="text-right">To</Label>
-              <Input id="person" name="person" placeholder="e.g., Customer, Department" className="col-span-3" />
+              <Input id="person" name="person" placeholder="e.g., Customer, Department" className="col-span-3" required />
             </div>
             <DialogFooter>
               <Button type="submit">Remove Stock</Button>
