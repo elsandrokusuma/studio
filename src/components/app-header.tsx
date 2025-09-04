@@ -62,13 +62,13 @@ function NotificationBell() {
         setNotifications(prev => {
             const others = prev.filter(n => n.type !== 'low_stock');
             if (!snapshot.empty) {
-                return [...others, {
+                return [{
                     type: 'low_stock',
                     title: 'Low Stock Items',
                     count: snapshot.size,
                     href: '/inventory',
                     icon: AlertCircle,
-                }];
+                }, ...others];
             }
             return others;
         });
@@ -82,13 +82,13 @@ function NotificationBell() {
         setNotifications(prev => {
             const others = prev.filter(n => n.type !== 'stationery_approval');
             if (stationeryPOs.size > 0) {
-                 return [...others, {
+                 return [{
                     type: 'stationery_approval',
                     title: 'Stationery Approvals',
                     count: stationeryPOs.size,
                     href: '/approval',
                     icon: Clock,
-                }];
+                }, ...others];
             }
             return others;
         });
@@ -102,13 +102,13 @@ function NotificationBell() {
         setNotifications(prev => {
             const others = prev.filter(n => n.type !== 'sparepart_approval');
             if (sparepartPOs.size > 0) {
-                return [...others, {
+                return [{
                     type: 'sparepart_approval',
                     title: 'Sparepart Approvals',
                     count: sparepartPOs.size,
                     href: '/approval-sparepart',
                     icon: Clock,
-                }];
+                }, ...others];
             }
             return others;
         });
