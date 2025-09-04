@@ -17,9 +17,8 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react"
-import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore"
+import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import type { InventoryItem, PreOrder, SparepartRequest } from "@/lib/types"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -55,56 +54,70 @@ function NotificationBell() {
   React.useEffect(() => {
     if (!db) return;
 
-    const fetchNotifications = async () => {
-        const newNotifications: Notification[] = [];
+    const unsubscribers: (() => void)[] = [];
 
-        // Low Stock
-        const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
-        const lowStockSnapshot = await getDocs(lowStockQuery);
-        if (!lowStockSnapshot.empty) {
-            newNotifications.push({
-                type: 'low_stock',
-                title: 'Low Stock Items',
-                count: lowStockSnapshot.size,
-                href: '/inventory',
-                icon: AlertCircle,
-            });
-        }
+    // Low Stock Listener
+    const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
+    const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
+        setNotifications(prev => {
+            const others = prev.filter(n => n.type !== 'low_stock');
+            if (!snapshot.empty) {
+                return [...others, {
+                    type: 'low_stock',
+                    title: 'Low Stock Items',
+                    count: snapshot.size,
+                    href: '/inventory',
+                    icon: AlertCircle,
+                }];
+            }
+            return others;
+        });
+    });
+    unsubscribers.push(unsubscribeLowStock);
 
-        // Stationery Approval
-        const stationeryQuery = query(collection(db, "pre-orders"), where("status", "==", "Awaiting Approval"));
-        const stationerySnapshot = await getDocs(stationeryQuery);
-        const stationeryPOs = new Set(stationerySnapshot.docs.map(doc => doc.data().poNumber));
-        if (stationeryPOs.size > 0) {
-            newNotifications.push({
-                type: 'stationery_approval',
-                title: 'Stationery Approvals',
-                count: stationeryPOs.size,
-                href: '/approval',
-                icon: Clock,
-            });
-        }
-        
-        // Sparepart Approval
-        const sparepartQuery = query(collection(db, "sparepart-requests"), where("status", "==", "Pending"));
-        const sparepartSnapshot = await getDocs(sparepartQuery);
-        const sparepartPOs = new Set(sparepartSnapshot.docs.map(doc => doc.data().requestNumber));
-        if (sparepartPOs.size > 0) {
-             newNotifications.push({
-                type: 'sparepart_approval',
-                title: 'Sparepart Approvals',
-                count: sparepartPOs.size,
-                href: '/approval-sparepart',
-                icon: Clock,
-            });
-        }
-
-        setNotifications(newNotifications);
-    }
+    // Stationery Approval Listener
+    const stationeryQuery = query(collection(db, "pre-orders"), where("status", "==", "Awaiting Approval"));
+    const unsubscribeStationery = onSnapshot(stationeryQuery, (snapshot) => {
+        const stationeryPOs = new Set(snapshot.docs.map(doc => doc.data().poNumber));
+        setNotifications(prev => {
+            const others = prev.filter(n => n.type !== 'stationery_approval');
+            if (stationeryPOs.size > 0) {
+                 return [...others, {
+                    type: 'stationery_approval',
+                    title: 'Stationery Approvals',
+                    count: stationeryPOs.size,
+                    href: '/approval',
+                    icon: Clock,
+                }];
+            }
+            return others;
+        });
+    });
+    unsubscribers.push(unsubscribeStationery);
     
-    // Using onSnapshot for real-time updates might be too much for a header component.
-    // Let's fetch on mount and maybe add a refresh mechanism later if needed.
-    fetchNotifications();
+    // Sparepart Approval Listener
+    const sparepartQuery = query(collection(db, "sparepart-requests"), where("status", "==", "Pending"));
+    const unsubscribeSparepart = onSnapshot(sparepartQuery, (snapshot) => {
+        const sparepartPOs = new Set(snapshot.docs.map(doc => doc.data().requestNumber));
+        setNotifications(prev => {
+            const others = prev.filter(n => n.type !== 'sparepart_approval');
+            if (sparepartPOs.size > 0) {
+                return [...others, {
+                    type: 'sparepart_approval',
+                    title: 'Sparepart Approvals',
+                    count: sparepartPOs.size,
+                    href: '/approval-sparepart',
+                    icon: Clock,
+                }];
+            }
+            return others;
+        });
+    });
+    unsubscribers.push(unsubscribeSparepart);
+
+    return () => {
+        unsubscribers.forEach(unsub => unsub());
+    };
     
   }, []);
 
