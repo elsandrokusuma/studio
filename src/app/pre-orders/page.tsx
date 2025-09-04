@@ -403,7 +403,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
       const phoneNumber = "6285536979866"; // Indonesian country code
       const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\n');
       const message = encodeURIComponent(
-        `Permintaan Persetujuan Pre-Order Stationery:\n\nBerikut adalah daftar PO yang memerlukan persetujuan Anda:\n${poList}\n\nTotal: ${posToApprove.length} PO\n\nSilakan tinjau dan berikan persetujuan di aplikasi.\nTerima kasih.`
+        `Awaiting Approval:\n${poList}`
       );
       
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
