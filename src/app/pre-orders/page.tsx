@@ -393,12 +393,22 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
 
       await batch.commit();
 
-      setSelectedRows([]);
+      const poNumbers = posToApprove.map(po => po.poNumber).join(', ');
       toast({
         title: 'Approval Requested',
         description: `${posToApprove.length} pre-order(s) have been sent for approval.`,
       });
-      router.push('/approval');
+
+      // Send WhatsApp Notification
+      const phoneNumber = "6285536979866"; // Indonesian country code
+      const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\n');
+      const message = encodeURIComponent(
+        `Permintaan Persetujuan Pre-Order Stationery:\n\nBerikut adalah daftar PO yang memerlukan persetujuan Anda:\n${poList}\n\nTotal: ${posToApprove.length} PO\n\nSilakan tinjau dan berikan persetujuan di aplikasi.\nTerima kasih.`
+      );
+      
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+      
+      setSelectedRows([]);
     } catch (error) {
        console.error("Error requesting approval: ", error);
       toast({
