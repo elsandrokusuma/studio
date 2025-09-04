@@ -119,7 +119,7 @@ function NotificationBell() {
         unsubscribers.forEach(unsub => unsub());
     };
     
-  }, []);
+  }, [db]);
 
   const hasNotifications = notifications.some(n => n.count > 0);
 
@@ -141,8 +141,9 @@ function NotificationBell() {
             Notifications
         </div>
         <div className="p-2 space-y-1">
-            {notifications.length > 0 ? (
+            {hasNotifications ? (
                 notifications.map((notif) => {
+                    if (notif.count === 0) return null;
                     const Icon = notif.icon;
                     return (
                         <Link href={notif.href} key={notif.type} className="block">
