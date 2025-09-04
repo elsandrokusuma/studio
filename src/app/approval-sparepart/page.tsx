@@ -254,7 +254,7 @@ export default function ApprovalSparepartPage() {
       });
       
       // Send WhatsApp Notification
-      const phoneNumber = "6285536979866"; // Indonesian country code
+      const phoneNumber = "6281210418699"; // Indonesian country code + number
       const poList = posToRequest.map(po => `- ${po.requestNumber}`).join('\n');
       const message = encodeURIComponent(
         `Dengan hormat,\n\nMohon untuk ditinjau dan disetujui permintaan Sparepart berikut:\n\n${poList}\n\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\nhttps://stationeryinventory-gwk.vercel.app/approval-sparepart\n\nTerima kasih.`
