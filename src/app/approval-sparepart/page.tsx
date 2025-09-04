@@ -44,6 +44,7 @@ import {
     Pencil,
     MapPin,
     FileDown,
+    Send,
 } from "lucide-react";
 import {
   Table,
@@ -220,6 +221,44 @@ export default function ApprovalSparepartPage() {
             variant: "destructive",
             title: "Failed to approve PO."
         });
+    }
+  };
+  
+   const handleRequestApproval = async () => {
+    if (!db) return;
+    const posToRequest = groupedRequests.filter(po => selectedRows.includes(po.requestNumber) && po.status === 'Pending');
+
+    if (posToRequest.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No items to send',
+        description: 'Please select pending requests to send for approval.',
+      });
+      return;
+    }
+    
+    try {
+      const batch = writeBatch(db);
+      posToRequest.forEach(po => {
+        po.requests.forEach(order => {
+            const orderRef = doc(db, 'sparepart-requests', order.id);
+            batch.update(orderRef, { status: 'Awaiting Approval' });
+        });
+      });
+
+      await batch.commit();
+
+      setSelectedRows([]);
+      toast({
+        title: 'Approval Requested',
+        description: `${posToRequest.length} request(s) have been sent for approval.`,
+      });
+    } catch (error) {
+       console.error("Error requesting approval: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to request approvals',
+      });
     }
   };
 
@@ -540,6 +579,8 @@ export default function ApprovalSparepartPage() {
     link.click();
     document.body.removeChild(link);
   };
+  
+  const canRequestApproval = selectedRows.some(poNumber => groupedRequests.find(po => po.poNumber === poNumber)?.status === 'Pending');
 
 
   if (loading) {
@@ -572,18 +613,24 @@ export default function ApprovalSparepartPage() {
         </div>
         <div className="flex items-center gap-2">
             {selectedRows.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    <FileDown className="mr-2 h-4 w-4" />
-                    Export
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={handleExportCsv}>Export as CSV</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={handleExportPdf}>Export as PDF</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <>
+                <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
+                    <Send className="mr-2 h-4 w-4" />
+                    Request Approval
+                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                        <FileDown className="mr-2 h-4 w-4" />
+                        Export
+                    </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                    <DropdownMenuItem onSelect={handleExportCsv}>Export as CSV</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleExportPdf}>Export as PDF</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                </>
             )}
             <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
                 <DialogTrigger asChild>
@@ -718,6 +765,7 @@ export default function ApprovalSparepartPage() {
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="Pending">Pending</SelectItem>
+              <SelectItem value="Awaiting Approval">Awaiting Approval</SelectItem>
               <SelectItem value="Approved">Approved</SelectItem>
               <SelectItem value="Rejected">Rejected</SelectItem>
             </SelectContent>
@@ -758,6 +806,7 @@ export default function ApprovalSparepartPage() {
                     <div className={cn("absolute left-0 top-0 h-full w-1.5", 
                         req.status === 'Approved' ? 'bg-green-500' :
                         req.status === 'Rejected' ? 'bg-red-500' :
+                        req.status === 'Awaiting Approval' ? 'bg-orange-500' :
                         'bg-yellow-500'
                     )}></div>
                     <CardHeader className="p-4 pl-8">
@@ -774,7 +823,11 @@ export default function ApprovalSparepartPage() {
                               <div className="flex-grow">
                                   <h3 className="font-semibold text-base">{req.requestNumber}</h3>
                                   <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
-                                      <Badge variant={req.status === 'Approved' ? 'default' : req.status === 'Rejected' ? 'destructive' : 'warning'} className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
+                                      <Badge variant={
+                                        req.status === 'Approved' ? 'default' : 
+                                        req.status === 'Rejected' ? 'destructive' : 
+                                        req.status === 'Awaiting Approval' ? 'warning' : 'secondary'} 
+                                        className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
                                           {req.status}
                                       </Badge>
                                       <span>• {req.totalQuantity} units</span>
@@ -797,7 +850,7 @@ export default function ApprovalSparepartPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        {req.status === 'Pending' && (
+                                        {req.status === 'Awaiting Approval' && (
                                             <DropdownMenuItem onSelect={() => handleMarkAsApproved(req)}>
                                                 <Check className="mr-2 h-4 w-4" />
                                                 Mark as Approved
@@ -850,7 +903,7 @@ export default function ApprovalSparepartPage() {
                                         </Badge>
                                       </TableCell>
                                       <TableCell>
-                                        {req.status === 'Pending' && (
+                                        {req.status === 'Awaiting Approval' && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -951,10 +1004,3 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
-
-    
-
-    
-
-    
-

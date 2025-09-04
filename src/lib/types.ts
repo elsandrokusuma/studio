@@ -41,7 +41,7 @@ export type SparepartRequest = {
   revisedQuantity?: number;
   requester: string;
   requestDate: string;
-  status: 'Awaiting Approval' | 'Approved' | 'Rejected' | 'Pending';
+  status: 'Pending' | 'Awaiting Approval' | 'Approved' | 'Rejected';
   itemStatus?: 'Pending' | 'Approved' | 'Rejected';
   location: string;
 };

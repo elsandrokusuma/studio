@@ -96,7 +96,7 @@ function NotificationBell() {
     unsubscribers.push(unsubscribeStationery);
     
     // Sparepart Approval Listener
-    const sparepartQuery = query(collection(db, "sparepart-requests"), where("status", "==", "Pending"));
+    const sparepartQuery = query(collection(db, "sparepart-requests"), where("status", "==", "Awaiting Approval"));
     const unsubscribeSparepart = onSnapshot(sparepartQuery, (snapshot) => {
         const sparepartPOs = new Set(snapshot.docs.map(doc => doc.data().requestNumber));
         setNotifications(prev => {
