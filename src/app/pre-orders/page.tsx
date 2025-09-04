@@ -400,10 +400,10 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
       });
 
       // Send WhatsApp Notification
-      const phoneNumber = "6285536979866"; // Indonesian country code
+      const phoneNumber = "628563866500"; // Indonesian country code
       const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\n');
       const message = encodeURIComponent(
-        `Dengan hormat,\n\nMohon untuk ditinjau dan disetujui permintaan Pre-Order berikut:\n\n${poList}\n\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\nhttps://stationeryinventory-gwk.vercel.app/\n\nTerima kasih.`
+        `Dengan hormat,\n\nMohon untuk ditinjau dan disetujui permintaan Pre-Order berikut:\n\n${poList}\n\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\nhttps://stationeryinventory-gwk.vercel.app/approval\n\nTerima kasih.`
       );
       
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
@@ -1077,5 +1077,3 @@ export default function PreOrdersPage({ searchParams }: { searchParams: { [key: 
       </React.Suspense>
     );
 }
-
-    
