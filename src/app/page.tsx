@@ -177,6 +177,7 @@ export default function DashboardPage() {
   const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
   const [selectedUnit, setSelectedUnit] = React.useState<string | undefined>();
   const [activePoNumber, setActivePoNumber] = React.useState<string>("");
+  const [poPrice, setPoPrice] = React.useState<number | string>("");
 
   // States for stock status dialog
   const [isStockStatusOpen, setStockStatusOpen] = React.useState(false);
@@ -503,6 +504,7 @@ export default function DashboardPage() {
     setSelectedUnit(undefined);
     setSelectedItemId(null);
     setSelectedItemName("Select an item...");
+    setPoPrice("");
     (e.target as HTMLFormElement).reset();
   };
 
@@ -530,6 +532,7 @@ export default function DashboardPage() {
     setSelectedItemId(item.id);
     setSelectedItemName(item.name);
     setSelectedUnit(item.unit);
+    setPoPrice(item.price);
     setCreatePoOpen(true);
   };
 
@@ -1300,6 +1303,7 @@ export default function DashboardPage() {
           if (!isOpen) {
             setSelectedItemId(null);
             setSelectedItemName("Select an item...");
+            setPoPrice("");
           }
           setCreatePoOpen(isOpen);
         }}
@@ -1357,6 +1361,7 @@ export default function DashboardPage() {
                                 setSelectedItemId(item.id);
                                 setSelectedItemName(item.name);
                                 setSelectedUnit(item.unit);
+                                setPoPrice(item.price);
                                 setComboPoOpen(false);
                               }}
                             >
@@ -1389,6 +1394,8 @@ export default function DashboardPage() {
                 min="1"
                 className="col-span-3"
                 required
+                value={poPrice}
+                onChange={(e) => setPoPrice(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
