@@ -883,7 +883,7 @@ export default function DashboardPage() {
                   value={selectedChartItem}
                   onValueChange={setSelectedChartItem}
                 >
-                  <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectTrigger className="w-full md:w-auto">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
