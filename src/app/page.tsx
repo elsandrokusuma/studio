@@ -711,7 +711,7 @@ export default function DashboardPage() {
             <Package className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl font-bold">
               {totalItems.toLocaleString()}
             </div>
           </CardContent>
@@ -725,7 +725,7 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">
+            <div className="text-2xl font-bold">
               {formatCurrency(stockValue)}
             </div>
           </CardContent>
@@ -740,7 +740,7 @@ export default function DashboardPage() {
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{lowStockItems}</div>
+            <div className="text-2xl font-bold">{lowStockItems}</div>
           </CardContent>
         </Card>
         <Card
@@ -753,7 +753,7 @@ export default function DashboardPage() {
             <Ban className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{outOfStockItems}</div>
+            <div className="text-2xl font-bold">{outOfStockItems}</div>
           </CardContent>
         </Card>
         <Card
@@ -768,7 +768,7 @@ export default function DashboardPage() {
             <Clock className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{awaitingApprovalCount}</div>
+            <div className="text-2xl font-bold">{awaitingApprovalCount}</div>
           </CardContent>
         </Card>
       </div>
