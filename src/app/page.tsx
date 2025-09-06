@@ -899,10 +899,10 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto h-[350px] flex items-end">
               <ChartContainer
                 config={chartConfig}
-                className="h-[300px] min-w-[300px] w-full"
+                className="min-w-[300px] w-full h-[300px]"
               >
                 <ChartComponent accessibilityLayer data={chartData}>
                   <CartesianGrid vertical={false} />
