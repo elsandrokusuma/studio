@@ -23,7 +23,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend, Line, LineChart } from "recharts";
 import type { InventoryItem, Transaction, PreOrder } from "@/lib/types";
 import {
   AlertCircle,
@@ -46,6 +46,8 @@ import {
   Sun,
   Moon,
   Sunset,
+  LineChart as LineChartIcon,
+  AreaChart as AreaChartIcon,
 } from "lucide-react";
 import {
   collection,
@@ -94,6 +96,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const chartConfig = {
   quantity: {
@@ -195,6 +198,9 @@ export default function DashboardPage() {
   );
   const [selectedItemName, setSelectedItemName] =
     React.useState<string>("Select an item...");
+
+  // State for chart type
+  const [chartType, setChartType] = React.useState<'bar' | 'line' | 'area'>('bar');
 
   const monthlyStockData = React.useMemo(() => {
     const data: {
@@ -595,6 +601,81 @@ export default function DashboardPage() {
   
   const GreetingIcon = greetingInfo.icon;
 
+  const ChartComponent = {
+    bar: BarChart,
+    line: LineChart,
+    area: AreaChart,
+  }[chartType];
+
+  const ChartElements = {
+    bar: (
+      <>
+        <Bar
+          dataKey="stockIn"
+          fill="var(--color-stockIn)"
+          radius={[4, 4, 0, 0]}
+          name="Stock In"
+        />
+        <Bar
+          dataKey="stockOut"
+          fill="var(--color-stockOut)"
+          radius={[4, 4, 0, 0]}
+          name="Stock Out"
+        />
+      </>
+    ),
+    line: (
+      <>
+        <Line
+          type="monotone"
+          dataKey="stockIn"
+          stroke="var(--color-stockIn)"
+          strokeWidth={2}
+          dot={false}
+          name="Stock In"
+        />
+        <Line
+          type="monotone"
+          dataKey="stockOut"
+          stroke="var(--color-stockOut)"
+          strokeWidth={2}
+          dot={false}
+          name="Stock Out"
+        />
+      </>
+    ),
+    area: (
+       <>
+        <defs>
+          <linearGradient id="fillStockIn" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--color-stockIn)" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="var(--color-stockIn)" stopOpacity={0.1} />
+          </linearGradient>
+          <linearGradient id="fillStockOut" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--color-stockOut)" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="var(--color-stockOut)" stopOpacity={0.1} />
+          </linearGradient>
+        </defs>
+        <Area
+          type="monotone"
+          dataKey="stockIn"
+          stroke="var(--color-stockIn)"
+          fill="url(#fillStockIn)"
+          stackId="1"
+          name="Stock In"
+        />
+        <Area
+          type="monotone"
+          dataKey="stockOut"
+          stroke="var(--color-stockOut)"
+          fill="url(#fillStockOut)"
+          stackId="1"
+          name="Stock Out"
+        />
+      </>
+    )
+  }[chartType];
+
   return (
     <div className="flex flex-col gap-8">
       <Card className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800/50">
@@ -762,22 +843,41 @@ export default function DashboardPage() {
                   <CardDescription>Last 6 months activity</CardDescription>
                 </div>
               </div>
-              <Select
-                value={selectedChartItem}
-                onValueChange={setSelectedChartItem}
-              >
-                <SelectTrigger className="w-full md:w-[250px]">
-                  <SelectValue placeholder="Select an item to view" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Items</SelectItem>
-                  {inventoryItems.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
+                 <ToggleGroup 
+                  type="single" 
+                  defaultValue="bar" 
+                  variant="outline" 
+                  className="w-full sm:w-auto"
+                  onValueChange={(value: 'bar' | 'line' | 'area') => value && setChartType(value)}
+                >
+                  <ToggleGroupItem value="bar" aria-label="Bar chart">
+                    <BarChart4 className="h-4 w-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="line" aria-label="Line chart">
+                    <LineChartIcon className="h-4 w-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="area" aria-label="Area chart">
+                    <AreaChartIcon className="h-4 w-4" />
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                <Select
+                  value={selectedChartItem}
+                  onValueChange={setSelectedChartItem}
+                >
+                  <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Select an item" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Items</SelectItem>
+                    {inventoryItems.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -786,7 +886,7 @@ export default function DashboardPage() {
                 config={chartConfig}
                 className="h-[300px] min-w-[300px] w-full"
               >
-                <BarChart accessibilityLayer data={monthlyStockData}>
+                <ChartComponent accessibilityLayer data={monthlyStockData}>
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="month"
@@ -798,19 +898,8 @@ export default function DashboardPage() {
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend />
-                  <Bar
-                    dataKey="stockIn"
-                    fill="var(--color-stockIn)"
-                    radius={[4, 4, 0, 0]}
-                    name="Stock In"
-                  />
-                  <Bar
-                    dataKey="stockOut"
-                    fill="var(--color-stockOut)"
-                    radius={[4, 4, 0, 0]}
-                    name="Stock Out"
-                  />
-                </BarChart>
+                  {ChartElements}
+                </ChartComponent>
               </ChartContainer>
             </div>
           </CardContent>
