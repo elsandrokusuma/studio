@@ -97,6 +97,8 @@ import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { format, subDays } from 'date-fns';
+
 
 const chartConfig = {
   quantity: {
@@ -199,63 +201,67 @@ export default function DashboardPage() {
   const [selectedItemName, setSelectedItemName] =
     React.useState<string>("Select an item...");
 
-  // State for chart type
+  // State for chart type and time period
   const [chartType, setChartType] = React.useState<'bar' | 'line' | 'area'>('bar');
+  const [timePeriod, setTimePeriod] = React.useState<'monthly' | 'daily'>('monthly');
 
-  const monthlyStockData = React.useMemo(() => {
-    const data: {
-      [key: string]: { month: string; stockIn: number; stockOut: number };
-    } = {};
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
 
+  const chartData = React.useMemo(() => {
     const filteredTransactions =
       selectedChartItem === "all"
         ? transactions
         : transactions.filter((t) => t.itemId === selectedChartItem);
 
-    filteredTransactions.forEach((t) => {
-      const date = new Date(t.date);
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      const monthLabel = `${monthNames[date.getMonth()]} '${String(
-        date.getFullYear()
-      ).slice(2)}`;
+    if (timePeriod === 'monthly') {
+      const data: { [key: string]: { month: string; stockIn: number; stockOut: number } } = {};
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-      if (!data[monthKey]) {
-        data[monthKey] = { month: monthLabel, stockIn: 0, stockOut: 0 };
-      }
+      filteredTransactions.forEach((t) => {
+        const date = new Date(t.date);
+        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        const monthLabel = `${monthNames[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
 
-      if (t.type === "in" || t.type === "add") {
-        data[monthKey].stockIn += t.quantity;
-      } else if (t.type === "out") {
-        data[monthKey].stockOut += t.quantity;
-      }
-    });
+        if (!data[monthKey]) {
+          data[monthKey] = { month: monthLabel, stockIn: 0, stockOut: 0 };
+        }
+        if (t.type === "in" || t.type === "add") data[monthKey].stockIn += t.quantity;
+        else if (t.type === "out") data[monthKey].stockOut += t.quantity;
+      });
 
-    return Object.values(data)
-      .sort((a, b) => {
-        const aDate = new Date(
-          a.month.split(" '")[0] + " 1, 20" + a.month.split(" '")[1]
-        );
-        const bDate = new Date(
-          b.month.split(" '")[0] + " 1, 20" + b.month.split(" '")[1]
-        );
-        return aDate.getTime() - bDate.getTime();
-      })
-      .slice(-6); // Get last 6 months
-  }, [transactions, selectedChartItem]);
+      return Object.values(data)
+        .sort((a, b) => {
+          const aDate = new Date(a.month.split(" '")[0] + " 1, 20" + a.month.split(" '")[1]);
+          const bDate = new Date(b.month.split(" '")[0] + " 1, 20" + b.month.split(" '")[1]);
+          return aDate.getTime() - bDate.getTime();
+        })
+        .slice(-6);
+    } else { // Daily
+      const data: { [key: string]: { date: string; stockIn: number; stockOut: number } } = {};
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const d = subDays(new Date(), i);
+        return format(d, 'yyyy-MM-dd');
+      }).reverse();
+
+      last7Days.forEach(day => {
+        data[day] = { date: format(new Date(day), 'dd MMM'), stockIn: 0, stockOut: 0 };
+      });
+      
+      const sevenDaysAgo = subDays(new Date(), 6);
+
+      filteredTransactions.forEach((t) => {
+        const transactionDate = new Date(t.date);
+        if (transactionDate >= sevenDaysAgo) {
+          const dayKey = format(transactionDate, 'yyyy-MM-dd');
+          if(data[dayKey]) {
+            if (t.type === "in" || t.type === "add") data[dayKey].stockIn += t.quantity;
+            else if (t.type === "out") data[dayKey].stockOut += t.quantity;
+          }
+        }
+      });
+      return Object.values(data);
+    }
+  }, [transactions, selectedChartItem, timePeriod]);
+
 
   React.useEffect(() => {
     if (!db) {
@@ -840,13 +846,15 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <CardTitle>Stock Movement Trends</CardTitle>
-                  <CardDescription>Last 6 months activity</CardDescription>
+                  <CardDescription>
+                    {timePeriod === 'monthly' ? 'Last 6 months activity' : 'Last 7 days activity'}
+                  </CardDescription>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
                  <ToggleGroup 
                   type="single" 
-                  defaultValue="bar" 
+                  defaultValue={chartType}
                   variant="outline" 
                   className="w-full sm:w-auto"
                   onValueChange={(value: 'bar' | 'line' | 'area') => value && setChartType(value)}
@@ -860,6 +868,16 @@ export default function DashboardPage() {
                   <ToggleGroupItem value="area" aria-label="Area chart">
                     <AreaChartIcon className="h-4 w-4" />
                   </ToggleGroupItem>
+                </ToggleGroup>
+                 <ToggleGroup 
+                  type="single" 
+                  defaultValue={timePeriod}
+                  variant="outline" 
+                  className="w-full sm:w-auto"
+                  onValueChange={(value: 'daily' | 'monthly') => value && setTimePeriod(value)}
+                >
+                  <ToggleGroupItem value="daily" aria-label="Daily view">Daily</ToggleGroupItem>
+                  <ToggleGroupItem value="monthly" aria-label="Monthly view">Monthly</ToggleGroupItem>
                 </ToggleGroup>
                 <Select
                   value={selectedChartItem}
@@ -886,10 +904,10 @@ export default function DashboardPage() {
                 config={chartConfig}
                 className="h-[300px] min-w-[300px] w-full"
               >
-                <ChartComponent accessibilityLayer data={monthlyStockData}>
+                <ChartComponent accessibilityLayer data={chartData}>
                   <CartesianGrid vertical={false} />
                   <XAxis
-                    dataKey="month"
+                    dataKey={timePeriod === 'monthly' ? 'month' : 'date'}
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
