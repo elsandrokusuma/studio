@@ -525,6 +525,14 @@ export default function DashboardPage() {
     setStockStatusOpen(true);
   };
 
+  const handleStockItemClick = (item: InventoryItem) => {
+    setStockStatusOpen(false);
+    setSelectedItemId(item.id);
+    setSelectedItemName(item.name);
+    setSelectedUnit(item.unit);
+    setCreatePoOpen(true);
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -986,7 +994,7 @@ export default function DashboardPage() {
                 </TableHeader>
                 <TableBody>
                   {stockStatusItems.map((item) => (
-                    <TableRow key={item.id}>
+                    <TableRow key={item.id} onClick={() => handleStockItemClick(item)} className="cursor-pointer">
                       <TableCell className="font-medium">{item.name}</TableCell>
                       <TableCell className="text-right">
                         {item.quantity}
