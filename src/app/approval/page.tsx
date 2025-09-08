@@ -106,7 +106,9 @@ export default function ApprovalPage() {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    }
   }, [toast]);
 
   const handleDecision = async (po: GroupedPO, decision: "approved" | "rejected") => {

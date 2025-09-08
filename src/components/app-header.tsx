@@ -54,9 +54,38 @@ function NotificationBell() {
   React.useEffect(() => {
     if (!db) return;
 
-    const unsubscribers: (() => void)[] = [];
+    const unsubs: (() => void)[] = [];
 
-    // Low Stock Listener
+    const setupListener = (
+      collectionName: string,
+      statusField: string,
+      statusValue: string,
+      groupByField: string,
+      notificationType: Notification['type'],
+      title: string,
+      href: string,
+      icon: React.ElementType
+    ) => {
+      const q = query(collection(db, collectionName), where(statusField, "==", statusValue));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const uniqueItems = new Set(snapshot.docs.map(doc => doc.data()[groupByField]));
+        setNotifications(prev => {
+          const others = prev.filter(n => n.type !== notificationType);
+          if (uniqueItems.size > 0) {
+            return [{
+              type: notificationType,
+              title: title,
+              count: uniqueItems.size,
+              href: href,
+              icon: icon,
+            }, ...others];
+          }
+          return others;
+        });
+      });
+      unsubs.push(unsubscribe);
+    };
+
     const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
     const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
         setNotifications(prev => {
@@ -73,50 +102,13 @@ function NotificationBell() {
             return others;
         });
     });
-    unsubscribers.push(unsubscribeLowStock);
+    unsubs.push(unsubscribeLowStock);
 
-    // Stationery Approval Listener
-    const stationeryQuery = query(collection(db, "pre-orders"), where("status", "==", "Awaiting Approval"));
-    const unsubscribeStationery = onSnapshot(stationeryQuery, (snapshot) => {
-        const stationeryPOs = new Set(snapshot.docs.map(doc => doc.data().poNumber));
-        setNotifications(prev => {
-            const others = prev.filter(n => n.type !== 'stationery_approval');
-            if (stationeryPOs.size > 0) {
-                 return [{
-                    type: 'stationery_approval',
-                    title: 'Stationery Approvals',
-                    count: stationeryPOs.size,
-                    href: '/approval',
-                    icon: Clock,
-                }, ...others];
-            }
-            return others;
-        });
-    });
-    unsubscribers.push(unsubscribeStationery);
-    
-    // Sparepart Approval Listener
-    const sparepartQuery = query(collection(db, "sparepart-requests"), where("status", "==", "Awaiting Approval"));
-    const unsubscribeSparepart = onSnapshot(sparepartQuery, (snapshot) => {
-        const sparepartPOs = new Set(snapshot.docs.map(doc => doc.data().requestNumber));
-        setNotifications(prev => {
-            const others = prev.filter(n => n.type !== 'sparepart_approval');
-            if (sparepartPOs.size > 0) {
-                return [{
-                    type: 'sparepart_approval',
-                    title: 'Sparepart Approvals',
-                    count: sparepartPOs.size,
-                    href: '/approval-sparepart',
-                    icon: Clock,
-                }, ...others];
-            }
-            return others;
-        });
-    });
-    unsubscribers.push(unsubscribeSparepart);
+    setupListener("pre-orders", "status", "Awaiting Approval", "poNumber", "stationery_approval", "Stationery Approvals", "/approval", Clock);
+    setupListener("sparepart-requests", "status", "Awaiting Approval", "requestNumber", "sparepart_approval", "Sparepart Approvals", "/approval-sparepart", Clock);
 
     return () => {
-        unsubscribers.forEach(unsub => unsub());
+      unsubs.forEach(unsub => unsub());
     };
     
   }, []);

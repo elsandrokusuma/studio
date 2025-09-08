@@ -271,8 +271,7 @@ export default function DashboardPage() {
       setLoading(false);
       return;
     }
-    let active = true;
-
+    
     const getGreeting = (): GreetingInfo => {
         const now = new Date();
         const utcOffset = now.getTimezoneOffset() * 60000;
@@ -301,7 +300,6 @@ export default function DashboardPage() {
     const unsubscribeInventory = onSnapshot(
       qInventory,
       (querySnapshot) => {
-        if (!active) return;
         const items: InventoryItem[] = [];
         querySnapshot.forEach((doc) => {
           items.push({ id: doc.id, ...doc.data() } as InventoryItem);
@@ -319,7 +317,6 @@ export default function DashboardPage() {
     const unsubscribeTransactions = onSnapshot(
       qTransactions,
       (querySnapshot) => {
-        if (!active) return;
         const trans: Transaction[] = [];
         querySnapshot.forEach((doc) => {
           trans.push({ id: doc.id, ...doc.data() } as Transaction);
@@ -336,7 +333,6 @@ export default function DashboardPage() {
     const unsubscribeRecentTransactions = onSnapshot(
       qRecentTransactions,
       (querySnapshot) => {
-        if (!active) return;
         const trans: Transaction[] = [];
         querySnapshot.forEach((doc) => {
           trans.push({ id: doc.id, ...doc.data() } as Transaction);
@@ -350,7 +346,6 @@ export default function DashboardPage() {
       orderBy("orderDate", "desc")
     );
     const unsubscribePreOrders = onSnapshot(qPreOrders, (querySnapshot) => {
-      if (!active) return;
       const orders: PreOrder[] = [];
       querySnapshot.forEach((doc) => {
         orders.push({ id: doc.id, ...doc.data() } as PreOrder);
@@ -359,7 +354,6 @@ export default function DashboardPage() {
     });
 
     return () => {
-      active = false;
       unsubscribeInventory();
       unsubscribeTransactions();
       unsubscribeRecentTransactions();

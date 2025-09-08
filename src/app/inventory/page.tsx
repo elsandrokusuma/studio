@@ -285,7 +285,9 @@ export default function InventoryPage() {
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    }
   }, [toast]);
   
   React.useEffect(() => {

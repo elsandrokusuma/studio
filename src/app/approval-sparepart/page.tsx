@@ -46,6 +46,7 @@ import {
     FileDown,
     Send,
     Undo2,
+    ChevronDown,
 } from "lucide-react";
 import {
   Table,
@@ -872,7 +873,9 @@ export default function ApprovalSparepartPage() {
                                 <div className="text-muted-foreground">Req: {req.requester}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180" />
+                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md">
+                                    <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                                </AccordionTrigger>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -1047,5 +1050,3 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
-
-    
