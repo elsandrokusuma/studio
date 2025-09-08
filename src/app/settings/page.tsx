@@ -22,7 +22,6 @@ const colors: { name: Color, bgColor: string }[] = [
 ];
 
 const defaultWallpapers = [
-    { name: 'Default', value: 'https://picsum.photos/1920/1080?grayscale' },
     { name: 'Nature', value: 'https://picsum.photos/seed/nature/1920/1080' },
     { name: 'City', value: 'https://picsum.photos/seed/city/1920/1080' },
     { name: 'Tech', value: 'https://picsum.photos/seed/tech/1920/1080' },
@@ -122,12 +121,26 @@ export default function SettingsPage() {
                             <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                             <div
+                                key="default"
+                                className={cn(
+                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
+                                    wallpaper === 'default' && "ring-2 ring-primary"
+                                )}
+                                onClick={() => setWallpaper('default')}
+                                tabIndex={0}
+                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
+                            >
+                                <div className="absolute inset-0 flex items-end p-2">
+                                    <p className="text-muted-foreground text-xs font-medium">Solid Color</p>
+                                </div>
+                            </div>
                             {defaultWallpapers.map((wp) => (
                                 <div
                                     key={wp.name}
                                     className={cn(
                                         "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                                        (wallpaper === wp.value || (wallpaper === 'default' && wp.name === 'Default')) && "ring-2 ring-primary"
+                                        wallpaper === wp.value && "ring-2 ring-primary"
                                     )}
                                     onClick={() => setWallpaper(wp.value)}
                                     tabIndex={0}

@@ -24,11 +24,14 @@ function AppWallpaper() {
     const [imageUrl, setImageUrl] = React.useState<string | null>(null);
 
     React.useEffect(() => {
-        // Handle both default URLs and locally stored data URIs
-        if (wallpaper && wallpaper.startsWith('data:image')) {
-            setImageUrl(wallpaper);
-        } else if (wallpaper) {
-            // For default wallpapers, it's a direct URL
+        // If wallpaper is set to 'default', we want a solid color, so imageUrl should be null.
+        if (wallpaper === 'default') {
+            setImageUrl(null);
+            return;
+        }
+
+        // Handle both locally stored data URIs and external URLs
+        if (wallpaper) {
             setImageUrl(wallpaper);
         } else {
             setImageUrl(null);
@@ -46,7 +49,7 @@ function AppWallpaper() {
                 alt="Background Wallpaper"
                 fill
                 className="object-cover"
-                unoptimized // Use this if the source can be a data URI
+                unoptimized // Use this if the source can be a data URI or from an unconfigured host
             />
             <div className="absolute inset-0 bg-black/30 dark:bg-black/50" />
         </div>
