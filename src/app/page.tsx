@@ -104,11 +104,11 @@ import { format, subDays } from 'date-fns';
 const chartConfig = {
   stockIn: {
     label: "Stock In",
-    color: "hsl(var(--chart-2))", // Green
+    color: "hsl(142 76% 36%)",
   },
   stockOut: {
     label: "Stock Out",
-    color: "hsl(var(--chart-5))", // Red
+    color: "hsl(0 84% 60%)",
   },
 };
 
@@ -1573,5 +1573,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
