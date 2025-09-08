@@ -210,14 +210,16 @@ export function AppHeader() {
           <NavLinks />
         </div>
         
-        <div className="flex items-center gap-2">
-            <NotificationBell />
-            <Link href="/settings">
-                <Button variant="ghost" size="icon">
-                    <Settings className="h-5 w-5" />
-                </Button>
-            </Link>
-            <div className="md:hidden">
+        <div className="flex items-center">
+            <div className="flex items-center gap-2">
+                <NotificationBell />
+                <Link href="/settings">
+                    <Button variant="ghost" size="icon">
+                        <Settings className="h-5 w-5" />
+                    </Button>
+                </Link>
+            </div>
+            <div className="md:hidden ml-2">
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="icon">
