@@ -894,7 +894,6 @@ export default function InventoryPage() {
                                 height="64"
                                 src={src}
                                 width="64"
-                                data-ai-hint="product image"
                               />
                           ) : (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -999,7 +998,6 @@ export default function InventoryPage() {
                               height={180}
                               src={src}
                               width={320}
-                              data-ai-hint="product image"
                             />
                         ) : (
                           // eslint-disable-next-line @next/next/no-img-element
