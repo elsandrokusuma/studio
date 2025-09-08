@@ -60,7 +60,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, color, setColor, background, setBackground }}>
-       <html lang="en" suppressHydrationWarning className={cn(theme, `theme-${color}`, `bg-pattern-${background}`)}>
+       <html lang="en" suppressHydrationWarning className={cn(theme, `theme-${color}`)}>
           <head>
             <title>Stationery Inventory</title>
             <meta name="description" content="Comprehensive inventory and stock management ERP" />
@@ -69,7 +69,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
           </head>
-           <body className={cn('font-body antialiased bg-background text-foreground')}>
+           <body className={cn('font-body antialiased bg-background text-foreground', `bg-pattern-${background}`)}>
               {children}
            </body>
        </html>
