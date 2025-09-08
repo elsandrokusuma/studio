@@ -24,13 +24,11 @@ function AppWallpaper() {
     const [imageUrl, setImageUrl] = React.useState<string | null>(null);
 
     React.useEffect(() => {
-        // If wallpaper is set to 'default', we want a solid color, so imageUrl should be null.
         if (wallpaper === 'default') {
             setImageUrl(null);
             return;
         }
 
-        // Handle both locally stored data URIs and external URLs
         if (wallpaper) {
             setImageUrl(wallpaper);
         } else {
@@ -49,9 +47,12 @@ function AppWallpaper() {
                 alt="Background Wallpaper"
                 fill
                 className="object-cover"
-                unoptimized // Use this if the source can be a data URI or from an unconfigured host
+                unoptimized
             />
-            <div className="absolute inset-0 bg-black/30 dark:bg-black/50" />
+            <div 
+              className="absolute inset-0 bg-black" 
+              style={{ opacity: 'var(--wallpaper-overlay-opacity)' }}
+            />
         </div>
     );
 }
@@ -61,6 +62,8 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = React.useState<Theme>('light');
   const [color, setColorState] = React.useState<Color>('green');
   const [wallpaper, setWallpaperState] = React.useState<Wallpaper>('default');
+  const [wallpaperOpacity, setWallpaperOpacityState] = React.useState(0.5);
+  const [componentOpacity, setComponentOpacityState] = React.useState(1);
   
   const [isMounted, setIsMounted] = React.useState(false);
 
@@ -68,17 +71,19 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedTheme = Cookies.get('theme') as Theme | undefined;
     const savedColor = Cookies.get('color') as Color | undefined;
     const savedWallpaper = localStorage.getItem('wallpaper') as Wallpaper | undefined;
+    const savedWallpaperOpacity = localStorage.getItem('wallpaperOpacity');
+    const savedComponentOpacity = localStorage.getItem('componentOpacity');
 
     if (savedTheme) setThemeState(savedTheme);
     if (savedColor) setColorState(savedColor);
     if (savedWallpaper) setWallpaperState(savedWallpaper);
+    if (savedWallpaperOpacity) setWallpaperOpacityState(parseFloat(savedWallpaperOpacity));
+    if (savedComponentOpacity) setComponentOpacityState(parseFloat(savedComponentOpacity));
     
     setIsMounted(true);
   }, []);
   
-  // Only render children when mounted to avoid hydration mismatch
   if (!isMounted) {
-    // Return a placeholder or null to prevent server-client mismatch
     return null; 
   }
 
@@ -94,13 +99,36 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   
   const setWallpaper = (newWallpaper: Wallpaper) => {
     setWallpaperState(newWallpaper);
-    // Use localStorage for wallpaper as it can store larger data (e.g., data URIs)
     localStorage.setItem('wallpaper', newWallpaper);
+  };
+  
+  const setWallpaperOpacity = (opacity: number) => {
+    setWallpaperOpacityState(opacity);
+    localStorage.setItem('wallpaperOpacity', opacity.toString());
+  };
+
+  const setComponentOpacity = (opacity: number) => {
+    setComponentOpacityState(opacity);
+    localStorage.setItem('componentOpacity', opacity.toString());
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, color, setColor, wallpaper, setWallpaper }}>
-       <html lang="en" suppressHydrationWarning className={cn(theme, `theme-${color}`)}>
+    <ThemeContext.Provider value={{ 
+      theme, setTheme, 
+      color, setColor, 
+      wallpaper, setWallpaper,
+      wallpaperOpacity, setWallpaperOpacity,
+      componentOpacity, setComponentOpacity
+    }}>
+       <html 
+        lang="en" 
+        suppressHydrationWarning 
+        className={cn(theme, `theme-${color}`)}
+        style={{
+          '--wallpaper-overlay-opacity': wallpaperOpacity,
+          '--component-opacity': componentOpacity,
+        } as React.CSSProperties}
+      >
           <head>
             <title>Stationery Inventory</title>
             <meta name="description" content="Comprehensive inventory and stock management ERP" />
@@ -109,7 +137,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
           </head>
-           <body className={cn('font-body antialiased bg-background text-foreground')}>
+           <body className={cn('font-body antialiased text-foreground')}>
               <AppWallpaper />
               {children}
            </body>

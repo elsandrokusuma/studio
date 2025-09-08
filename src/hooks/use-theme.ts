@@ -5,7 +5,6 @@ import * as React from 'react';
 
 type Theme = 'light' | 'dark';
 type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
-// Wallpaper can be a URL string or a data URI string from a file upload
 type Wallpaper = string;
 
 
@@ -16,6 +15,10 @@ type ThemeContextType = {
   setColor: (color: Color) => void;
   wallpaper: Wallpaper;
   setWallpaper: (wallpaper: Wallpaper) => void;
+  wallpaperOpacity: number;
+  setWallpaperOpacity: (opacity: number) => void;
+  componentOpacity: number;
+  setComponentOpacity: (opacity: number) => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);

@@ -119,7 +119,7 @@ function NotificationBell() {
         unsubscribers.forEach(unsub => unsub());
     };
     
-  }, [db]);
+  }, []);
 
   const hasNotifications = notifications.some(n => n.count > 0);
 
@@ -198,7 +198,7 @@ export function AppHeader() {
   )
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 md:px-6 print:hidden">
+    <header className="header sticky top-0 z-30 flex h-14 items-center border-b px-4 md:px-6 print:hidden">
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center">

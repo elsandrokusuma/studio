@@ -12,6 +12,7 @@ import { useTheme, type Color } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { Slider } from '@/components/ui/slider';
 
 const colors: { name: Color, bgColor: string }[] = [
     { name: 'green', bgColor: 'bg-green-500' },
@@ -30,11 +31,16 @@ const defaultWallpapers = [
 
 export default function SettingsPage() {
     const router = useRouter();
-    const { theme, setTheme, color, setColor, wallpaper, setWallpaper } = useTheme();
+    const { 
+        theme, setTheme, 
+        color, setColor, 
+        wallpaper, setWallpaper,
+        wallpaperOpacity, setWallpaperOpacity,
+        componentOpacity, setComponentOpacity
+    } = useTheme();
     const { toast } = useToast();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     
-    // Ensure theme is not undefined during initial render
     const isDarkMode = theme === 'dark';
 
     const handleThemeChange = (checked: boolean) => {
@@ -45,7 +51,6 @@ export default function SettingsPage() {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        // Check file size (e.g., 5MB limit)
         if (file.size > 5 * 1024 * 1024) {
             toast({
                 variant: 'destructive',
@@ -82,7 +87,7 @@ export default function SettingsPage() {
                     <CardTitle>Appearance</CardTitle>
                     <CardDescription>Sesuaikan tampilan dan nuansa aplikasi.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-8">
                     <div className="flex items-center justify-between">
                         <div>
                             <Label htmlFor="dark-mode">Dark Mode</Label>
@@ -115,7 +120,7 @@ export default function SettingsPage() {
                         </div>
                     </div>
 
-                     <div className="space-y-2">
+                     <div className="space-y-4">
                        <div>
                             <Label>Wallpaper Latar Belakang</Label>
                             <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
@@ -172,6 +177,35 @@ export default function SettingsPage() {
                                 />
                             </button>
                         </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <Label>Tingkat Kegelapan Wallpaper</Label>
+                            <p className="text-sm text-muted-foreground">Atur seberapa gelap overlay pada wallpaper.</p>
+                        </div>
+                        <Slider
+                            value={[wallpaperOpacity]}
+                            onValueChange={(value) => setWallpaperOpacity(value[0])}
+                            min={0}
+                            max={1}
+                            step={0.1}
+                            disabled={wallpaper === 'default'}
+                        />
+                    </div>
+                    
+                    <div className="space-y-4">
+                        <div>
+                            <Label>Transparansi Komponen</Label>
+                            <p className="text-sm text-muted-foreground">Atur transparansi untuk card dan header.</p>
+                        </div>
+                         <Slider
+                            value={[componentOpacity]}
+                            onValueChange={(value) => setComponentOpacity(value[0])}
+                            min={0.5}
+                            max={1}
+                            step={0.05}
+                        />
                     </div>
                 </CardContent>
             </Card>

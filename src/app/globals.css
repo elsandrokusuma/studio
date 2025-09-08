@@ -23,6 +23,10 @@
     --input: 220 13% 91%;
     --radius: 0.8rem;
     
+    /* Custom Opacity Variables */
+    --wallpaper-overlay-opacity: 0.3;
+    --component-opacity: 1;
+    
     /* Chart Colors (consistent across themes) */
     --chart-2: 0 79% 63%;
     --chart-3: 197 37% 24%;
@@ -70,6 +74,8 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --chart-2: 0 69% 56%;
+
+    --wallpaper-overlay-opacity: 0.5;
   }
 }
 
@@ -144,9 +150,16 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  /* Apply opacity to cards */
+  .card, .header {
+    background-color: hsl(var(--card) / var(--component-opacity));
   }
 }
+
 
 /* Hide Vercel Toolbar */
 [data-vercel-toolbar] {
