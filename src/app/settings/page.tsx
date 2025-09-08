@@ -22,10 +22,10 @@ const colors: { name: Color, bgColor: string }[] = [
 ];
 
 const defaultWallpapers = [
-    { name: 'Default', value: 'https://picsum.photos/1920/1080?grayscale', hint: 'abstract grayscale' },
-    { name: 'Nature', value: 'https://picsum.photos/seed/nature/1920/1080', hint: 'forest nature' },
-    { name: 'City', value: 'https://picsum.photos/seed/city/1920/1080', hint: 'city skyline' },
-    { name: 'Tech', value: 'https://picsum.photos/seed/tech/1920/1080', hint: 'circuit board' },
+    { name: 'Default', value: 'https://picsum.photos/1920/1080?grayscale' },
+    { name: 'Nature', value: 'https://picsum.photos/seed/nature/1920/1080' },
+    { name: 'City', value: 'https://picsum.photos/seed/city/1920/1080' },
+    { name: 'Tech', value: 'https://picsum.photos/seed/tech/1920/1080' },
 ];
 
 
@@ -138,7 +138,6 @@ export default function SettingsPage() {
                                         alt={wp.name}
                                         fill
                                         className="object-cover"
-                                        data-ai-hint={wp.hint}
                                     />
                                     <div className="absolute inset-0 bg-black/30 flex items-end p-2">
                                         <p className="text-white text-xs font-medium">{wp.name}</p>
