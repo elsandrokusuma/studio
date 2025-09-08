@@ -785,7 +785,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                                         po.status === 'Approved' ? 'default' :
                                         po.status === 'Fulfilled' ? 'default' :
                                         po.status === 'Rejected' || po.status === 'Cancelled' ? 'destructive' :
-                                        po.status === 'Pending' ? 'secondary' :
+                                        po.status === 'Pending' ? 'warning' :
                                         po.status === 'Awaiting Approval' ? 'warning' : 'outline'
                                         }
                                         className={
@@ -863,14 +863,14 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
                                           order.status === 'Approved' ? 'default' :
                                           order.status === 'Fulfilled' ? 'default' :
                                           order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
-                                          order.status === 'Pending' ? 'secondary' :
+                                          order.status === 'Pending' ? 'warning' :
                                           order.status === 'Awaiting Approval' ? 'warning' : 'outline'
                                           }
                                           className={
                                           order.status === 'Approved' ? 'bg-green-100 text-green-800' :
                                           order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
                                           order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                          order.status === 'Pending' ? 'bg-gray-100 text-gray-800' :
+                                          order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
                                           order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
                                           }
                                       >
