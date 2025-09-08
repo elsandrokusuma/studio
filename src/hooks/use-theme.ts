@@ -2,16 +2,19 @@
 'use client';
 
 import * as React from 'react';
-import Cookies from 'js-cookie';
 
 type Theme = 'light' | 'dark';
 type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
+type BackgroundPattern = 'solid' | 'dots' | 'lines' | 'geometric';
+
 
 type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   color: Color;
   setColor: (color: Color) => void;
+  background: BackgroundPattern;
+  setBackground: (background: BackgroundPattern) => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
@@ -25,4 +28,4 @@ export function useTheme() {
 }
 
 export { ThemeContext };
-export type { Theme, Color };
+export type { Theme, Color, BackgroundPattern };

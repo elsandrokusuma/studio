@@ -3,13 +3,14 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check, LucideIcon, Dot, Minus, AppWindow } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useTheme, type Color } from '@/hooks/use-theme';
+import { useTheme, type Color, type BackgroundPattern } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const colors: { name: Color, bgColor: string }[] = [
     { name: 'green', bgColor: 'bg-green-500' },
@@ -19,9 +20,16 @@ const colors: { name: Color, bgColor: string }[] = [
     { name: 'violet', bgColor: 'bg-violet-500' },
 ];
 
+const patterns: { name: BackgroundPattern, label: string, icon: LucideIcon }[] = [
+    { name: 'solid', label: 'Solid', icon: AppWindow },
+    { name: 'dots', label: 'Dots', icon: Dot },
+    { name: 'lines', label: 'Lines', icon: Minus },
+    { name: 'geometric', label: 'Geometric', icon: AppWindow }, // Using a placeholder, could be a more specific icon
+]
+
 export default function SettingsPage() {
     const router = useRouter();
-    const { theme, setTheme, color, setColor } = useTheme();
+    const { theme, setTheme, color, setColor, background, setBackground } = useTheme();
     
     // Ensure theme is not undefined during initial render
     const isDarkMode = theme === 'dark';
@@ -76,6 +84,29 @@ export default function SettingsPage() {
                                 </Button>
                             ))}
                         </div>
+                    </div>
+                    
+                     <div className="space-y-2">
+                       <div>
+                            <Label>Background Pattern</Label>
+                            <p className="text-sm text-muted-foreground">Select a background pattern for the app.</p>
+                        </div>
+                        <RadioGroup
+                            value={background}
+                            onValueChange={(value) => setBackground(value as BackgroundPattern)}
+                            className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2"
+                        >
+                          {patterns.map((p) => {
+                             const Icon = p.icon;
+                             return (
+                                <Label key={p.name} htmlFor={p.name} className="relative flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
+                                  <RadioGroupItem value={p.name} id={p.name} className="sr-only" />
+                                  <Icon className="mb-2 h-6 w-6" />
+                                  <span>{p.label}</span>
+                                </Label>
+                             )
+                          })}
+                        </RadioGroup>
                     </div>
                 </CardContent>
             </Card>
