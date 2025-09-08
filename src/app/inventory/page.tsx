@@ -73,7 +73,9 @@ import {
   Download,
   Database,
   Check,
-  ChevronsUpDown
+  ChevronsUpDown,
+  List,
+  LayoutGrid,
 } from "lucide-react";
 import type { InventoryItem, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -85,13 +87,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGoogleDriveImageSrc } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 
 const seedData = [
@@ -229,6 +232,7 @@ export default function InventoryPage() {
   const [photoToShow, setPhotoToShow] = React.useState<string | null>(null);
   const router = useRouter();
   const [loading, setLoading] = React.useState(true);
+  const [layout, setLayout] = React.useState<'list' | 'grid'>('list');
 
   // States for camera functionality
   const [isCameraOpen, setCameraOpen] = React.useState(false);
@@ -550,10 +554,10 @@ export default function InventoryPage() {
   );
   
   const getDisplayImage = (url: string | undefined | null) => {
-    if (!url) return { src: "https://placehold.co/64x64.png", isPlaceholder: true };
+    if (!url) return { src: "https://placehold.co/600x400.png", isPlaceholder: true };
     if (url.startsWith("data:image")) return { src: url, isPlaceholder: false };
     const gdriveSrc = getGoogleDriveImageSrc(url);
-    return gdriveSrc ? { src: gdriveSrc, isPlaceholder: false } : { src: "https://placehold.co/64x64.png", isPlaceholder: true };
+    return gdriveSrc ? { src: gdriveSrc, isPlaceholder: false } : { src: "https://placehold.co/600x400.png", isPlaceholder: true };
   };
 
 
@@ -727,6 +731,14 @@ export default function InventoryPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <ToggleGroup type="single" value={layout} onValueChange={(value: 'list' | 'grid') => value && setLayout(value)} variant="outline">
+            <ToggleGroupItem value="list" aria-label="List view">
+              <List className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="grid" aria-label="Grid view">
+              <LayoutGrid className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-full md:w-auto">
@@ -850,126 +862,212 @@ export default function InventoryPage() {
         </div>
       </header>
       
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px] hidden sm:table-cell">Photo</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead className="hidden md:table-cell">Unit</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredItems.map((item) => {
-                  const { src, isPlaceholder } = getDisplayImage(item.photoUrl);
-                  return (
-                  <TableRow key={item.id}>
-                    <TableCell className="hidden sm:table-cell">
-                      <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
-                        {isPlaceholder ? (
-                          <Image
+      {layout === 'list' ? (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[80px] hidden sm:table-cell">Photo</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead className="hidden md:table-cell">Unit</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-right">Quantity</TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredItems.map((item) => {
+                    const { src, isPlaceholder } = getDisplayImage(item.photoUrl);
+                    return (
+                    <TableRow key={item.id}>
+                      <TableCell className="hidden sm:table-cell">
+                        <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
+                          {isPlaceholder ? (
+                            <Image
+                                alt={item.name}
+                                className="aspect-square rounded-md object-cover"
+                                height="64"
+                                src={src}
+                                width="64"
+                                data-ai-hint="product image"
+                              />
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
                               alt={item.name}
                               className="aspect-square rounded-md object-cover"
                               height="64"
                               src={src}
                               width="64"
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell>{formatCurrency(item.price || 0)}</TableCell>
+                      <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={item.quantity > 5 ? "outline" : item.quantity > 0 ? "warning" : "destructive"}
+                           className={
+                            item.quantity > 5 ? 'border-green-600 text-green-600' : 
+                            item.quantity > 0 ? 'bg-orange-100 text-orange-800' : 
+                            'bg-red-100 text-red-800'
+                          }
+                        >
+                          {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">{item.quantity}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
+                              <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setSelectedItem(item);
+                                setEditItemOpen(true);
+                              }}
+                            >
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setSelectedItemId(item.id);
+                                setSelectedItemName(item.name);
+                                setStockInOpen(true);
+                              }}
+                            >
+                              <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setSelectedItemId(item.id);
+                                setSelectedItemName(item.name);
+                                setStockOutOpen(true);
+                              }}
+                            >
+                              <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-red-600 focus:text-red-700"
+                              onSelect={() => {
+                                setSelectedItem(item);
+                                setDeleteOpen(true);
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )})}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {filteredItems.map((item) => {
+             const { src, isPlaceholder } = getDisplayImage(item.photoUrl);
+             return (
+              <Card key={item.id} className="flex flex-col">
+                <CardHeader className="p-0">
+                  <div className="relative">
+                    <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
+                       {isPlaceholder ? (
+                          <Image
+                              alt={item.name}
+                              className="aspect-video w-full rounded-t-lg object-cover"
+                              height={180}
+                              src={src}
+                              width={320}
                               data-ai-hint="product image"
                             />
                         ) : (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             alt={item.name}
-                            className="aspect-square rounded-md object-cover"
-                            height="64"
+                            className="aspect-video w-full rounded-t-lg object-cover"
+                            height={180}
                             src={src}
-                            width="64"
+                            width={320}
                           />
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{formatCurrency(item.price || 0)}</TableCell>
-                    <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        variant={item.quantity > 5 ? "outline" : item.quantity > 0 ? "warning" : "destructive"}
-                         className={
-                          item.quantity > 5 ? 'border-green-600 text-green-600' : 
-                          item.quantity > 0 ? 'bg-orange-100 text-orange-800' : 
-                          'bg-red-100 text-red-800'
-                        }
-                      >
-                        {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">{item.quantity}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
-                            <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setSelectedItem(item);
-                              setEditItemOpen(true);
-                            }}
-                          >
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setSelectedItemId(item.id);
-                              setSelectedItemName(item.name);
-                              setStockInOpen(true);
-                            }}
-                          >
-                            <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setSelectedItemId(item.id);
-                              setSelectedItemName(item.name);
-                              setStockOutOpen(true);
-                            }}
-                          >
-                            <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600 focus:text-red-700"
-                            onSelect={() => {
-                              setSelectedItem(item);
-                              setDeleteOpen(true);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete Item
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                )})}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="secondary" className="h-8 w-8 rounded-full">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
+                              <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => { setSelectedItem(item); setEditItemOpen(true); }}>
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockInOpen(true); }}>
+                              <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockOutOpen(true); }}>
+                              <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedItem(item); setDeleteOpen(true); }}>
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 flex-1">
+                    <h3 className="font-semibold text-lg truncate" title={item.name}>{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">{formatCurrency(item.price || 0)}</p>
+                </CardContent>
+                <CardFooter className="p-4 pt-0 flex justify-between items-center">
+                    <Badge
+                      variant={item.quantity > 5 ? "outline" : item.quantity > 0 ? "warning" : "destructive"}
+                      className={
+                        item.quantity > 5 ? 'border-green-600 text-green-600' : 
+                        item.quantity > 0 ? 'bg-orange-100 text-orange-800' : 
+                        'bg-red-100 text-red-800'
+                      }
+                    >
+                      {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
+                    </Badge>
+                     <div className="text-right">
+                        <p className="font-bold text-lg">{item.quantity}</p>
+                        <p className="text-xs text-muted-foreground -mt-1">{item.unit}</p>
+                    </div>
+                </CardFooter>
+              </Card>
+             )
+          })}
+        </div>
+      )}
       
       {/* Photo Viewer Dialog */}
       <Dialog open={isPhotoOpen} onOpenChange={setPhotoOpen}>
