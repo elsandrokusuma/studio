@@ -833,11 +833,17 @@ export default function ApprovalSparepartPage() {
                               <div className="flex-grow">
                                   <h3 className="font-semibold text-base">{req.requestNumber}</h3>
                                   <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
-                                      <Badge variant={
-                                        req.status === 'Approved' ? 'default' : 
-                                        req.status === 'Rejected' ? 'destructive' : 
-                                        req.status === 'Awaiting Approval' ? 'warning' : 'secondary'} 
-                                        className={req.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
+                                      <Badge
+                                        variant={
+                                            req.status === 'Approved' ? 'default' :
+                                            req.status === 'Rejected' ? 'destructive' :
+                                            req.status === 'Pending' || req.status === 'Awaiting Approval' ? 'warning' : 'secondary'
+                                        }
+                                        className={
+                                            req.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                            req.status === 'Pending' || req.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
+                                        }
+                                      >
                                           {req.status}
                                       </Badge>
                                       <span>• {req.totalQuantity} units</span>
@@ -904,12 +910,18 @@ export default function ApprovalSparepartPage() {
                                       <TableCell>{item.quantity}</TableCell>
                                       <TableCell>{item.revisedQuantity ?? '-'}</TableCell>
                                       <TableCell>
-                                        <Badge variant={
-                                            item.itemStatus === 'Approved' ? 'default' :
-                                            item.itemStatus === 'Rejected' ? 'destructive' :
-                                            'warning'
-                                        } className={item.itemStatus === 'Approved' ? 'bg-green-100 text-green-800' : ''}>
-                                          {item.itemStatus || 'Pending'}
+                                        <Badge
+                                            variant={
+                                                item.itemStatus === 'Approved' ? 'default' :
+                                                item.itemStatus === 'Rejected' ? 'destructive' :
+                                                'warning'
+                                            }
+                                            className={
+                                                item.itemStatus === 'Approved' ? 'bg-green-100 text-green-800' :
+                                                item.itemStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' : ''
+                                            }
+                                        >
+                                            {item.itemStatus || 'Pending'}
                                         </Badge>
                                       </TableCell>
                                       <TableCell>
