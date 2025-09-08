@@ -1071,7 +1071,7 @@ export default function InventoryPage() {
       
       {/* Photo Viewer Dialog */}
       <Dialog open={isPhotoOpen} onOpenChange={setPhotoOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Item Photo</DialogTitle>
             <DialogDescription>
