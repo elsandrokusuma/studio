@@ -76,6 +76,7 @@ import {
   ChevronsUpDown,
   List,
   LayoutGrid,
+  Loader2,
 } from "lucide-react";
 import type { InventoryItem, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -233,6 +234,8 @@ export default function InventoryPage() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(true);
   const [layout, setLayout] = React.useState<'list' | 'grid'>('list');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
 
   // States for camera functionality
   const [isCameraOpen, setCameraOpen] = React.useState(false);
@@ -384,51 +387,61 @@ export default function InventoryPage() {
 
   const handleStockUpdate = (type: "in" | "out") => async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!db) return;
-      const selectedItemToUpdate = items.find(i => i.id === selectedItemId);
-      if (!selectedItemToUpdate) {
-        toast({ variant: "destructive", title: "Please select an item." });
-        return;
-      }
+      if (!db || isSubmitting) return;
 
-      const formData = new FormData(e.currentTarget);
-      const quantity = Number(formData.get("quantity"));
-      const person = formData.get("person") as string;
+      setIsSubmitting(true);
+      
+      try {
+        const selectedItemToUpdate = items.find(i => i.id === selectedItemId);
+        if (!selectedItemToUpdate) {
+          toast({ variant: "destructive", title: "Please select an item." });
+          return;
+        }
 
-      if (type === 'out' && !person.trim()) {
+        const formData = new FormData(e.currentTarget);
+        const quantity = Number(formData.get("quantity"));
+        const person = formData.get("person") as string;
+
+        if (type === 'out' && !person.trim()) {
+          toast({
+            variant: "destructive",
+            title: "Field Required",
+            description: "The 'To' field cannot be empty.",
+          });
+          return;
+        }
+
+        const itemRef = doc(db, "inventory", selectedItemToUpdate.id);
+        const newQuantity = type === "in" ? selectedItemToUpdate.quantity + quantity : selectedItemToUpdate.quantity - quantity;
+
+        if (newQuantity < 0) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Stock cannot be negative.",
+          });
+          return;
+        }
+        
+        await updateDoc(itemRef, { quantity: newQuantity });
+        await addTransaction({ itemId: selectedItemToUpdate.id, itemName: selectedItemToUpdate.name, type, quantity, person });
+        
         toast({
-          variant: "destructive",
-          title: "Field Required",
-          description: "The 'To' field cannot be empty.",
+          title: "Stock Updated",
+          description: `Quantity for ${selectedItemToUpdate.name} updated.`,
         });
-        return;
+        
+        if (type === 'in') setStockInOpen(false);
+        else setStockOutOpen(false);
+        
+        setSelectedItemId(null);
+        setSelectedItemName("Select an item...");
+      } catch (error) {
+        console.error("Error updating stock:", error);
+        toast({ variant: "destructive", title: "Failed to update stock" });
+      } finally {
+        setIsSubmitting(false);
       }
-
-      const itemRef = doc(db, "inventory", selectedItemToUpdate.id);
-      const newQuantity = type === "in" ? selectedItemToUpdate.quantity + quantity : selectedItemToUpdate.quantity - quantity;
-
-      if (newQuantity < 0) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Stock cannot be negative.",
-        });
-        return;
-      }
-      
-      await updateDoc(itemRef, { quantity: newQuantity });
-      addTransaction({ itemId: selectedItemToUpdate.id, itemName: selectedItemToUpdate.name, type, quantity, person });
-      
-      toast({
-        title: "Stock Updated",
-        description: `Quantity for ${selectedItemToUpdate.name} updated.`,
-      });
-      
-      if (type === 'in') setStockInOpen(false);
-      else setStockOutOpen(false);
-      
-      setSelectedItemId(null);
-      setSelectedItemName("Select an item...");
   };
 
   const handleDeleteItem = async () => {
@@ -1233,7 +1246,10 @@ export default function InventoryPage() {
               <Input id="person" name="person" placeholder="e.g., Supplier Name" className="col-span-3" />
             </div>
             <DialogFooter>
-              <Button type="submit">Add Stock</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Add Stock
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1305,7 +1321,10 @@ export default function InventoryPage() {
               <Input id="person" name="person" placeholder="e.g., Customer, Department" className="col-span-3" required />
             </div>
             <DialogFooter>
-              <Button type="submit">Remove Stock</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Remove Stock
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
