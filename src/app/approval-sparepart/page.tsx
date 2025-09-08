@@ -45,6 +45,7 @@ import {
     MapPin,
     FileDown,
     Send,
+    Undo2,
 } from "lucide-react";
 import {
   Table,
@@ -300,6 +301,20 @@ export default function ApprovalSparepartPage() {
       console.error("Failed to revise quantity", error);
       toast({ variant: "destructive", title: "Error revising quantity" });
     }
+  };
+
+  const updateStatus = async (po: GroupedRequest, status: SparepartRequest['status']) => {
+    if (!db) return;
+    const batch = writeBatch(db);
+    po.requests.forEach(request => {
+        const docRef = doc(db, "sparepart-requests", request.id);
+        batch.update(docRef, { status });
+    });
+    await batch.commit();
+    toast({
+      title: 'Status Updated',
+      description: `PO ${po.requestNumber} marked as ${status}.`
+    });
   };
   
   // Handlers for Create PO Dialog
@@ -867,10 +882,16 @@ export default function ApprovalSparepartPage() {
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                         {req.status === 'Awaiting Approval' && (
+                                            <>
                                             <DropdownMenuItem onSelect={() => handleMarkAsApproved(req)}>
                                                 <Check className="mr-2 h-4 w-4" />
                                                 Mark as Approved
                                             </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => updateStatus(req, 'Pending')}>
+                                                <Undo2 className="mr-2 h-4 w-4" />
+                                                Undo Decision
+                                            </DropdownMenuItem>
+                                            </>
                                         )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
