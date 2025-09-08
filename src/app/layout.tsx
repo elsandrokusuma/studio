@@ -33,18 +33,6 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
       setColorState(savedColor);
     }
   }, []);
-  
-  React.useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-  }, [theme]);
-
-  React.useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('theme-green', 'theme-blue', 'theme-orange', 'theme-rose', 'theme-violet');
-    root.classList.add(`theme-${color}`);
-  }, [color]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -69,6 +57,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [theme, setTheme] = React.useState<Theme>('light');
+  const [color, setColor] = React.useState<Color>('green');
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    const savedTheme = Cookies.get('theme') as Theme | undefined;
+    const savedColor = Cookies.get('color') as Color | undefined;
+    if (savedTheme) setTheme(savedTheme);
+    if (savedColor) setColor(savedColor);
+    setIsMounted(true);
+  }, []);
+
+  const layoutClasses = isMounted ? cn(theme, `theme-${color}`) : '';
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -79,7 +81,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('font-body antialiased bg-background text-foreground')}>
+      <body className={cn('font-body antialiased bg-background text-foreground', layoutClasses)}>
         <ThemeProvider>
           <div className="flex flex-col min-h-screen">
             <AppHeader />
