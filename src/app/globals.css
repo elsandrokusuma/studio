@@ -5,6 +5,8 @@
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 224 10% 21%;
     --card: 0 0% 100%;
     --card-foreground: 224 10% 21%;
     --popover: 0 0% 100%;
@@ -51,6 +53,8 @@
   }
 
   .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
     --card: 222 47% 14%;
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
@@ -67,43 +71,35 @@
     --input: 217 33% 17%;
     --chart-2: 0 69% 56%;
   }
+}
 
+@layer base {
   /* == Light Mode Themes == */
-  .light.theme-green {
-    --background: 220 20% 96%;
-    --foreground: 224 10% 21%;
+  .theme-green {
     --primary: 158 79% 46%;
     --accent: 220 14% 96%;
     --ring: 158 79% 46%;
     --chart-1: 158 79% 46%;
   }
-  .light.theme-blue {
-    --background: 220 20% 96%;
-    --foreground: 224 10% 21%;
+  .theme-blue {
     --primary: 221.2 83.2% 53.3%;
     --accent: 220 14% 96%;
     --ring: 221.2 83.2% 53.3%;
     --chart-1: 221.2 83.2% 53.3%;
   }
-  .light.theme-orange {
-    --background: 220 20% 96%;
-    --foreground: 224 10% 21%;
+  .theme-orange {
     --primary: 24.6 95% 53.1%;
     --accent: 220 14% 96%;
     --ring: 24.6 95% 53.1%;
     --chart-1: 24.6 95% 53.1%;
   }
-  .light.theme-rose {
-    --background: 220 20% 96%;
-    --foreground: 224 10% 21%;
+  .theme-rose {
     --primary: 346.8 77.2% 49.8%;
     --accent: 220 14% 96%;
     --ring: 346.8 77.2% 49.8%;
     --chart-1: 346.8 77.2% 49.8%;
   }
-  .light.theme-violet {
-    --background: 220 20% 96%;
-    --foreground: 224 10% 21%;
+  .theme-violet {
     --primary: 262.1 83.3% 57.8%;
     --accent: 220 14% 96%;
     --ring: 262.1 83.3% 57.8%;
@@ -112,40 +108,30 @@
 
   /* == Dark Mode Themes == */
   .dark.theme-green {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
     --primary: 158 69% 56%;
     --accent: 217 33% 17%;
     --ring: 158 69% 56%;
     --chart-1: 158 69% 56%;
   }
   .dark.theme-blue {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --accent: 217 33% 17%;
     --ring: 217.2 91.2% 59.8%;
     --chart-1: 217.2 91.2% 59.8%;
   }
   .dark.theme-orange {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
     --primary: 24.6 95% 53.1%;
     --accent: 217 33% 17%;
     --ring: 24.6 95% 53.1%;
     --chart-1: 24.6 95% 53.1%;
   }
   .dark.theme-rose {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
     --primary: 346.8 77.2% 49.8%;
     --accent: 217 33% 17%;
     --ring: 346.8 77.2% 49.8%;
     --chart-1: 346.8 77.2% 49.8%;
   }
   .dark.theme-violet {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
     --primary: 262.1 83.3% 57.8%;
     --accent: 217 33% 17%;
     --ring: 262.1 83.3% 57.8%;
@@ -161,20 +147,17 @@
     @apply bg-background text-foreground;
   }
   
+  /* These classes now ONLY add a background-image over the theme's background-color */
   .bg-pattern-solid {
-    background-color: hsl(var(--background));
     background-image: none;
   }
   .bg-pattern-dots {
-    background-color: hsl(var(--background));
     background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
   }
-   .bg-pattern-lines {
-    background-color: hsl(var(--background));
+  .bg-pattern-lines {
     background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
   }
   .bg-pattern-geometric {
-     background-color: hsl(var(--background));
      background-image:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h5v1H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 }

@@ -37,24 +37,11 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     setIsMounted(true);
   }, []);
   
-  React.useEffect(() => {
-    if (isMounted) {
-      const root = window.document.documentElement;
-      root.classList.remove('light', 'dark');
-      root.classList.add(theme);
-
-      // Remove all theme color classes before adding the new one
-      const colorThemes = ['theme-green', 'theme-blue', 'theme-orange', 'theme-rose', 'theme-violet'];
-      root.classList.remove(...colorThemes);
-      root.classList.add(`theme-${color}`);
-      
-      // Remove all background pattern classes before adding the new one
-      const bgPatterns = ['bg-pattern-solid', 'bg-pattern-dots', 'bg-pattern-lines', 'bg-pattern-geometric'];
-      root.classList.remove(...bgPatterns);
-      root.classList.add(`bg-pattern-${background}`);
-      
-    }
-  }, [theme, color, background, isMounted]);
+  // Only render children when mounted to avoid hydration mismatch
+  if (!isMounted) {
+    // Return a placeholder or null to prevent server-client mismatch
+    return null; 
+  }
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -71,14 +58,9 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     Cookies.set('background', newBackground, { expires: 365 });
   };
 
-  // Only render children when mounted to avoid hydration mismatch
-  if (!isMounted) {
-    return null; 
-  }
-
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, color,setColor, background, setBackground }}>
-       <html lang="en" suppressHydrationWarning>
+    <ThemeContext.Provider value={{ theme, setTheme, color, setColor, background, setBackground }}>
+       <html lang="en" suppressHydrationWarning className={cn(theme, `theme-${color}`, `bg-pattern-${background}`)}>
           <head>
             <title>Stationery Inventory</title>
             <meta name="description" content="Comprehensive inventory and stock management ERP" />
