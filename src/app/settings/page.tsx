@@ -22,12 +22,22 @@ const colors: { name: Color, bgColor: string }[] = [
     { name: 'violet', bgColor: 'bg-violet-500' },
 ];
 
-const defaultWallpapers = [
-    { name: 'Nature', value: 'https://picsum.photos/seed/nature/1920/1080' },
-    { name: 'City', value: 'https://picsum.photos/seed/city/1920/1080' },
-    { name: 'Tech', value: 'https://picsum.photos/seed/tech/1920/1080' },
-];
+const wallpaperCategories = {
+    Nature: Array.from({ length: 10 }, (_, i) => ({
+        name: `Nature ${i + 1}`,
+        value: `https://picsum.photos/seed/nature${i + 1}/1920/1080`,
+    })),
+    City: Array.from({ length: 10 }, (_, i) => ({
+        name: `City ${i + 1}`,
+        value: `https://picsum.photos/seed/city${i + 1}/1920/1080`,
+    })),
+    Tech: Array.from({ length: 10 }, (_, i) => ({
+        name: `Tech ${i + 1}`,
+        value: `https://picsum.photos/seed/tech${i + 1}/1920/1080`,
+    })),
+};
 
+type Category = keyof typeof wallpaperCategories;
 
 export default function SettingsPage() {
     const router = useRouter();
@@ -40,6 +50,7 @@ export default function SettingsPage() {
     } = useTheme();
     const { toast } = useToast();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [selectedCategory, setSelectedCategory] = React.useState<Category | null>(null);
     
     const isDarkMode = theme === 'dark';
 
@@ -71,6 +82,113 @@ export default function SettingsPage() {
         };
         reader.readAsDataURL(file);
     };
+
+    const renderWallpaperSelection = () => {
+        if (selectedCategory) {
+            const wallpapers = wallpaperCategories[selectedCategory];
+            return (
+                <>
+                    <div className="flex items-center justify-between">
+                        <Label>Pilih Wallpaper {selectedCategory}</Label>
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedCategory(null)}>
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Kembali
+                        </Button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                        {wallpapers.map((wp) => (
+                             <div
+                                key={wp.name}
+                                className={cn(
+                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                    wallpaper === wp.value && "ring-2 ring-primary"
+                                )}
+                                onClick={() => setWallpaper(wp.value)}
+                                tabIndex={0}
+                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                            >
+                                <Image
+                                    src={wp.value}
+                                    alt={wp.name}
+                                    fill
+                                    className="object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/30" />
+                                {wallpaper === wp.value && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Check className="h-6 w-6 text-white" />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </>
+            );
+        }
+
+        return (
+            <>
+                <div>
+                    <Label>Wallpaper Latar Belakang</Label>
+                    <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                     <div
+                        key="default"
+                        className={cn(
+                            "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
+                            wallpaper === 'default' && "ring-2 ring-primary"
+                        )}
+                        onClick={() => setWallpaper('default')}
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
+                    >
+                        <div className="absolute inset-0 flex items-end p-2">
+                            <p className="text-muted-foreground text-xs font-medium">Solid Color</p>
+                        </div>
+                         {wallpaper === 'default' && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Check className="h-6 w-6 text-primary" />
+                            </div>
+                        )}
+                    </div>
+                    {Object.keys(wallpaperCategories).map((category) => (
+                        <div
+                            key={category}
+                            className="relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                            onClick={() => setSelectedCategory(category as Category)}
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && setSelectedCategory(category as Category)}
+                        >
+                            <Image
+                                src={wallpaperCategories[category as Category][0].value}
+                                alt={category}
+                                fill
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/30 flex items-end p-2">
+                                <p className="text-white text-xs font-medium">{category}</p>
+                            </div>
+                        </div>
+                    ))}
+                     <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                        <Upload className="h-6 w-6 mb-1" />
+                        <span className="text-xs font-medium">Unggah Gambar</span>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/png, image/jpeg, image/webp"
+                            onChange={handleFileUpload}
+                        />
+                    </button>
+                </div>
+            </>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-8 max-w-2xl mx-auto">
@@ -121,62 +239,7 @@ export default function SettingsPage() {
                     </div>
 
                      <div className="space-y-4">
-                       <div>
-                            <Label>Wallpaper Latar Belakang</Label>
-                            <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
-                             <div
-                                key="default"
-                                className={cn(
-                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
-                                    wallpaper === 'default' && "ring-2 ring-primary"
-                                )}
-                                onClick={() => setWallpaper('default')}
-                                tabIndex={0}
-                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
-                            >
-                                <div className="absolute inset-0 flex items-end p-2">
-                                    <p className="text-muted-foreground text-xs font-medium">Solid Color</p>
-                                </div>
-                            </div>
-                            {defaultWallpapers.map((wp) => (
-                                <div
-                                    key={wp.name}
-                                    className={cn(
-                                        "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                                        wallpaper === wp.value && "ring-2 ring-primary"
-                                    )}
-                                    onClick={() => setWallpaper(wp.value)}
-                                    tabIndex={0}
-                                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
-                                >
-                                    <Image
-                                        src={wp.value}
-                                        alt={wp.name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black/30 flex items-end p-2">
-                                        <p className="text-white text-xs font-medium">{wp.name}</p>
-                                    </div>
-                                </div>
-                            ))}
-                             <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                            >
-                                <Upload className="h-6 w-6 mb-1" />
-                                <span className="text-xs font-medium">Unggah Gambar</span>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    className="hidden"
-                                    accept="image/png, image/jpeg, image/webp"
-                                    onChange={handleFileUpload}
-                                />
-                            </button>
-                        </div>
+                        {renderWallpaperSelection()}
                     </div>
 
                     <div className="space-y-4">
