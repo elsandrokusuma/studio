@@ -28,6 +28,7 @@
     --component-opacity: 1;
     
     /* Chart Colors (consistent across themes) */
+    --chart-1: hsl(var(--primary));
     --chart-2: 0 79% 63%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -85,31 +86,26 @@
     --primary: 158 79% 46%;
     --accent: 220 14% 96%;
     --ring: 158 79% 46%;
-    --chart-1: 158 79% 46%;
   }
   .theme-blue {
     --primary: 221.2 83.2% 53.3%;
     --accent: 220 14% 96%;
     --ring: 221.2 83.2% 53.3%;
-    --chart-1: 221.2 83.2% 53.3%;
   }
   .theme-orange {
     --primary: 24.6 95% 53.1%;
     --accent: 220 14% 96%;
     --ring: 24.6 95% 53.1%;
-    --chart-1: 24.6 95% 53.1%;
   }
   .theme-rose {
     --primary: 346.8 77.2% 49.8%;
     --accent: 220 14% 96%;
     --ring: 346.8 77.2% 49.8%;
-    --chart-1: 346.8 77.2% 49.8%;
   }
   .theme-violet {
     --primary: 262.1 83.3% 57.8%;
     --accent: 220 14% 96%;
     --ring: 262.1 83.3% 57.8%;
-    --chart-1: 262.1 83.3% 57.8%;
   }
 
   /* == Dark Mode Themes == */
@@ -117,31 +113,26 @@
     --primary: 158 69% 56%;
     --accent: 217 33% 17%;
     --ring: 158 69% 56%;
-    --chart-1: 158 69% 56%;
   }
   .dark.theme-blue {
     --primary: 217.2 91.2% 59.8%;
     --accent: 217 33% 17%;
     --ring: 217.2 91.2% 59.8%;
-    --chart-1: 217.2 91.2% 59.8%;
   }
   .dark.theme-orange {
     --primary: 24.6 95% 53.1%;
     --accent: 217 33% 17%;
     --ring: 24.6 95% 53.1%;
-    --chart-1: 24.6 95% 53.1%;
   }
   .dark.theme-rose {
     --primary: 346.8 77.2% 49.8%;
     --accent: 217 33% 17%;
     --ring: 346.8 77.2% 49.8%;
-    --chart-1: 346.8 77.2% 49.8%;
   }
   .dark.theme-violet {
     --primary: 262.1 83.3% 57.8%;
     --accent: 217 33% 17%;
     --ring: 262.1 83.3% 57.8%;
-    --chart-1: 262.1 83.3% 57.8%;
   }
 }
 

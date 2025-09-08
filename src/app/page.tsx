@@ -104,11 +104,11 @@ import { format, subDays } from 'date-fns';
 const chartConfig = {
   stockIn: {
     label: "Stock In",
-    color: "hsl(142 76% 36%)",
+    color: "hsl(var(--chart-1))",
   },
   stockOut: {
     label: "Stock Out",
-    color: "hsl(0 84% 60%)",
+    color: "hsl(var(--chart-2))",
   },
 };
 
@@ -687,15 +687,15 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <Card className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800/50">
+      <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="bg-green-100 dark:bg-green-800/30 p-3 rounded-full">
-              <GreetingIcon className="h-6 w-6 text-green-700 dark:text-green-300" />
+            <div className="bg-primary/10 p-3 rounded-full">
+              <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-green-900 dark:text-green-200">{`${greetingInfo.text}!`}</h1>
-              <p className="text-green-800 dark:text-green-300/80">
+              <h1 className="text-2xl font-bold text-primary">{`${greetingInfo.text}!`}</h1>
+              <p className="text-muted-foreground">
                 {dailyQuote}
               </p>
             </div>
