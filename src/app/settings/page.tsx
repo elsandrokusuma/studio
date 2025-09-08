@@ -3,14 +3,15 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, LucideIcon, Dot, Minus, AppWindow } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useTheme, type Color, type BackgroundPattern } from '@/hooks/use-theme';
+import { useTheme, type Color } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 const colors: { name: Color, bgColor: string }[] = [
     { name: 'green', bgColor: 'bg-green-500' },
@@ -20,22 +21,51 @@ const colors: { name: Color, bgColor: string }[] = [
     { name: 'violet', bgColor: 'bg-violet-500' },
 ];
 
-const patterns: { name: BackgroundPattern, label: string, icon: LucideIcon }[] = [
-    { name: 'solid', label: 'Solid', icon: AppWindow },
-    { name: 'dots', label: 'Dots', icon: Dot },
-    { name: 'lines', label: 'Lines', icon: Minus },
-    { name: 'geometric', label: 'Geometric', icon: AppWindow }, // Using a placeholder, could be a more specific icon
-]
+const defaultWallpapers = [
+    { name: 'Default', value: 'https://picsum.photos/1920/1080?grayscale', hint: 'abstract grayscale' },
+    { name: 'Nature', value: 'https://picsum.photos/seed/nature/1920/1080', hint: 'forest nature' },
+    { name: 'City', value: 'https://picsum.photos/seed/city/1920/1080', hint: 'city skyline' },
+    { name: 'Tech', value: 'https://picsum.photos/seed/tech/1920/1080', hint: 'circuit board' },
+];
+
 
 export default function SettingsPage() {
     const router = useRouter();
-    const { theme, setTheme, color, setColor, background, setBackground } = useTheme();
+    const { theme, setTheme, color, setColor, wallpaper, setWallpaper } = useTheme();
+    const { toast } = useToast();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
     
     // Ensure theme is not undefined during initial render
     const isDarkMode = theme === 'dark';
 
     const handleThemeChange = (checked: boolean) => {
         setTheme(checked ? 'dark' : 'light');
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Check file size (e.g., 5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            toast({
+                variant: 'destructive',
+                title: 'File Terlalu Besar',
+                description: 'Ukuran gambar tidak boleh melebihi 5MB.',
+            });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const result = e.target?.result as string;
+            setWallpaper(result);
+            toast({
+                title: 'Wallpaper Diperbarui',
+                description: 'Wallpaper latar belakang Anda telah diubah.',
+            });
+        };
+        reader.readAsDataURL(file);
     };
 
     return (
@@ -51,13 +81,13 @@ export default function SettingsPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Appearance</CardTitle>
-                    <CardDescription>Customize the look and feel of the app.</CardDescription>
+                    <CardDescription>Sesuaikan tampilan dan nuansa aplikasi.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div>
                             <Label htmlFor="dark-mode">Dark Mode</Label>
-                            <p className="text-sm text-muted-foreground">Enable or disable the dark theme.</p>
+                            <p className="text-sm text-muted-foreground">Aktifkan atau nonaktifkan tema gelap.</p>
                         </div>
                         <Switch
                             id="dark-mode"
@@ -68,8 +98,8 @@ export default function SettingsPage() {
 
                     <div className="space-y-2">
                        <div>
-                            <Label>Theme Color</Label>
-                            <p className="text-sm text-muted-foreground">Select your preferred theme color.</p>
+                            <Label>Warna Tema</Label>
+                            <p className="text-sm text-muted-foreground">Pilih warna tema pilihan Anda.</p>
                         </div>
                         <div className="flex gap-3 pt-2">
                             {colors.map((c) => (
@@ -85,28 +115,51 @@ export default function SettingsPage() {
                             ))}
                         </div>
                     </div>
-                    
+
                      <div className="space-y-2">
                        <div>
-                            <Label>Background Pattern</Label>
-                            <p className="text-sm text-muted-foreground">Select a background pattern for the app.</p>
+                            <Label>Wallpaper Latar Belakang</Label>
+                            <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
                         </div>
-                        <RadioGroup
-                            value={background}
-                            onValueChange={(value) => setBackground(value as BackgroundPattern)}
-                            className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2"
-                        >
-                          {patterns.map((p) => {
-                             const Icon = p.icon;
-                             return (
-                                <Label key={p.name} htmlFor={p.name} className="relative flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
-                                  <RadioGroupItem value={p.name} id={p.name} className="sr-only" />
-                                  <Icon className="mb-2 h-6 w-6" />
-                                  <span>{p.label}</span>
-                                </Label>
-                             )
-                          })}
-                        </RadioGroup>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                            {defaultWallpapers.map((wp) => (
+                                <div
+                                    key={wp.name}
+                                    className={cn(
+                                        "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                        (wallpaper === wp.value || (wallpaper === 'default' && wp.name === 'Default')) && "ring-2 ring-primary"
+                                    )}
+                                    onClick={() => setWallpaper(wp.value)}
+                                    tabIndex={0}
+                                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                                >
+                                    <Image
+                                        src={wp.value}
+                                        alt={wp.name}
+                                        fill
+                                        className="object-cover"
+                                        data-ai-hint={wp.hint}
+                                    />
+                                    <div className="absolute inset-0 bg-black/30 flex items-end p-2">
+                                        <p className="text-white text-xs font-medium">{wp.name}</p>
+                                    </div>
+                                </div>
+                            ))}
+                             <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                                <Upload className="h-6 w-6 mb-1" />
+                                <span className="text-xs font-medium">Unggah Gambar</span>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={handleFileUpload}
+                                />
+                            </button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

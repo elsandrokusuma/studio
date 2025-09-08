@@ -5,7 +5,8 @@ import * as React from 'react';
 
 type Theme = 'light' | 'dark';
 type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
-type BackgroundPattern = 'solid' | 'dots' | 'lines' | 'geometric';
+// Wallpaper can be a URL string or a data URI string from a file upload
+type Wallpaper = string;
 
 
 type ThemeContextType = {
@@ -13,8 +14,8 @@ type ThemeContextType = {
   setTheme: (theme: Theme) => void;
   color: Color;
   setColor: (color: Color) => void;
-  background: BackgroundPattern;
-  setBackground: (background: BackgroundPattern) => void;
+  wallpaper: Wallpaper;
+  setWallpaper: (wallpaper: Wallpaper) => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
@@ -28,4 +29,4 @@ export function useTheme() {
 }
 
 export { ThemeContext };
-export type { Theme, Color, BackgroundPattern };
+export type { Theme, Color, Wallpaper };
