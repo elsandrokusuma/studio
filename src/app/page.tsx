@@ -102,17 +102,13 @@ import { format, subDays } from 'date-fns';
 
 
 const chartConfig = {
-  quantity: {
-    label: "Quantity",
-    color: "hsl(var(--chart-1))",
-  },
   stockIn: {
     label: "Stock In",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-2))", // Green
   },
   stockOut: {
     label: "Stock Out",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-5))", // Red
   },
 };
 
@@ -1577,3 +1573,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
