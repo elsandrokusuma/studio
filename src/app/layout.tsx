@@ -30,18 +30,32 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedColor = Cookies.get('color') as Color | undefined;
     const savedBackground = Cookies.get('background') as BackgroundPattern | undefined;
 
-    if (savedTheme) {
-      setThemeState(savedTheme);
-    }
-    if (savedColor) {
-      setColorState(savedColor);
-    }
-     if (savedBackground) {
-      setBackgroundState(savedBackground);
-    }
+    if (savedTheme) setThemeState(savedTheme);
+    if (savedColor) setColorState(savedColor);
+    if (savedBackground) setBackgroundState(savedBackground);
+    
     setIsMounted(true);
   }, []);
   
+  React.useEffect(() => {
+    if (isMounted) {
+      const root = window.document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(theme);
+
+      // Remove all theme color classes before adding the new one
+      const colorThemes = ['theme-green', 'theme-blue', 'theme-orange', 'theme-rose', 'theme-violet'];
+      root.classList.remove(...colorThemes);
+      root.classList.add(`theme-${color}`);
+      
+      // Remove all background pattern classes before adding the new one
+      const bgPatterns = ['bg-pattern-solid', 'bg-pattern-dots', 'bg-pattern-lines', 'bg-pattern-geometric'];
+      root.classList.remove(...bgPatterns);
+      root.classList.add(`bg-pattern-${background}`);
+      
+    }
+  }, [theme, color, background, isMounted]);
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     Cookies.set('theme', newTheme, { expires: 365 });
@@ -57,11 +71,14 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     Cookies.set('background', newBackground, { expires: 365 });
   };
 
-  const layoutClasses = isMounted ? cn(theme, `theme-${color}`, `bg-pattern-${background}`) : '';
+  // Only render children when mounted to avoid hydration mismatch
+  if (!isMounted) {
+    return null; 
+  }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, color, setColor, background, setBackground }}>
-       <html lang="en" suppressHydrationWarning className={layoutClasses}>
+    <ThemeContext.Provider value={{ theme, setTheme, color,setColor, background, setBackground }}>
+       <html lang="en" suppressHydrationWarning>
           <head>
             <title>Stationery Inventory</title>
             <meta name="description" content="Comprehensive inventory and stock management ERP" />

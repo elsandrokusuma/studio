@@ -5,32 +5,29 @@
 
 @layer base {
   :root {
-    --background: 220 20% 96%;
-    --foreground: 224 10% 21%;
     --card: 0 0% 100%;
     --card-foreground: 224 10% 21%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 10% 21%;
-    --primary: hsl(var(--theme-primary));
     --primary-foreground: 0 0% 98%;
     --secondary: 220 13% 91%;
     --secondary-foreground: 224 10% 21%;
     --muted: 220 13% 91%;
     --muted-foreground: 220 9% 46%;
-    --accent: 220 14% 96%;
     --accent-foreground: 224 10% 21%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 89%;
     --input: 220 13% 91%;
-    --ring: hsl(var(--theme-primary));
-    --chart-1: hsl(var(--theme-primary));
+    --radius: 0.8rem;
+    
+    /* Chart Colors (consistent across themes) */
     --chart-2: 0 79% 63%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.8rem;
-
+    
+    /* Sidebar Colors (consistent across themes) */
     --sidebar-background: 0 0% 0%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 158 69% 56%;
@@ -40,10 +37,12 @@
     --sidebar-border: 217 33% 17%;
     --sidebar-ring: 158 69% 56%;
 
+    /* Summary Card Colors */
     --summary-card-1: 221 83% 53%; /* Blue */
     --summary-card-2: 142 76% 36%; /* Green */
     --summary-card-3: 25 95% 53%; /* Orange */
 
+    /* Stock Card Colors */
     --stock-card-1: 221 83% 53%; /* Blue */
     --stock-card-2: 142 76% 36%; /* Green */
     --stock-card-3: 30 100% 50%; /* Orange terang */
@@ -52,27 +51,105 @@
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
     --card: 222 47% 14%;
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: hsl(var(--theme-primary));
     --primary-foreground: 222 47% 11%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: hsl(var(--theme-primary));
-    --chart-1: hsl(var(--theme-primary));
     --chart-2: 0 69% 56%;
+  }
+
+  /* == Light Mode Themes == */
+  .light.theme-green {
+    --background: 220 20% 96%;
+    --foreground: 224 10% 21%;
+    --primary: 158 79% 46%;
+    --accent: 220 14% 96%;
+    --ring: 158 79% 46%;
+    --chart-1: 158 79% 46%;
+  }
+  .light.theme-blue {
+    --background: 220 20% 96%;
+    --foreground: 224 10% 21%;
+    --primary: 221.2 83.2% 53.3%;
+    --accent: 220 14% 96%;
+    --ring: 221.2 83.2% 53.3%;
+    --chart-1: 221.2 83.2% 53.3%;
+  }
+  .light.theme-orange {
+    --background: 220 20% 96%;
+    --foreground: 224 10% 21%;
+    --primary: 24.6 95% 53.1%;
+    --accent: 220 14% 96%;
+    --ring: 24.6 95% 53.1%;
+    --chart-1: 24.6 95% 53.1%;
+  }
+  .light.theme-rose {
+    --background: 220 20% 96%;
+    --foreground: 224 10% 21%;
+    --primary: 346.8 77.2% 49.8%;
+    --accent: 220 14% 96%;
+    --ring: 346.8 77.2% 49.8%;
+    --chart-1: 346.8 77.2% 49.8%;
+  }
+  .light.theme-violet {
+    --background: 220 20% 96%;
+    --foreground: 224 10% 21%;
+    --primary: 262.1 83.3% 57.8%;
+    --accent: 220 14% 96%;
+    --ring: 262.1 83.3% 57.8%;
+    --chart-1: 262.1 83.3% 57.8%;
+  }
+
+  /* == Dark Mode Themes == */
+  .dark.theme-green {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 158 69% 56%;
+    --accent: 217 33% 17%;
+    --ring: 158 69% 56%;
+    --chart-1: 158 69% 56%;
+  }
+  .dark.theme-blue {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --accent: 217 33% 17%;
+    --ring: 217.2 91.2% 59.8%;
+    --chart-1: 217.2 91.2% 59.8%;
+  }
+  .dark.theme-orange {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 24.6 95% 53.1%;
+    --accent: 217 33% 17%;
+    --ring: 24.6 95% 53.1%;
+    --chart-1: 24.6 95% 53.1%;
+  }
+  .dark.theme-rose {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 346.8 77.2% 49.8%;
+    --accent: 217 33% 17%;
+    --ring: 346.8 77.2% 49.8%;
+    --chart-1: 346.8 77.2% 49.8%;
+  }
+  .dark.theme-violet {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --primary: 262.1 83.3% 57.8%;
+    --accent: 217 33% 17%;
+    --ring: 262.1 83.3% 57.8%;
+    --chart-1: 262.1 83.3% 57.8%;
   }
 }
 
@@ -98,21 +175,9 @@
   }
   .bg-pattern-geometric {
      background-color: hsl(var(--background));
-     background-image:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h5v1H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+     background-image:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h5v1H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 }
-
-.theme-green { --theme-primary: 158 79% 46%; }
-.theme-blue { --theme-primary: 221.2 83.2% 53.3%; }
-.theme-orange { --theme-primary: 24.6 95% 53.1%; }
-.theme-rose { --theme-primary: 346.8 77.2% 49.8%; }
-.theme-violet { --theme-primary: 262.1 83.3% 57.8%; }
-
-.dark.theme-green { --theme-primary: 158 69% 56%; }
-.dark.theme-blue { --theme-primary: 217.2 91.2% 59.8%; }
-.dark.theme-orange { --theme-primary: 24.6 95% 53.1%; }
-.dark.theme-rose { --theme-primary: 346.8 77.2% 49.8%; }
-.dark.theme-violet { --theme-primary: 262.1 83.3% 57.8%; }
 
 /* Hide Vercel Toolbar */
 [data-vercel-toolbar] {
