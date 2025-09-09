@@ -17,16 +17,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ThemeProvider>
-      <div className="flex flex-col min-h-screen">
-        <AppHeader />
-        <main className="flex-grow p-4 md:p-8">
-          <div className="mx-auto w-full max-w-full">
-            {children}
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <title>Stationery Inventory</title>
+        <meta name="description" content="Comprehensive inventory and stock management ERP" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body>
+        <ThemeProvider>
+          <div className="flex flex-col min-h-screen">
+            <AppHeader />
+            <main className="flex-grow p-4 md:p-8">
+              <div className="mx-auto w-full max-w-full">
+                {children}
+              </div>
+            </main>
           </div>
-        </main>
-      </div>
-      <Toaster />
-    </ThemeProvider>
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

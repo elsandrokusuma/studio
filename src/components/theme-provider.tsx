@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { ThemeContext, type Theme, type Color, type Wallpaper } from '@/hooks/use-theme';
 
 function AppWallpaper() {
-    const { wallpaper } = React.useContext(ThemeContext)!;
+    const { wallpaper, wallpaperOpacity } = React.useContext(ThemeContext)!;
     const [imageUrl, setImageUrl] = React.useState<string | null>(null);
 
     React.useEffect(() => {
@@ -40,7 +40,7 @@ function AppWallpaper() {
             />
             <div 
               className="absolute inset-0 bg-black" 
-              style={{ opacity: 'var(--wallpaper-overlay-opacity)' }}
+              style={{ opacity: wallpaperOpacity }}
             />
         </div>
     );
@@ -104,54 +104,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('componentOpacity', opacity.toString());
   };
 
-  if (!isMounted) {
-    return (
-        <html lang="en" suppressHydrationWarning>
-            <head>
-              <title>Stationery Inventory</title>
-              <meta name="description" content="Comprehensive inventory and stock management ERP" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-              <link rel="preconnect" href="https://fonts.googleapis.com" />
-              <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-              <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </head>
-            <body className={cn('font-body antialiased text-foreground bg-background')}>
-                {children}
-            </body>
-        </html>
-    );
-  }
-
-  return (
-    <ThemeContext.Provider value={{ 
+  const contextValue = { 
       theme, setTheme, 
       color, setColor, 
       wallpaper, setWallpaper,
       wallpaperOpacity, setWallpaperOpacity,
       componentOpacity, setComponentOpacity
-    }}>
-       <html 
-        lang="en" 
-        suppressHydrationWarning 
-        className={cn(theme, `theme-${color}`)}
-        style={{
-          '--wallpaper-overlay-opacity': wallpaperOpacity,
-          '--component-opacity': componentOpacity,
-        } as React.CSSProperties}
-      >
-          <head>
-            <title>Stationery Inventory</title>
-            <meta name="description" content="Comprehensive inventory and stock management ERP" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-          </head>
-           <body className={cn('font-body antialiased text-foreground')}>
-              <AppWallpaper />
-              {children}
-           </body>
-       </html>
+  };
+
+  if (!isMounted) {
+      return null;
+  }
+
+  return (
+    <ThemeContext.Provider value={contextValue}>
+       <AppWallpaper />
+       {children}
     </ThemeContext.Provider>
   );
 }
