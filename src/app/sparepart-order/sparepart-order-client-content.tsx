@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { SparepartRequest } from "@/lib/types";
 import { Printer } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 export type GroupedOrders = {
   requestNumber: string;
@@ -24,6 +25,7 @@ export type GroupedOrders = {
 };
 
 export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: GroupedOrders[] }) {
+  const { componentOpacity } = useTheme();
 
   const handlePrint = () => {
     window.print();
@@ -43,6 +45,12 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
       </div>
     );
   }
+  
+  const cardStyle = {
+    '--component-opacity': componentOpacity,
+    backgroundColor: `hsl(var(--card) / var(--component-opacity))`,
+  } as React.CSSProperties;
+
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -50,16 +58,19 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
         {`
           @media print {
             body {
-              background-color: #fff;
+              background-color: #fff !important;
+              background-image: none !important;
             }
             .no-print {
               display: none;
             }
             .printable-area {
-              border: none;
-              box-shadow: none;
-              margin: 0;
-              padding: 0;
+              border: none !important;
+              box-shadow: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background-color: #fff !important;
+              color: #000 !important;
             }
              .printable-area, .printable-area * {
                color: #000 !important;
@@ -77,7 +88,11 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
         </div>
 
         {groupedOrders.map(orderGroup => (
-            <Card key={orderGroup.requestNumber} className="printable-area p-8 mb-8">
+            <Card 
+              key={orderGroup.requestNumber} 
+              className="printable-area p-8 mb-8"
+              style={cardStyle}
+            >
             <CardContent>
                 <header className="mb-12">
                 <div className="flex justify-between items-start">
