@@ -1,0 +1,157 @@
+
+'use client';
+
+import * as React from 'react';
+import Cookies from 'js-cookie';
+import Image from 'next/image';
+
+import { cn } from '@/lib/utils';
+import { ThemeContext, type Theme, type Color, type Wallpaper } from '@/hooks/use-theme';
+
+function AppWallpaper() {
+    const { wallpaper } = React.useContext(ThemeContext)!;
+    const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        if (wallpaper === 'default') {
+            setImageUrl(null);
+            return;
+        }
+
+        if (wallpaper) {
+            setImageUrl(wallpaper);
+        } else {
+            setImageUrl(null);
+        }
+    }, [wallpaper]);
+
+    if (!imageUrl) {
+        return null;
+    }
+
+    return (
+        <div className="fixed inset-0 z-[-1] overflow-hidden">
+            <Image
+                src={imageUrl}
+                alt="Background Wallpaper"
+                fill
+                className="object-cover"
+                unoptimized
+            />
+            <div 
+              className="absolute inset-0 bg-black" 
+              style={{ opacity: 'var(--wallpaper-overlay-opacity)' }}
+            />
+        </div>
+    );
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = React.useState<Theme>('dark');
+  const [color, setColorState] = React.useState<Color>('green');
+  const [wallpaper, setWallpaperState] = React.useState<Wallpaper>('default');
+  const [wallpaperOpacity, setWallpaperOpacityState] = React.useState(0.5);
+  const [componentOpacity, setComponentOpacityState] = React.useState(1);
+  
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    const savedTheme = Cookies.get('theme') as Theme | undefined;
+    const savedColor = Cookies.get('color') as Color | undefined;
+    const savedWallpaper = localStorage.getItem('wallpaper') as Wallpaper | undefined;
+    const savedWallpaperOpacity = localStorage.getItem('wallpaperOpacity');
+    const savedComponentOpacity = localStorage.getItem('componentOpacity');
+
+    if (savedTheme) setThemeState(savedTheme);
+    if (savedColor) setColorState(savedColor);
+    if (savedWallpaper) setWallpaperState(savedWallpaper);
+    if (savedWallpaperOpacity) setWallpaperOpacityState(parseFloat(savedWallpaperOpacity));
+    if (savedComponentOpacity) setComponentOpacityState(parseFloat(savedComponentOpacity));
+    
+    setIsMounted(true);
+  }, []);
+  
+  React.useEffect(() => {
+    if (isMounted) {
+      document.documentElement.className = cn(theme, `theme-${color}`);
+      document.documentElement.style.setProperty('--wallpaper-overlay-opacity', wallpaperOpacity.toString());
+      document.documentElement.style.setProperty('--component-opacity', componentOpacity.toString());
+    }
+  }, [isMounted, theme, color, wallpaperOpacity, componentOpacity]);
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    Cookies.set('theme', newTheme, { expires: 365 });
+  };
+
+  const setColor = (newColor: Color) => {
+    setColorState(newColor);
+    Cookies.set('color', newColor, { expires: 365 });
+  };
+  
+  const setWallpaper = (newWallpaper: Wallpaper) => {
+    setWallpaperState(newWallpaper);
+    localStorage.setItem('wallpaper', newWallpaper);
+  };
+  
+  const setWallpaperOpacity = (opacity: number) => {
+    setWallpaperOpacityState(opacity);
+    localStorage.setItem('wallpaperOpacity', opacity.toString());
+  };
+
+  const setComponentOpacity = (opacity: number) => {
+    setComponentOpacityState(opacity);
+    localStorage.setItem('componentOpacity', opacity.toString());
+  };
+
+  if (!isMounted) {
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <head>
+              <title>Stationery Inventory</title>
+              <meta name="description" content="Comprehensive inventory and stock management ERP" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+              <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+            </head>
+            <body className={cn('font-body antialiased text-foreground bg-background')}>
+                {children}
+            </body>
+        </html>
+    );
+  }
+
+  return (
+    <ThemeContext.Provider value={{ 
+      theme, setTheme, 
+      color, setColor, 
+      wallpaper, setWallpaper,
+      wallpaperOpacity, setWallpaperOpacity,
+      componentOpacity, setComponentOpacity
+    }}>
+       <html 
+        lang="en" 
+        suppressHydrationWarning 
+        className={cn(theme, `theme-${color}`)}
+        style={{
+          '--wallpaper-overlay-opacity': wallpaperOpacity,
+          '--component-opacity': componentOpacity,
+        } as React.CSSProperties}
+      >
+          <head>
+            <title>Stationery Inventory</title>
+            <meta name="description" content="Comprehensive inventory and stock management ERP" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+          </head>
+           <body className={cn('font-body antialiased text-foreground')}>
+              <AppWallpaper />
+              {children}
+           </body>
+       </html>
+    </ThemeContext.Provider>
+  );
+}
