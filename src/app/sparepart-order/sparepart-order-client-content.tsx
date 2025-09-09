@@ -70,7 +70,6 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
               margin: 0 !important;
               padding: 0 !important;
               background-color: #fff !important;
-              color: #000 !important;
             }
              .printable-area, .printable-area * {
                color: #000 !important;
@@ -123,7 +122,7 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
                     </TableHeader>
                     <TableBody>
                     {orderGroup.items.map((item) => (
-                        <TableRow key={item.id}>
+                        <TableRow key={item.id} className="border-b">
                         <TableCell className="font-medium">
                             {item.itemName}
                         </TableCell>
