@@ -104,7 +104,6 @@ import { format, subDays } from 'date-fns';
 const chartConfig = {
   stockIn: {
     label: "Stock In",
-    color: "hsl(var(--chart-1))",
   },
   stockOut: {
     label: "Stock Out",
@@ -621,7 +620,7 @@ export default function DashboardPage() {
       <>
         <Bar
           dataKey="stockIn"
-          fill="var(--color-stockIn)"
+          fill="hsl(var(--primary))"
           radius={[4, 4, 0, 0]}
           name="Stock In"
         />
@@ -638,7 +637,7 @@ export default function DashboardPage() {
         <Line
           type="monotone"
           dataKey="stockIn"
-          stroke="var(--color-stockIn)"
+          stroke="hsl(var(--primary))"
           strokeWidth={2}
           dot={false}
           name="Stock In"
@@ -657,8 +656,8 @@ export default function DashboardPage() {
        <>
         <defs>
           <linearGradient id="fillStockIn" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-stockIn)" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="var(--color-stockIn)" stopOpacity={0.1} />
+            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
           </linearGradient>
           <linearGradient id="fillStockOut" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="var(--color-stockOut)" stopOpacity={0.8} />
@@ -668,7 +667,7 @@ export default function DashboardPage() {
         <Area
           type="monotone"
           dataKey="stockIn"
-          stroke="var(--color-stockIn)"
+          stroke="hsl(var(--primary))"
           fill="url(#fillStockIn)"
           stackId="1"
           name="Stock In"
