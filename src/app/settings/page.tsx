@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Palette, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Palette, ChevronRight, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -46,7 +46,27 @@ const wallpaperCategories = {
 };
 
 type Category = keyof typeof wallpaperCategories;
-type ActiveMenu = 'main' | 'appearance';
+type ActiveMenu = 'main' | 'appearance' | 'account';
+
+function AccountSettings({ onBack }: { onBack: () => void }) {
+    return (
+        <div className="flex flex-col gap-8">
+             <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali ke Pengaturan
+            </Button>
+            <header>
+                <h1 className="text-3xl font-bold tracking-tight">Account</h1>
+                <p className="text-muted-foreground">Kelola detail dan preferensi akun Anda.</p>
+            </header>
+            <Card>
+                <CardContent className="p-6">
+                    <p className="text-muted-foreground">Pengaturan akun akan tersedia di sini.</p>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 
 function AppearanceSettings({ onBack }: { onBack: () => void }) {
@@ -297,7 +317,22 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
                 <p className="text-muted-foreground">Kelola preferensi aplikasi Anda.</p>
             </header>
             <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-4 space-y-2">
+                     <button 
+                        onClick={() => onMenuClick('account')}
+                        className="flex items-center justify-between w-full p-4 rounded-lg hover:bg-accent transition-colors"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="p-2 bg-primary/10 rounded-md">
+                                <User className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="text-left">
+                                <p className="font-semibold">Account</p>
+                                <p className="text-sm text-muted-foreground">Kelola detail akun Anda.</p>
+                            </div>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </button>
                     <button 
                         onClick={() => onMenuClick('appearance')}
                         className="flex items-center justify-between w-full p-4 rounded-lg hover:bg-accent transition-colors"
@@ -329,6 +364,12 @@ export default function SettingsPage() {
                 activeMenu !== 'main' && "-translate-x-full opacity-0 absolute"
             )}>
                 <MainSettings onMenuClick={setActiveMenu} />
+            </div>
+             <div className={cn(
+                "w-full transition-transform duration-300 ease-in-out",
+                activeMenu !== 'account' && "translate-x-full opacity-0 absolute"
+            )}>
+                <AccountSettings onBack={() => setActiveMenu('main')} />
             </div>
             <div className={cn(
                 "w-full transition-transform duration-300 ease-in-out",
