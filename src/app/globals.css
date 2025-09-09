@@ -28,7 +28,7 @@
     --component-opacity: 1;
     
     /* Chart Colors (consistent across themes) */
-    --chart-1: var(--primary);
+    --chart-1: hsl(var(--primary));
     --chart-2: 0 79% 63%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
