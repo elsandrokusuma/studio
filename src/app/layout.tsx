@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/app-header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Stationery Inventory',
@@ -27,7 +28,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body>
+      <body className={cn("no-scrollbar")}>
         <ThemeProvider>
           <AuthProvider>
             <div className="flex flex-col min-h-screen">
