@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Image as ImageIcon, Palette, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Slider } from '@/components/ui/slider';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 const colors: { name: Color, bgColor: string }[] = [
     { name: 'green', bgColor: 'bg-green-500' },
@@ -201,75 +203,90 @@ export default function SettingsPage() {
             </header>
             
             <Card>
-                <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
-                    <CardDescription>Sesuaikan tampilan dan nuansa aplikasi.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-8">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <Label htmlFor="dark-mode">Dark Mode</Label>
-                            <p className="text-sm text-muted-foreground">Aktifkan atau nonaktifkan tema gelap.</p>
-                        </div>
-                        <Switch
-                            id="dark-mode"
-                            checked={isDarkMode}
-                            onCheckedChange={handleThemeChange}
-                        />
-                    </div>
+                <CardContent className="p-0">
+                    <Accordion type="single" collapsible defaultValue="appearance" className="w-full">
+                        <AccordionItem value="appearance" className="border-0">
+                            <AccordionTrigger className="p-6 text-lg font-semibold hover:no-underline">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary/10 rounded-md">
+                                        <Palette className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div>
+                                        <p>Appearance</p>
+                                        <p className="text-sm font-normal text-muted-foreground text-left">Sesuaikan tampilan dan nuansa aplikasi.</p>
+                                    </div>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-6 pb-6">
+                                <div className="space-y-8 pt-4 border-t">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <Label htmlFor="dark-mode">Dark Mode</Label>
+                                            <p className="text-sm text-muted-foreground">Aktifkan atau nonaktifkan tema gelap.</p>
+                                        </div>
+                                        <Switch
+                                            id="dark-mode"
+                                            checked={isDarkMode}
+                                            onCheckedChange={handleThemeChange}
+                                        />
+                                    </div>
 
-                    <div className="space-y-2">
-                       <div>
-                            <Label>Warna Tema</Label>
-                            <p className="text-sm text-muted-foreground">Pilih warna tema pilihan Anda.</p>
-                        </div>
-                        <div className="flex gap-3 pt-2">
-                            {colors.map((c) => (
-                                <Button
-                                    key={c.name}
-                                    variant="outline"
-                                    size="icon"
-                                    className={cn('h-8 w-8 rounded-full', c.bgColor, color === c.name && 'ring-2 ring-offset-2 ring-primary')}
-                                    onClick={() => setColor(c.name)}
-                                >
-                                    {color === c.name && <Check className="h-4 w-4 text-white" />}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
+                                    <div className="space-y-2">
+                                    <div>
+                                            <Label>Warna Tema</Label>
+                                            <p className="text-sm text-muted-foreground">Pilih warna tema pilihan Anda.</p>
+                                        </div>
+                                        <div className="flex gap-3 pt-2">
+                                            {colors.map((c) => (
+                                                <Button
+                                                    key={c.name}
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className={cn('h-8 w-8 rounded-full', c.bgColor, color === c.name && 'ring-2 ring-offset-2 ring-primary')}
+                                                    onClick={() => setColor(c.name)}
+                                                >
+                                                    {color === c.name && <Check className="h-4 w-4 text-white" />}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                     <div className="space-y-4">
-                        {renderWallpaperSelection()}
-                    </div>
+                                    <div className="space-y-4">
+                                        {renderWallpaperSelection()}
+                                    </div>
 
-                    <div className="space-y-4">
-                        <div>
-                            <Label>Tingkat Kegelapan Wallpaper</Label>
-                            <p className="text-sm text-muted-foreground">Atur seberapa gelap overlay pada wallpaper.</p>
-                        </div>
-                        <Slider
-                            value={[wallpaperOpacity]}
-                            onValueChange={(value) => setWallpaperOpacity(value[0])}
-                            min={0}
-                            max={1}
-                            step={0.1}
-                            disabled={wallpaper === 'default'}
-                        />
-                    </div>
-                    
-                    <div className="space-y-4">
-                        <div>
-                            <Label>Transparansi Komponen</Label>
-                            <p className="text-sm text-muted-foreground">Atur transparansi untuk card dan header.</p>
-                        </div>
-                         <Slider
-                            value={[componentOpacity]}
-                            onValueChange={(value) => setComponentOpacity(value[0])}
-                            min={0.5}
-                            max={1}
-                            step={0.05}
-                        />
-                    </div>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label>Tingkat Kegelapan Wallpaper</Label>
+                                            <p className="text-sm text-muted-foreground">Atur seberapa gelap overlay pada wallpaper.</p>
+                                        </div>
+                                        <Slider
+                                            value={[wallpaperOpacity]}
+                                            onValueChange={(value) => setWallpaperOpacity(value[0])}
+                                            min={0}
+                                            max={1}
+                                            step={0.1}
+                                            disabled={wallpaper === 'default'}
+                                        />
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label>Transparansi Komponen</Label>
+                                            <p className="text-sm text-muted-foreground">Atur transparansi untuk card dan header.</p>
+                                        </div>
+                                        <Slider
+                                            value={[componentOpacity]}
+                                            onValueChange={(value) => setComponentOpacity(value[0])}
+                                            min={0.5}
+                                            max={1}
+                                            step={0.05}
+                                        />
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </CardContent>
             </Card>
         </div>
