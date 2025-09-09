@@ -34,11 +34,15 @@ const wallpaperCategories = {
         value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
         hint: 'city architecture',
     })),
-    Tech: Array.from({ length: 10 }, (_, i) => ({
-        name: `Tech ${i + 1}`,
-        value: `https://picsum.photos/seed/technology_${i + 1}/1920/1080`,
-        hint: 'technology abstract',
-    })),
+    Tech: Array.from({ length: 10 }, (_, i) => {
+        const seeds = ['circuit', 'code', 'server', 'abstract', 'network', 'futuristic', 'data', 'processor', 'digital', 'developer'];
+        const hints = ['circuit board', 'code', 'server room', 'abstract tech', 'network', 'futuristic city', 'data stream', 'microchip', 'digital art', 'developer setup'];
+        return {
+            name: `Tech ${i + 1}`,
+            value: `https://picsum.photos/seed/${seeds[i]}/1920/1080`,
+            hint: hints[i],
+        }
+    }),
 };
 
 type Category = keyof typeof wallpaperCategories;
