@@ -26,15 +26,18 @@ const colors: { name: Color, bgColor: string }[] = [
 const wallpaperCategories = {
     Nature: Array.from({ length: 10 }, (_, i) => ({
         name: `Nature ${i + 1}`,
-        value: `https://picsum.photos/seed/nature${i + 1}/1920/1080`,
+        value: `https://picsum.photos/seed/nature_${i + 1}/1920/1080`,
+        hint: 'nature',
     })),
     City: Array.from({ length: 10 }, (_, i) => ({
         name: `City ${i + 1}`,
-        value: `https://picsum.photos/seed/city${i + 1}/1920/1080`,
+        value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
+        hint: 'city architecture',
     })),
     Tech: Array.from({ length: 10 }, (_, i) => ({
         name: `Tech ${i + 1}`,
-        value: `https://picsum.photos/seed/tech${i + 1}/1920/1080`,
+        value: `https://picsum.photos/seed/technology_${i + 1}/1920/1080`,
+        hint: 'technology abstract',
     })),
 };
 
@@ -114,6 +117,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                     alt={wp.name}
                                     fill
                                     className="object-cover"
+                                    data-ai-hint={wp.hint}
                                 />
                                 <div className="absolute inset-0 bg-black/30" />
                                 {wallpaper === wp.value && (
@@ -167,6 +171,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                 alt={category}
                                 fill
                                 className="object-cover"
+                                data-ai-hint={wallpaperCategories[category as Category][0].hint}
                             />
                             <div className="absolute inset-0 bg-black/30 flex items-end p-2">
                                 <p className="text-white text-xs font-medium">{category}</p>
