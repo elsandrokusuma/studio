@@ -60,9 +60,8 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
               box-shadow: none;
               margin: 0;
               padding: 0;
-              color: #000 !important; /* Force text to black for printing */
             }
-             .printable-area h2, .printable-area h3, .printable-area p, .printable-area div, .printable-area th, .printable-area td {
+             .printable-area, .printable-area * {
                color: #000 !important;
              }
           }
@@ -110,11 +109,11 @@ export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: 
                     <TableBody>
                     {orderGroup.items.map((item) => (
                         <TableRow key={item.id}>
-                        <TableCell className="font-medium text-black">
+                        <TableCell className="font-medium">
                             {item.itemName}
                         </TableCell>
-                        <TableCell className="text-black">{item.company}</TableCell>
-                        <TableCell className="text-right text-black">
+                        <TableCell>{item.company}</TableCell>
+                        <TableCell className="text-right">
                             {item.revisedQuantity ?? item.quantity}
                         </TableCell>
                         </TableRow>
