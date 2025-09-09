@@ -104,7 +104,7 @@ import { format, subDays } from 'date-fns';
 const chartConfig = {
   stockIn: {
     label: "Stock In",
-    color: "hsl(var(--color-stockIn))",
+    color: "#17b878",
   },
   stockOut: {
     label: "Stock Out",
@@ -694,7 +694,7 @@ export default function DashboardPage() {
               <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-primary">{`${greetingInfo.text}!`}</h1>
+              <h1 className="text-2xl font-bold text-white">{`${greetingInfo.text}!`}</h1>
               <p className="text-muted-foreground">
                 {dailyQuote}
               </p>
