@@ -497,7 +497,7 @@ export default function SettingsPage() {
     const [activeMenu, setActiveMenu] = React.useState<ActiveMenu>('main');
 
     return (
-        <div className="max-w-2xl mx-auto relative overflow-x-hidden" style={{ minHeight: 'calc(100vh - 120px)' }}>
+        <div className="max-w-2xl mx-auto relative overflow-x-hidden no-scrollbar" style={{ minHeight: 'calc(100vh - 120px)' }}>
             <div className={cn(
                 "w-full transition-transform duration-300 ease-in-out",
                 activeMenu !== 'main' && "-translate-x-full opacity-0 absolute"
