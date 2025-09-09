@@ -59,7 +59,7 @@ function AppWallpaper() {
 
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>('light');
+  const [theme, setThemeState] = React.useState<Theme>('dark');
   const [color, setColorState] = React.useState<Color>('green');
   const [wallpaper, setWallpaperState] = React.useState<Wallpaper>('default');
   const [wallpaperOpacity, setWallpaperOpacityState] = React.useState(0.5);
