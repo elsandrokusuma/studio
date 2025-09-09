@@ -5,6 +5,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/app-header';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
   title: 'Stationery Inventory',
@@ -28,15 +29,17 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <div className="flex flex-col min-h-screen">
-            <AppHeader />
-            <main className="flex-grow p-4 md:p-8">
-              <div className="mx-auto w-full max-w-full">
-                {children}
-              </div>
-            </main>
-          </div>
-          <Toaster />
+          <AuthProvider>
+            <div className="flex flex-col min-h-screen">
+              <AppHeader />
+              <main className="flex-grow p-4 md:p-8">
+                <div className="mx-auto w-full max-w-full">
+                  {children}
+                </div>
+              </main>
+            </div>
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

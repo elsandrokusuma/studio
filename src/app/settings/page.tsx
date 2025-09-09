@@ -14,7 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Slider } from '@/components/ui/slider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +25,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -73,6 +74,25 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 function AccountSettings({ onBack }: { onBack: () => void }) {
+    const { user, loading, signIn, signOut, deleteAccount } = useAuth();
+    const { toast } = useToast();
+
+    const handleDelete = async () => {
+        try {
+            await deleteAccount();
+            toast({
+                title: "Akun Dihapus",
+                description: "Akun Anda telah berhasil dihapus.",
+            });
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Gagal Menghapus Akun",
+                description: error.message,
+            });
+        }
+    };
+
     return (
         <div className="flex flex-col gap-8">
              <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
@@ -91,14 +111,38 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
-                            <AvatarImage src="https://picsum.photos/seed/user/100/100" />
-                            <AvatarFallback>JD</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="font-semibold text-lg">John Doe</p>
-                            <p className="text-sm text-muted-foreground">john.doe@example.com</p>
-                        </div>
+                        {loading ? (
+                            <>
+                                <Skeleton className="h-16 w-16 rounded-full" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-6 w-32" />
+                                    <Skeleton className="h-4 w-48" />
+                                </div>
+                            </>
+                        ) : user ? (
+                            <>
+                                <Avatar className="h-16 w-16">
+                                    <AvatarImage src={user.photoURL || undefined} />
+                                    <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold text-lg">{user.displayName}</p>
+                                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                                </div>
+                            </>
+                        ) : (
+                             <div className="flex items-center gap-4 text-muted-foreground">
+                                <Avatar className="h-16 w-16 bg-muted">
+                                    <AvatarFallback>
+                                        <User className="h-8 w-8 text-muted-foreground" />
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold text-lg">Not signed in</p>
+                                    <p className="text-sm">Connect your account to see your profile.</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -109,16 +153,25 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                     <CardDescription>Kelola koneksi akun Google Anda untuk login.</CardDescription>
                 </CardHeader>
                  <CardContent>
-                    <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                            <GoogleIcon className="h-6 w-6" />
-                            <div>
-                                <p className="font-medium">Terhubung dengan Google</p>
-                                <p className="text-xs text-muted-foreground">john.doe@example.com</p>
+                    {loading ? (
+                        <Skeleton className="h-14 w-full" />
+                    ) : user ? (
+                        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                                <GoogleIcon className="h-6 w-6" />
+                                <div>
+                                    <p className="font-medium">Terhubung dengan Google</p>
+                                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                                </div>
                             </div>
+                            <Button variant="outline" onClick={signOut}>Putuskan</Button>
                         </div>
-                        <Button variant="outline">Putuskan</Button>
-                    </div>
+                    ) : (
+                        <Button onClick={signIn} className="w-full">
+                            <GoogleIcon className="mr-2 h-5 w-5" />
+                            Hubungkan dengan Google
+                        </Button>
+                    )}
                 </CardContent>
             </Card>
 
@@ -130,7 +183,7 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                 <CardContent>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           <Button variant="destructive">
+                           <Button variant="destructive" disabled={!user}>
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Hapus Akun Saya
                             </Button>
@@ -144,7 +197,7 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                             <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction>Ya, Hapus Akun Saya</AlertDialogAction>
+                            <AlertDialogAction onClick={handleDelete}>Ya, Hapus Akun Saya</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
@@ -444,7 +497,7 @@ export default function SettingsPage() {
     const [activeMenu, setActiveMenu] = React.useState<ActiveMenu>('main');
 
     return (
-        <div className="max-w-2xl mx-auto relative overflow-x-hidden overflow-y-auto no-scrollbar" style={{ height: 'calc(100vh - 80px)' }}>
+        <div className="max-w-2xl mx-auto relative overflow-x-hidden" style={{ minHeight: 'calc(100vh - 120px)' }}>
             <div className={cn(
                 "w-full transition-transform duration-300 ease-in-out",
                 activeMenu !== 'main' && "-translate-x-full opacity-0 absolute"
