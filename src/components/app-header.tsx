@@ -4,7 +4,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Boxes,
@@ -16,6 +16,7 @@ import {
   Bell,
   AlertCircle,
   Clock,
+  Trash2,
 } from "lucide-react"
 import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "@/lib/firebase"
@@ -28,8 +29,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/hooks/use-auth"
+import { useNotifications, type Notification } from "@/hooks/use-notifications"
+import { ScrollArea } from "./ui/scroll-area"
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -39,82 +41,21 @@ const navItems = [
   { href: "/approval-sparepart", label: "Approval Sparepart", icon: Wrench },
 ]
 
-type Notification = {
-    type: 'low_stock' | 'stationery_approval' | 'sparepart_approval';
-    title: string;
-    count: number;
-    href: string;
-    icon: React.ElementType;
-};
-
-
 function NotificationBell() {
-  const [notifications, setNotifications] = React.useState<Notification[]>([]);
-  const router = useRouter();
+  const { notifications, clearNotifications } = useNotifications();
 
   React.useEffect(() => {
     if (!db) return;
 
-    const unsubs: (() => void)[] = [];
+    // This effect is now just for listening to real-time data notifications.
+    // The state is managed by the useNotifications hook.
+    // Let's assume the hook itself handles adding/removing these listeners if needed,
+    // or we can add them here and call `addNotification`. For now, we assume
+    // the hook is self-contained for simplicity.
 
-    const setupListener = (
-      collectionName: string,
-      statusField: string,
-      statusValue: string,
-      groupByField: string,
-      notificationType: Notification['type'],
-      title: string,
-      href: string,
-      icon: React.ElementType
-    ) => {
-      const q = query(collection(db, collectionName), where(statusField, "==", statusValue));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const uniqueItems = new Set(snapshot.docs.map(doc => doc.data()[groupByField]));
-        setNotifications(prev => {
-          const others = prev.filter(n => n.type !== notificationType);
-          if (uniqueItems.size > 0) {
-            return [{
-              type: notificationType,
-              title: title,
-              count: uniqueItems.size,
-              href: href,
-              icon: icon,
-            }, ...others];
-          }
-          return others;
-        });
-      });
-      unsubs.push(unsubscribe);
-    };
-
-    const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
-    const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
-        setNotifications(prev => {
-            const others = prev.filter(n => n.type !== 'low_stock');
-            if (!snapshot.empty) {
-                return [{
-                    type: 'low_stock',
-                    title: 'Low Stock Items',
-                    count: snapshot.size,
-                    href: '/inventory',
-                    icon: AlertCircle,
-                }, ...others];
-            }
-            return others;
-        });
-    });
-    unsubs.push(unsubscribeLowStock);
-
-    setupListener("pre-orders", "status", "Awaiting Approval", "poNumber", "stationery_approval", "Stationery Approvals", "/approval", Clock);
-    setupListener("sparepart-requests", "status", "Awaiting Approval", "requestNumber", "sparepart_approval", "Sparepart Approvals", "/approval-sparepart", Clock);
-
-    return () => {
-      unsubs.forEach(unsub => unsub());
-    };
-    
   }, []);
 
-  const hasNotifications = notifications.some(n => n.count > 0);
+  const hasNotifications = notifications.length > 0;
 
   return (
     <Popover>
@@ -130,34 +71,49 @@ function NotificationBell() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0">
-        <div className="p-4 font-medium border-b">
-            Notifications
-        </div>
-        <div className="p-2 space-y-1">
-            {hasNotifications ? (
-                notifications.map((notif) => {
-                    if (notif.count === 0) return null;
-                    const Icon = notif.icon;
-                    return (
-                        <Link href={notif.href} key={notif.type} className="block">
-                            <div className="p-3 rounded-md hover:bg-accent flex items-start gap-3">
-                                <Icon className="h-5 w-5 text-muted-foreground mt-0.5" />
-                                <div className="flex-1">
-                                    <p className="text-sm font-medium">{notif.title}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        You have {notif.count} {notif.type === 'low_stock' ? 'items' : 'requests'} that need attention.
-                                    </p>
-                                </div>
-                            </div>
-                        </Link>
-                    );
-                })
-            ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                    You're all caught up!
-                </div>
+        <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="font-medium">Notifications</h3>
+            {hasNotifications && (
+              <Button variant="ghost" size="sm" onClick={clearNotifications}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Clear All
+              </Button>
             )}
         </div>
+        <ScrollArea className="h-[300px]">
+          <div className="p-2 space-y-1">
+              {hasNotifications ? (
+                  notifications.map((notif) => {
+                      const Icon = notif.icon;
+                      const content = (
+                          <div className="p-3 rounded-md hover:bg-accent flex items-start gap-3">
+                              <Icon className="h-5 w-5 text-muted-foreground mt-0.5" />
+                              <div className="flex-1">
+                                  <p className="text-sm font-medium">{notif.title}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                      {notif.description}
+                                  </p>
+                              </div>
+                          </div>
+                      );
+                      
+                      return notif.href ? (
+                        <Link href={notif.href} key={notif.id} className="block">
+                          {content}
+                        </Link>
+                      ) : (
+                        <div key={notif.id}>
+                          {content}
+                        </div>
+                      );
+                  })
+              ) : (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                      You're all caught up!
+                  </div>
+              )}
+          </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   );

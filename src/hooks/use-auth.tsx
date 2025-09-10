@@ -17,6 +17,8 @@ import {
 import { app, firebaseEnabled } from '@/lib/firebase';
 import { FullPageSpinner } from '@/components/full-page-spinner';
 import { useToast } from './use-toast';
+import { useNotifications } from './use-notifications';
+import { LogIn, LogOut } from 'lucide-react';
 
 interface AuthContextType {
   user: User | null;
@@ -33,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState<Auth | null>(null);
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const router = useRouter();
 
   useEffect(() => {
@@ -88,9 +91,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, pass);
         setUser(userCredential.user);
-        toast({
+        addNotification({
             title: "Sign In Successful",
             description: "Welcome back!",
+            icon: LogIn,
         });
     } catch (error: any) {
         handleAuthError(error);
@@ -104,9 +108,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!auth) return;
     try {
       await signOut(auth);
-      toast({
+      addNotification({
           title: "Signed Out",
           description: "You have been successfully signed out.",
+          icon: LogOut,
       });
       router.push('/');
     } catch (error) {

@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/app-header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/hooks/use-auth';
+import { NotificationProvider } from '@/hooks/use-notifications';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
@@ -30,17 +31,19 @@ export default function RootLayout({
       </head>
       <body className={cn("no-scrollbar")}>
         <ThemeProvider>
-          <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-              <AppHeader />
-              <main className="flex-grow p-4 md:p-8">
-                <div className="mx-auto w-full max-w-full">
-                  {children}
-                </div>
-              </main>
-            </div>
-            <Toaster />
-          </AuthProvider>
+          <NotificationProvider>
+            <AuthProvider>
+              <div className="flex flex-col min-h-screen">
+                <AppHeader />
+                <main className="flex-grow p-4 md:p-8">
+                  <div className="mx-auto w-full max-w-full">
+                    {children}
+                  </div>
+                </main>
+              </div>
+              <Toaster />
+            </AuthProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

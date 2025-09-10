@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -28,6 +28,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { useNotifications } from '@/hooks/use-notifications';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -67,13 +68,15 @@ type ActiveMenu = 'main' | 'appearance' | 'account';
 function AccountSettings({ onBack }: { onBack: () => void }) {
     const { user, loading, signOut, deleteAccount } = useAuth();
     const { toast } = useToast();
+    const { addNotification } = useNotifications();
 
     const handleDelete = async () => {
         try {
             await deleteAccount();
-            toast({
+            addNotification({
                 title: "Akun Dihapus",
                 description: "Akun Anda telah berhasil dihapus.",
+                icon: Trash2,
             });
         } catch (error: any) {
             toast({
@@ -183,6 +186,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         componentOpacity, setComponentOpacity
     } = useTheme();
     const { toast } = useToast();
+    const { addNotification } = useNotifications();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [selectedCategory, setSelectedCategory] = React.useState<Category | null>(null);
     
@@ -209,9 +213,10 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         reader.onload = (e) => {
             const result = e.target?.result as string;
             setWallpaper(result);
-            toast({
+            addNotification({
                 title: 'Wallpaper Diperbarui',
                 description: 'Wallpaper latar belakang Anda telah diubah.',
+                icon: ImageIcon,
             });
         };
         reader.readAsDataURL(file);
