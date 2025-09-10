@@ -27,8 +27,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         
         {/* Favicon links for different devices with cache-busting */}
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="icon" href="/favicon.ico?v=5" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.ico?v=5" />
         <link rel="manifest" href="/site.webmanifest" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
