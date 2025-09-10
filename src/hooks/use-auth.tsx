@@ -9,9 +9,10 @@ import {
     GoogleAuthProvider, 
     signOut,
     deleteUser,
-    type User 
+    type User,
+    type Auth
 } from 'firebase/auth';
-import { db, firebaseEnabled } from '@/lib/firebase';
+import { firebaseEnabled } from '@/lib/firebase';
 import { FullPageSpinner } from '@/components/full-page-spinner';
 import { useToast } from './use-toast';
 
@@ -28,25 +29,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [auth, setAuth] = useState<Auth | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!firebaseEnabled) {
+    if (firebaseEnabled) {
+      const authInstance = getAuth();
+      setAuth(authInstance);
+      const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+        setUser(user);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } else {
       setLoading(false);
-      return;
     }
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
   }, []);
 
   const signIn = async () => {
-    if (!firebaseEnabled) {
-        console.error("Firebase is not configured.");
+    if (!auth) {
+        console.error("Auth service is not available.");
         toast({
           variant: "destructive",
           title: "Firebase not configured",
@@ -54,12 +56,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
         return;
     }
-    const auth = getAuth();
+    
     const provider = new GoogleAuthProvider();
     try {
       setLoading(true);
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user); // Explicitly set user state after successful sign-in
+      setUser(result.user);
       toast({
         title: "Account Connected",
         description: "You've successfully signed in with Google.",
@@ -77,8 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOutUser = async () => {
-    if (!firebaseEnabled) return;
-    const auth = getAuth();
+    if (!auth) return;
     try {
       await signOut(auth);
     } catch (error) {
@@ -87,8 +88,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteAccount = async () => {
-    if (!firebaseEnabled) throw new Error("Firebase not enabled.");
-    const auth = getAuth();
+    if (!auth) throw new Error("Firebase not enabled.");
+    
     const currentUser = auth.currentUser;
     if (!currentUser) throw new Error("No user is signed in to delete.");
     
@@ -102,12 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
   
   const value = { user, loading, signIn, signOut: signOutUser, deleteAccount };
-
-  // Render a loading spinner for the initial auth state check
-  if (loading && !firebaseEnabled) {
-    // If firebase is disabled, don't show a spinner indefinitely.
-    // The initial check will be quick.
-  } else if(loading) {
+  
+  if(loading) {
     return <FullPageSpinner />;
   }
 
@@ -122,4 +119,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
