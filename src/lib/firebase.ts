@@ -1,3 +1,4 @@
+
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, type FirebaseOptions } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
@@ -8,7 +9,7 @@ const firebaseConfig: FirebaseOptions = {
   apiKey: "AIzaSyDa0mHjrTK1O73yosGLrE7I5Q51eoNa3sg",
   authDomain: "stationery-inventory.firebaseapp.com",
   projectId: "stationery-inventory",
-  storageBucket: "stationery-inventory.firebasestorage.app",
+  storageBucket: "stationery-inventory.appspot.com",
   messagingSenderId: "812550241868",
   appId: "1:812550241868:web:056174a385b1539456fee9",
 };
