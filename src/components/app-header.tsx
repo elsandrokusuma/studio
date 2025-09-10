@@ -167,7 +167,7 @@ export function AppHeader() {
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center">
-              <Image src="/favicon.ico" alt="Logo" width={40} height={40} className="h-10 w-10" />
+              <Image src="/favicon.ico" alt="Logo" width={48} height={48} className="h-12 w-12" />
             </Link>
         </div>
 
