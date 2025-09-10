@@ -2,6 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
     onAuthStateChanged, 
     signOut,
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState<Auth | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     if (firebaseEnabled && app) {
@@ -106,6 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           title: "Signed Out",
           description: "You have been successfully signed out.",
       });
+      router.push('/');
     } catch (error) {
       console.error("Error signing out", error);
       toast({
