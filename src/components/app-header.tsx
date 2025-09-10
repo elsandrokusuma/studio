@@ -170,12 +170,15 @@ export function AppHeader() {
   const { user } = useAuth();
 
   const visibleNavItems = React.useMemo(() => {
-    if (!user) return navItems;
+    if (!user) return [];
     if (user.email === 'krezthrd@gmail.com') {
       return navItems.filter(item => item.href !== '/approval-sparepart');
     }
     if (user.email === 'kreztservice@gmail.com') {
       return navItems.filter(item => item.href === '/approval-sparepart');
+    }
+    if (user.email === 'kreztuser@gmail.com') {
+        return navItems.filter(item => item.href === '/');
     }
     return navItems;
   }, [user]);

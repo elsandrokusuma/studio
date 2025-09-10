@@ -581,9 +581,15 @@ export default function DashboardPage() {
     return <LoginForm />;
   }
   
-  if (!user || user.email === 'kreztservice@gmail.com') {
+  // Specific redirect for service user, returns null to prevent flash
+  if (user && user.email === 'kreztservice@gmail.com') {
+    return null;
+  }
+
+  if (!user) {
     return <FullPageSpinner />;
   }
+
 
   if (!db) {
     return (
@@ -632,6 +638,7 @@ export default function DashboardPage() {
   
   const GreetingIcon = greetingInfo.icon;
   const isHrdUser = user.email === 'krezthrd@gmail.com';
+  const isStandardUser = user.email === 'kreztuser@gmail.com';
 
 
   return (
@@ -740,7 +747,7 @@ export default function DashboardPage() {
             <Button
               onClick={() => setAddOpen(true)}
               className="w-full justify-start h-auto p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
-              disabled={isHrdUser}
+              disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-4">
                 <Plus className="h-5 w-5" />
@@ -755,7 +762,7 @@ export default function DashboardPage() {
             <Button
               onClick={() => setStockInOpen(true)}
               className="w-full justify-start h-auto p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
-              disabled={isHrdUser}
+              disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-4">
                 <TrendingUp className="h-5 w-5" />
@@ -781,7 +788,7 @@ export default function DashboardPage() {
             <Button
               onClick={() => setCreatePoOpen(true)}
               className="w-full justify-start h-auto p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
-              disabled={isHrdUser}
+              disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-4">
                 <FileText className="h-5 w-5" />
