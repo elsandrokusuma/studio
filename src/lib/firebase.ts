@@ -31,3 +31,4 @@ if (!firebaseEnabled) {
 }
 
 export { db, auth, firebaseEnabled };
+
