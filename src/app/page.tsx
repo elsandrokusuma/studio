@@ -363,9 +363,13 @@ export default function DashboardPage() {
 
   React.useEffect(() => {
     if (!authLoading) {
-      setShowLogin(!user);
+      if (user && user.email === 'kreztservice@gmail.com') {
+        router.push('/approval-sparepart');
+      } else {
+        setShowLogin(!user);
+      }
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   React.useEffect(() => {
     const pendingPO = preOrders.find(po => po.status === 'Pending');
@@ -648,7 +652,7 @@ export default function DashboardPage() {
     area: AreaChart,
   }[chartType];
 
-  const ChartElements = {
+  const chartElements = {
     bar: (
       <>
         <Bar
@@ -715,7 +719,7 @@ export default function DashboardPage() {
         />
       </>
     )
-  }[chartType];
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -951,7 +955,7 @@ export default function DashboardPage() {
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend />
-                  {ChartElements}
+                  {chartElements[chartType]}
                 </ChartComponent>
               </ChartContainer>
             </div>
