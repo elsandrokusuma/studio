@@ -12,7 +12,7 @@ import {
     type User,
     type Auth
 } from 'firebase/auth';
-import { firebaseEnabled } from '@/lib/firebase';
+import { firebaseEnabled, app } from '@/lib/firebase';
 import { FullPageSpinner } from '@/components/full-page-spinner';
 import { useToast } from './use-toast';
 
@@ -33,8 +33,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (firebaseEnabled) {
-      const authInstance = getAuth();
+    if (firebaseEnabled && app) {
+      const authInstance = getAuth(app);
       setAuth(authInstance);
       const unsubscribe = onAuthStateChanged(authInstance, (user) => {
         setUser(user);
