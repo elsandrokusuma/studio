@@ -585,16 +585,21 @@ export default function DashboardPage() {
     return <FullPageSpinner />;
   }
 
+  // Prevent flash of dashboard for service account while redirecting
   if (user && user.email === 'kreztservice@gmail.com') {
+    return null; 
+  }
+
+  if (user && user.email === 'krezthrd@gmail.com') {
+    // Read-only view for HRD
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">
-        <div className="p-4 bg-destructive/10 rounded-full mb-4">
-            <Ban className="h-12 w-12 text-destructive" />
-        </div>
-        <h1 className="text-2xl font-bold">Access Denied</h1>
-        <p className="text-muted-foreground max-w-sm">
-            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
-        </p>
+      <div className="flex flex-col gap-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome, HRD</CardTitle>
+            <CardDescription>You have read-only access to this dashboard.</CardDescription>
+          </CardHeader>
+        </Card>
       </div>
     );
   }
@@ -645,81 +650,6 @@ export default function DashboardPage() {
   );
   
   const GreetingIcon = greetingInfo.icon;
-
-  const ChartComponent = {
-    bar: BarChart,
-    line: LineChart,
-    area: AreaChart,
-  }[chartType];
-
-  const chartElements = {
-    bar: (
-      <>
-        <Bar
-          dataKey="stockIn"
-          fill="var(--color-stockIn)"
-          radius={[4, 4, 0, 0]}
-          name="Stock In"
-        />
-        <Bar
-          dataKey="stockOut"
-          fill="var(--color-stockOut)"
-          radius={[4, 4, 0, 0]}
-          name="Stock Out"
-        />
-      </>
-    ),
-    line: (
-      <>
-        <Line
-          type="monotone"
-          dataKey="stockIn"
-          stroke="var(--color-stockIn)"
-          strokeWidth={2}
-          dot={false}
-          name="Stock In"
-        />
-        <Line
-          type="monotone"
-          dataKey="stockOut"
-          stroke="var(--color-stockOut)"
-          strokeWidth={2}
-          dot={false}
-          name="Stock Out"
-        />
-      </>
-    ),
-    area: (
-       <>
-        <defs>
-          <linearGradient id="fillStockIn" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-stockIn)" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="var(--color-stockIn)" stopOpacity={0.1} />
-          </linearGradient>
-          <linearGradient id="fillStockOut" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-stockOut)" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="var(--color-stockOut)" stopOpacity={0.1} />
-          </linearGradient>
-        </defs>
-        <Area
-          type="monotone"
-          dataKey="stockIn"
-          stroke="var(--color-stockIn)"
-          fill="url(#fillStockIn)"
-          stackId="1"
-          name="Stock In"
-        />
-        <Area
-          type="monotone"
-          dataKey="stockOut"
-          stroke="var(--color-stockOut)"
-          fill="url(#fillStockOut)"
-          stackId="1"
-          name="Stock Out"
-        />
-      </>
-    )
-  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -943,20 +873,49 @@ export default function DashboardPage() {
                 config={chartConfig}
                 className="min-w-[300px] w-full h-[300px]"
               >
-                <ChartComponent accessibilityLayer data={chartData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey={timePeriod === 'monthly' ? 'month' : 'date'}
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => value}
-                  />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend />
-                  {chartElements[chartType]}
-                </ChartComponent>
+                {chartType === 'bar' && (
+                  <BarChart accessibilityLayer data={chartData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Legend />
+                    <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={[4, 4, 0, 0]} name="Stock In" />
+                    <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={[4, 4, 0, 0]} name="Stock Out" />
+                  </BarChart>
+                )}
+                {chartType === 'line' && (
+                  <LineChart accessibilityLayer data={chartData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Legend />
+                    <Line type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" strokeWidth={2} dot={false} name="Stock In" />
+                    <Line type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" strokeWidth={2} dot={false} name="Stock Out" />
+                  </LineChart>
+                )}
+                {chartType === 'area' && (
+                  <AreaChart accessibilityLayer data={chartData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
+                    <YAxis />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Legend />
+                    <defs>
+                      <linearGradient id="fillStockIn" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-stockIn)" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="var(--color-stockIn)" stopOpacity={0.1} />
+                      </linearGradient>
+                      <linearGradient id="fillStockOut" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-stockOut)" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="var(--color-stockOut)" stopOpacity={0.1} />
+                      </linearGradient>
+                    </defs>
+                    <Area type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" fill="url(#fillStockIn)" stackId="1" name="Stock In" />
+                    <Area type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" fill="url(#fillStockOut)" stackId="1" name="Stock Out" />
+                  </AreaChart>
+                )}
               </ChartContainer>
             </div>
           </CardContent>
