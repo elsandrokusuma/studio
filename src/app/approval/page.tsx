@@ -40,11 +40,12 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import type { PreOrder } from "@/lib/types";
-import { Check, X, Box, Eye } from "lucide-react";
+import { Check, X, Box, Eye, Ban } from "lucide-react";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FullPageSpinner } from "@/components/full-page-spinner";
+import { useAuth } from "@/hooks/use-auth";
 
 type GroupedPO = {
   poNumber: string;
@@ -63,6 +64,7 @@ export default function ApprovalPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = React.useState(true);
+  const { user, loading: authLoading } = useAuth();
 
   React.useEffect(() => {
     if (!db) {
@@ -147,8 +149,22 @@ export default function ApprovalPage() {
     setDetailsOpen(true);
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return <FullPageSpinner />;
+  }
+  
+  if (user && user.email === 'kreztservice@gmail.com') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">
+        <div className="p-4 bg-destructive/10 rounded-full mb-4">
+            <Ban className="h-12 w-12 text-destructive" />
+        </div>
+        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <p className="text-muted-foreground max-w-sm">
+            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+        </p>
+      </div>
+    );
   }
 
   if (!db) {

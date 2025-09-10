@@ -61,7 +61,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, MapPin, ChevronDown } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, MapPin, ChevronDown, Ban } from "lucide-react";
 import type { PreOrder, InventoryItem } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -81,6 +81,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/use-auth";
 
 
 type GroupedPO = {
@@ -111,6 +112,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
   const [isCreatingNewPo, setIsCreatingNewPo] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [openAccordion, setOpenAccordion] = React.useState<string | undefined>();
+  const { user, loading: authLoading } = useAuth();
 
   // States for editing/deleting individual items
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
@@ -547,8 +549,22 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
   }
   
-  if (loading) {
+  if (loading || authLoading) {
     return <FullPageSpinner />;
+  }
+
+  if (user && user.email === 'kreztservice@gmail.com') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">
+        <div className="p-4 bg-destructive/10 rounded-full mb-4">
+            <Ban className="h-12 w-12 text-destructive" />
+        </div>
+        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <p className="text-muted-foreground max-w-sm">
+            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+        </p>
+      </div>
+    );
   }
 
   if (!db) {
@@ -1014,7 +1030,7 @@ function PreOrdersContent({ searchParams }: { searchParams: { [key: string]: str
               </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+        </AlertDialog>
 
         <AlertDialog open={isDeleteItemOpen} onOpenChange={setDeleteItemOpen}>
           <AlertDialogContent>

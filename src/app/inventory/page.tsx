@@ -77,6 +77,7 @@ import {
   List,
   LayoutGrid,
   Loader2,
+  Ban,
 } from "lucide-react";
 import type { InventoryItem, Transaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -96,6 +97,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useAuth } from "@/hooks/use-auth";
 
 
 const seedData = [
@@ -235,6 +237,7 @@ export default function InventoryPage() {
   const [loading, setLoading] = React.useState(true);
   const [layout, setLayout] = React.useState<'list' | 'grid'>('list');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { user, loading: authLoading } = useAuth();
 
 
   // States for camera functionality
@@ -709,8 +712,22 @@ export default function InventoryPage() {
   
   const selectedItemForStockOut = items.find(i => i.id === selectedItemId);
 
-  if (loading) {
+  if (loading || authLoading) {
     return <FullPageSpinner />;
+  }
+
+  if (user && user.email === 'kreztservice@gmail.com') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">
+        <div className="p-4 bg-destructive/10 rounded-full mb-4">
+            <Ban className="h-12 w-12 text-destructive" />
+        </div>
+        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <p className="text-muted-foreground max-w-sm">
+            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+        </p>
+      </div>
+    );
   }
 
   if (!db) {
