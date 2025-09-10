@@ -124,7 +124,7 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                             ) : user ? (
                                 <>
                                     <Avatar className="h-16 w-16">
-                                        <AvatarImage src={user.photoURL || undefined} />
+                                        <AvatarImage src={user.photoURL || `https://robohash.org/${user.email}.png`} />
                                         <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
                                     </Avatar>
                                     <div>
