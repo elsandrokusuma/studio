@@ -47,6 +47,7 @@ import {
     Send,
     Undo2,
     ChevronDown,
+    Ban,
 } from "lucide-react";
 import {
   Table,
@@ -103,6 +104,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 
 type GroupedRequest = {
@@ -129,6 +131,7 @@ export default function ApprovalSparepartPage() {
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
   // State for Create PO Dialog
   const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
@@ -609,8 +612,22 @@ export default function ApprovalSparepartPage() {
   const canRequestApproval = selectedRows.some(poNumber => groupedRequests.find(po => po.requestNumber === poNumber)?.status === 'Pending');
 
 
-  if (loading) {
+  if (loading || authLoading) {
     return <FullPageSpinner />;
+  }
+  
+  if (user && user.email === 'krezthrd@gmail.com') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">
+        <div className="p-4 bg-destructive/10 rounded-full mb-4">
+            <Ban className="h-12 w-12 text-destructive" />
+        </div>
+        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <p className="text-muted-foreground max-w-sm">
+            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+        </p>
+      </div>
+    );
   }
 
   if (!db) {

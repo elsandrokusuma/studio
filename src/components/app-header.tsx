@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sheet"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/hooks/use-auth"
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -166,10 +167,19 @@ function NotificationBell() {
 export function AppHeader() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const { user } = useAuth();
+
+  const visibleNavItems = React.useMemo(() => {
+    if (user && user.email === 'krezthrd@gmail.com') {
+      return navItems.filter(item => item.href !== '/approval-sparepart');
+    }
+    return navItems;
+  }, [user]);
+
 
   const NavLinks = ({ className, inSheet = false }: { className?: string, inSheet?: boolean }) => (
     <nav className={cn("flex items-center gap-2 lg:gap-4", className)}>
-      {navItems.map((item) => (
+      {visibleNavItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
