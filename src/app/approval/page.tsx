@@ -40,12 +40,13 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import type { PreOrder } from "@/lib/types";
-import { Check, X, Box, Eye, Ban } from "lucide-react";
+import { Check, X, Box, Eye, Ban, ClipboardCheck } from "lucide-react";
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 
 type GroupedPO = {
   poNumber: string;
@@ -62,6 +63,7 @@ export default function ApprovalPage() {
   const [selectedPo, setSelectedPo] = React.useState<GroupedPO | null>(null);
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const router = useRouter();
   const [loading, setLoading] = React.useState(true);
   const { user, loading: authLoading } = useAuth();
@@ -126,9 +128,10 @@ export default function ApprovalPage() {
         });
         await batch.commit();
 
-        toast({
+        addNotification({
           title: `Pre-Order ${decision}`,
           description: `The pre-order ${po.poNumber} has been ${decision}.`,
+          icon: decision === "approved" ? Check : X,
         });
         
     } catch(error) {

@@ -105,6 +105,7 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 
 
 type GroupedRequest = {
@@ -129,6 +130,7 @@ export default function ApprovalSparepartPage() {
   const [allRequests, setAllRequests] = React.useState<SparepartRequest[]>([]);
   const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -192,9 +194,10 @@ export default function ApprovalSparepartPage() {
         const itemRef = doc(db, "sparepart-requests", item.id);
         await updateDoc(itemRef, { itemStatus: decision });
         
-        toast({
+        addNotification({
           title: `Item ${decision}`,
           description: `Item ${item.itemName} has been ${decision}.`,
+          icon: decision === "Approved" ? Check : X,
         });
 
     } catch(error) {
@@ -216,9 +219,10 @@ export default function ApprovalSparepartPage() {
             batch.update(docRef, { status: 'Approved' });
         });
         await batch.commit();
-        toast({
+        addNotification({
             title: "PO Approved",
-            description: `Request ${po.requestNumber} has been marked as Approved.`
+            description: `Request ${po.requestNumber} has been marked as Approved.`,
+            icon: Check,
         });
     } catch (error) {
         console.error("Error marking PO as approved:", error);
@@ -253,9 +257,10 @@ export default function ApprovalSparepartPage() {
 
       await batch.commit();
 
-      toast({
+      addNotification({
         title: 'Approval Requested',
         description: `${posToRequest.length} request(s) have been sent for approval.`,
+        icon: Send,
       });
       
       // Send WhatsApp Notification
@@ -297,7 +302,7 @@ export default function ApprovalSparepartPage() {
       const itemRef = doc(db, "sparepart-requests", selectedOrderItem.id);
       await updateDoc(itemRef, { revisedQuantity: newQuantity });
       
-      toast({ title: "Quantity Revised", description: `Quantity for ${selectedOrderItem.itemName} updated.` });
+      addNotification({ title: "Quantity Revised", description: `Quantity for ${selectedOrderItem.itemName} updated.`, icon: Pencil });
       setEditItemOpen(false);
       setSelectedOrderItem(null);
       setRevisedQuantity('');
@@ -315,9 +320,10 @@ export default function ApprovalSparepartPage() {
         batch.update(docRef, { status });
     });
     await batch.commit();
-    toast({
+    addNotification({
       title: 'Status Updated',
-      description: `PO ${po.requestNumber} marked as ${status}.`
+      description: `PO ${po.requestNumber} marked as ${status}.`,
+      icon: Undo2,
     });
   };
   
@@ -384,7 +390,7 @@ export default function ApprovalSparepartPage() {
       
       await batch.commit();
       
-      toast({ title: "Request Created", description: `Request ${formattedReqNum} has been submitted for approval.` });
+      addNotification({ title: "Request Created", description: `Request ${formattedReqNum} has been submitted.`, icon: PlusCircle });
       setCreatePoOpen(false);
       resetPoForm();
     } catch (error) {
@@ -445,9 +451,10 @@ export default function ApprovalSparepartPage() {
         
         setPoItems(newItems);
 
-        toast({
+        addNotification({
           title: 'Import Successful',
           description: `${newItems.length} items have been loaded into the form.`,
+          icon: Upload,
         });
       },
       error: (error) => {
@@ -475,9 +482,10 @@ export default function ApprovalSparepartPage() {
       });
       await batch.commit();
 
-      toast({
+      addNotification({
         title: "Request Deleted",
         description: `Request ${selectedPo.requestNumber} has been deleted.`,
+        icon: Trash2,
       });
 
     } catch (error) {
