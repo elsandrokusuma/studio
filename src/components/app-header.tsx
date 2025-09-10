@@ -167,7 +167,7 @@ export function AppHeader() {
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center">
-              <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
+              <Image src="/favicon.ico" alt="Logo" width={32} height={32} className="h-8 w-8" />
             </Link>
         </div>
 
@@ -195,7 +195,7 @@ export function AppHeader() {
                 <SheetContent side="left">
                   <div className="flex flex-col gap-6 pt-8">
                     <Link href="/" className="flex items-center gap-2 font-semibold text-lg px-2" onClick={() => setIsMobileMenuOpen(false)}>
-                       <Image src="https://i.imgur.com/vofm5PY.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
+                       <Image src="/favicon.ico" alt="Logo" width={32} height={32} className="h-8 w-8" />
                       <span>Stationery Inv.</span>
                     </Link>
                     <NavLinks className="flex-col items-start gap-2" inSheet={true} />
