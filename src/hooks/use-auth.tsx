@@ -4,13 +4,14 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { 
     onAuthStateChanged, 
-    signInWithPopup, 
-    GoogleAuthProvider, 
     signOut,
     deleteUser,
     getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
     type Auth,
-    type User
+    type User,
+    type AuthError
 } from 'firebase/auth';
 import { app, firebaseEnabled } from '@/lib/firebase';
 import { FullPageSpinner } from '@/components/full-page-spinner';
@@ -19,7 +20,8 @@ import { useToast } from './use-toast';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: () => Promise<void>;
+  signUp: (email: string, pass: string) => Promise<void>;
+  signIn: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
 }
@@ -46,44 +48,89 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const signIn = async () => {
-    if (!auth) {
-        console.error("Auth service is not available.");
-        toast({
-          variant: "destructive",
-          title: "Firebase not configured",
-          description: "Could not connect to authentication services.",
-        });
-        return;
+  const handleAuthError = (error: AuthError) => {
+    let description = "An unexpected error occurred.";
+    switch (error.code) {
+        case 'auth/invalid-email':
+            description = "The email address is not valid.";
+            break;
+        case 'auth/user-disabled':
+            description = "This user account has been disabled.";
+            break;
+        case 'auth/user-not-found':
+            description = "No user found with this email.";
+            break;
+        case 'auth/wrong-password':
+            description = "Incorrect password. Please try again.";
+            break;
+        case 'auth/email-already-in-use':
+            description = "This email address is already in use.";
+            break;
+        case 'auth/weak-password':
+            description = "The password is too weak. Please use a stronger password.";
+            break;
+        default:
+            description = error.message;
+            break;
     }
-    
-    const provider = new GoogleAuthProvider();
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-      toast({
-        title: "Account Connected",
-        description: "You've successfully signed in with Google.",
-      });
-    } catch (error) {
-      console.error("Error signing in with Google", error);
-       toast({
+    toast({
         variant: "destructive",
-        title: "Sign-in Failed",
-        description: "There was a problem connecting your Google account.",
-      });
+        title: "Authentication Failed",
+        description,
+    });
+    throw error;
+  };
+
+  const signUp = async (email: string, pass: string) => {
+    if (!auth) throw new Error("Auth service not initialized.");
+    setLoading(true);
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        setUser(userCredential.user);
+        toast({
+            title: "Sign Up Successful",
+            description: "Your account has been created.",
+        });
+    } catch (error: any) {
+        handleAuthError(error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
+  
+  const signIn = async (email: string, pass: string) => {
+    if (!auth) throw new Error("Auth service not initialized.");
+    setLoading(true);
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+        setUser(userCredential.user);
+        toast({
+            title: "Sign In Successful",
+            description: "Welcome back!",
+        });
+    } catch (error: any) {
+        handleAuthError(error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
 
   const signOutUser = async () => {
     if (!auth) return;
     try {
       await signOut(auth);
+      toast({
+          title: "Signed Out",
+          description: "You have been successfully signed out.",
+      });
     } catch (error) {
       console.error("Error signing out", error);
+      toast({
+          variant: "destructive",
+          title: "Sign Out Failed",
+          description: "There was a problem signing out.",
+      });
     }
   };
 
@@ -102,9 +149,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
   
-  const value = { user, loading, signIn, signOut: signOutUser, deleteAccount };
+  const value = { user, loading, signUp, signIn, signOut: signOutUser, deleteAccount };
   
-  if(loading) {
+  if(loading && !user) {
+    // Show spinner only on initial load when user status is unknown
     return <FullPageSpinner />;
   }
 
@@ -119,3 +167,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    

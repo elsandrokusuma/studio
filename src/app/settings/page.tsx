@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -62,20 +63,28 @@ const wallpaperCategories = {
 type Category = keyof typeof wallpaperCategories;
 type ActiveMenu = 'main' | 'appearance' | 'account';
 
-function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48" {...props}>
-            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
-            <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path>
-            <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
-            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002l6.19 5.238C42.099 34.551 44 29.829 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
-        </svg>
-    )
-}
 
 function AccountSettings({ onBack }: { onBack: () => void }) {
-    const { user, loading, signIn, signOut, deleteAccount } = useAuth();
+    const { user, loading, signIn, signUp, signOut, deleteAccount } = useAuth();
     const { toast } = useToast();
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+
+    const handleSignUp = async () => {
+        try {
+            await signUp(email, password);
+        } catch (error) {
+            // Error is already handled by toast in useAuth
+        }
+    };
+
+    const handleSignIn = async () => {
+        try {
+            await signIn(email, password);
+        } catch (error) {
+            // Error is already handled by toast in useAuth
+        }
+    };
 
     const handleDelete = async () => {
         try {
@@ -110,70 +119,68 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                     <CardDescription>Informasi dasar tentang akun Anda.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        {loading ? (
-                            <>
-                                <Skeleton className="h-16 w-16 rounded-full" />
-                                <div className="space-y-2">
-                                    <Skeleton className="h-6 w-32" />
-                                    <Skeleton className="h-4 w-48" />
+                     <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            {loading ? (
+                                <>
+                                    <Skeleton className="h-16 w-16 rounded-full" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-6 w-32" />
+                                        <Skeleton className="h-4 w-48" />
+                                    </div>
+                                </>
+                            ) : user ? (
+                                <>
+                                    <Avatar className="h-16 w-16">
+                                        <AvatarImage src={user.photoURL || undefined} />
+                                        <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold text-lg">{user.displayName || user.email}</p>
+                                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex items-center gap-4 text-muted-foreground">
+                                    <Avatar className="h-16 w-16 bg-muted">
+                                        <AvatarFallback>
+                                            <User className="h-8 w-8 text-muted-foreground" />
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold text-lg">Not signed in</p>
+                                        <p className="text-sm">Sign up or sign in to manage your account.</p>
+                                    </div>
                                 </div>
-                            </>
-                        ) : user ? (
-                            <>
-                                <Avatar className="h-16 w-16">
-                                    <AvatarImage src={user.photoURL || undefined} />
-                                    <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="font-semibold text-lg">{user.displayName}</p>
-                                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                                </div>
-                            </>
-                        ) : (
-                             <div className="flex items-center gap-4 text-muted-foreground">
-                                <Avatar className="h-16 w-16 bg-muted">
-                                    <AvatarFallback>
-                                        <User className="h-8 w-8 text-muted-foreground" />
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="font-semibold text-lg">Not signed in</p>
-                                    <p className="text-sm">Connect your account to see your profile.</p>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
+                        {user && <Button variant="outline" onClick={signOut}>Sign Out</Button>}
                     </div>
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Login Akun Google</CardTitle>
-                    <CardDescription>Kelola koneksi akun Google Anda untuk login.</CardDescription>
-                </CardHeader>
-                 <CardContent>
-                    {loading ? (
-                        <Skeleton className="h-14 w-full" />
-                    ) : user ? (
-                        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                            <div className="flex items-center gap-3">
-                                <GoogleIcon className="h-6 w-6" />
-                                <div>
-                                    <p className="font-medium">Terhubung dengan Google</p>
-                                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                                </div>
-                            </div>
-                            <Button variant="outline" onClick={signOut}>Putuskan</Button>
+            {!user && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Sign In & Sign Up</CardTitle>
+                        <CardDescription>Create a new account or sign in with your existing credentials.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label htmlFor="email">Email</Label>
+                            <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
-                    ) : (
-                        <Button onClick={signIn} className="w-full">
-                            <GoogleIcon className="mr-2 h-5 w-5" />
-                            Hubungkan dengan Google
-                        </Button>
-                    )}
-                </CardContent>
-            </Card>
+                        <div>
+                            <Label htmlFor="password">Password</Label>
+                            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <Button onClick={handleSignUp} className="w-full">Sign Up</Button>
+                            <Button onClick={handleSignIn} variant="secondary" className="w-full">Sign In</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             <Card>
                 <CardHeader>
@@ -519,3 +526,5 @@ export default function SettingsPage() {
         </div>
     );
 }
+
+    
