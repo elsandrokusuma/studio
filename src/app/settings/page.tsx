@@ -167,7 +167,9 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                             <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <Button onClick={handleSignIn} variant="secondary" className="w-full">Sign In</Button>
+                             <Button onClick={handleSignIn} className="w-full" style={{ backgroundColor: '#17b878' }}>
+                                Sign In
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
