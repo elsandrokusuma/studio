@@ -101,6 +101,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format, subDays } from 'date-fns';
 import { useAuth } from "@/hooks/use-auth";
 import { LoginForm } from "@/components/login-form";
+import { useNotifications } from "@/hooks/use-notifications";
 
 
 const chartConfig = {
@@ -173,6 +174,7 @@ export default function DashboardPage() {
   const [loadingData, setLoadingData] = React.useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const { user, loading: authLoading } = useAuth();
   const [showLogin, setShowLogin] = React.useState(false);
 
@@ -418,9 +420,10 @@ export default function DashboardPage() {
       quantity: newItemData.quantity,
     });
 
-    toast({
-      title: "Success",
+    addNotification({
+      title: "Item Added",
       description: `${newItemData.name} has been added to inventory.`,
+      icon: Plus
     });
 
     setAddOpen(false);
@@ -480,9 +483,10 @@ export default function DashboardPage() {
           person,
         });
 
-        toast({
+        addNotification({
           title: "Stock Updated",
           description: `Quantity for ${selectedItem.name} updated.`,
+          icon: type === 'in' ? TrendingUp : TrendingDown,
         });
 
         if (type === "in") setStockInOpen(false);
@@ -525,9 +529,10 @@ export default function DashboardPage() {
 
     await addDoc(collection(db, "pre-orders"), newPreOrderData);
 
-    toast({
+    addNotification({
       title: "Pre-Order Created",
-      description: `Pre-order for ${newPreOrderData.quantity}x ${newPreOrderData.itemName} has been created.`,
+      description: `PO for ${newPreOrderData.quantity}x ${newPreOrderData.itemName} created.`,
+      icon: FileText
     });
     setCreatePoOpen(false);
     setSelectedUnit(undefined);
@@ -581,7 +586,6 @@ export default function DashboardPage() {
     return <LoginForm />;
   }
   
-  // Specific redirect for service user, returns null to prevent flash
   if (user && user.email === 'kreztservice@gmail.com') {
     return null;
   }

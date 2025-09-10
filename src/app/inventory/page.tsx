@@ -98,6 +98,7 @@ import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 
 
 const seedData = [
@@ -230,6 +231,7 @@ export default function InventoryPage() {
   const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<InventoryItem | null>(null);
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const [selectedUnit, setSelectedUnit] = React.useState<string | undefined>();
   const [isPhotoOpen, setPhotoOpen] = React.useState(false);
   const [photoToShow, setPhotoToShow] = React.useState<string | null>(null);
@@ -332,9 +334,10 @@ export default function InventoryPage() {
         quantity: newItemData.quantity,
     });
 
-    toast({
-      title: "Success",
+    addNotification({
+      title: "Item Added",
       description: `${newItemData.name} has been added to inventory.`,
+      icon: PlusCircle,
     });
 
     setAddOpen(false);
@@ -380,9 +383,10 @@ export default function InventoryPage() {
         });
     }
 
-    toast({
+    addNotification({
       title: "Item Updated",
       description: `${updatedItemData.name} has been updated.`,
+      icon: Pencil,
     });
     setEditItemOpen(false);
     setSelectedItem(null);
@@ -431,9 +435,10 @@ export default function InventoryPage() {
         await updateDoc(itemRef, { quantity: newQuantity });
         await addTransaction({ itemId: selectedItemToUpdate.id, itemName: selectedItemToUpdate.name, type, quantity, person });
         
-        toast({
+        addNotification({
           title: "Stock Updated",
           description: `Quantity for ${selectedItemToUpdate.name} updated.`,
+          icon: type === "in" ? ArrowDownCircle : ArrowUpCircle,
         });
         
         if (type === 'in') setStockInOpen(false);
@@ -461,9 +466,10 @@ export default function InventoryPage() {
         quantity: selectedItem.quantity,
     });
 
-    toast({
+    addNotification({
         title: "Item Deleted",
-        description: `${selectedItem.name} has been removed from inventory.`
+        description: `${selectedItem.name} has been removed from inventory.`,
+        icon: Trash2,
     });
     setDeleteOpen(false);
     setSelectedItem(null);
@@ -511,9 +517,10 @@ export default function InventoryPage() {
 
                 await batch.commit();
 
-                toast({
+                addNotification({
                     title: "Import Successful",
-                    description: `${newItems.filter(item => typeof item === 'object' && item !== null && item.name).length} items have been added to the inventory.`,
+                    description: `${newItems.filter(item => typeof item === 'object' && item !== null && item.name).length} items have been added.`,
+                    icon: Upload,
                 });
 
                 setImportOpen(false);
@@ -682,7 +689,7 @@ export default function InventoryPage() {
       });
       await deleteBatch.commit();
       
-      toast({ title: "Cleared existing inventory..." });
+      addNotification({ title: "Inventory Cleared", description: "Cleared existing inventory...", icon: Database });
 
       // 2. Add all new documents
       const addBatch = writeBatch(db);
@@ -692,9 +699,10 @@ export default function InventoryPage() {
       });
       await addBatch.commit();
 
-      toast({
-        title: "Database Seeded Successfully",
-        description: `${seedData.length} new items have been added to the inventory.`,
+      addNotification({
+        title: "Database Seeded",
+        description: `${seedData.length} new items have been added.`,
+        icon: Database,
       });
 
     } catch (error) {
@@ -711,6 +719,7 @@ export default function InventoryPage() {
   };
   
   const selectedItemForStockOut = items.find(i => i.id === selectedItemId);
+  const isHrdUser = user && user.email === 'krezthrd@gmail.com';
 
   if (loading || authLoading) {
     return <FullPageSpinner />;
@@ -771,29 +780,31 @@ export default function InventoryPage() {
               <LayoutGrid className="h-4 w-4" />
             </ToggleGroupItem>
           </ToggleGroup>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full md:w-auto">
-                Actions
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => setImportOpen(true)}>
-                <Upload className="mr-2 h-4 w-4" />
-                Import from CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleExportCsv}>
-                <Download className="mr-2 h-4 w-4" />
-                Export to CSV
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setSeedConfirmOpen(true)} className="text-red-600 focus:text-red-700">
-                <Database className="mr-2 h-4 w-4" />
-                Seed Database
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {!isHrdUser && (
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full md:w-auto">
+                    Actions
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import from CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleExportCsv}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export to CSV
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => setSeedConfirmOpen(true)} className="text-red-600 focus:text-red-700">
+                    <Database className="mr-2 h-4 w-4" />
+                    Seed Database
+                </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
             <DialogContent>
@@ -820,77 +831,79 @@ export default function InventoryPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
-            <DialogTrigger asChild>
-              <Button className="w-full md:w-auto">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Inventory Item</DialogTitle>
-                <DialogDescription>
-                  Fill in the details below to add a new product.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddItem} className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">Name</Label>
-                  <Input id="name" name="name" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="price" className="text-right">Price</Label>
-                  <Input id="price" name="price" type="number" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="unit" className="text-right">Unit</Label>
-                  <Select name="unit" required onValueChange={setSelectedUnit}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select a unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pcs">Pcs</SelectItem>
-                      <SelectItem value="Pack">Pack</SelectItem>
-                      <SelectItem value="Box">Box</SelectItem>
-                      <SelectItem value="Roll">Roll</SelectItem>
-                      <SelectItem value="Rim">Rim</SelectItem>
-                      <SelectItem value="Tube">Tube</SelectItem>
-                      <SelectItem value="Bottle">Bottle</SelectItem>
-                      <SelectItem value="Can">Can</SelectItem>
-                      <SelectItem value="Sheet">Sheet</SelectItem>
-                      <SelectItem value="Cartridge">Cartridge</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="quantity" className="text-right">Quantity</Label>
-                  <Input id="quantity" name="quantity" type="number" className="col-span-3" required />
-                </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="photoUrl" className="text-right">Photo</Label>
-                   <div className="col-span-3 flex items-center gap-2">
-                      <Input 
-                        id="photoUrl" 
-                        name="photoUrl" 
-                        type="text" 
-                        placeholder="Or paste https://drive.google.com/..." 
-                        className="flex-grow"
-                        value={photoUrl}
-                        onChange={(e) => setPhotoUrl(e.target.value)}
-                      />
-                      <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
-                        <Camera className="h-4 w-4" />
-                        <span className="sr-only">Take Photo</span>
-                      </Button>
-                   </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Save Item</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {!isHrdUser && (
+            <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
+                <DialogTrigger asChild>
+                <Button className="w-full md:w-auto">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Item
+                </Button>
+                </DialogTrigger>
+                <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Add New Inventory Item</DialogTitle>
+                    <DialogDescription>
+                    Fill in the details below to add a new product.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddItem} className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">Name</Label>
+                    <Input id="name" name="name" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="price" className="text-right">Price</Label>
+                    <Input id="price" name="price" type="number" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="unit" className="text-right">Unit</Label>
+                    <Select name="unit" required onValueChange={setSelectedUnit}>
+                        <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Select a unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="Pcs">Pcs</SelectItem>
+                        <SelectItem value="Pack">Pack</SelectItem>
+                        <SelectItem value="Box">Box</SelectItem>
+                        <SelectItem value="Roll">Roll</SelectItem>
+                        <SelectItem value="Rim">Rim</SelectItem>
+                        <SelectItem value="Tube">Tube</SelectItem>
+                        <SelectItem value="Bottle">Bottle</SelectItem>
+                        <SelectItem value="Can">Can</SelectItem>
+                        <SelectItem value="Sheet">Sheet</SelectItem>
+                        <SelectItem value="Cartridge">Cartridge</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="quantity" className="text-right">Quantity</Label>
+                    <Input id="quantity" name="quantity" type="number" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="photoUrl" className="text-right">Photo</Label>
+                    <div className="col-span-3 flex items-center gap-2">
+                        <Input 
+                            id="photoUrl" 
+                            name="photoUrl" 
+                            type="text" 
+                            placeholder="Or paste https://drive.google.com/..." 
+                            className="flex-grow"
+                            value={photoUrl}
+                            onChange={(e) => setPhotoUrl(e.target.value)}
+                        />
+                        <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
+                            <Camera className="h-4 w-4" />
+                            <span className="sr-only">Take Photo</span>
+                        </Button>
+                    </div>
+                    </div>
+                    <DialogFooter>
+                    <Button type="submit">Save Item</Button>
+                    </DialogFooter>
+                </form>
+                </DialogContent>
+            </Dialog>
+          )}
         </div>
       </header>
       
@@ -956,56 +969,58 @@ export default function InventoryPage() {
                       </TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="ghost">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
-                              <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onSelect={() => {
-                                setSelectedItem(item);
-                                setEditItemOpen(true);
-                              }}
-                            >
-                              <Pencil className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onSelect={() => {
-                                setSelectedItemId(item.id);
-                                setSelectedItemName(item.name);
-                                setStockInOpen(true);
-                              }}
-                            >
-                              <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onSelect={() => {
-                                setSelectedItemId(item.id);
-                                setSelectedItemName(item.name);
-                                setStockOutOpen(true);
-                              }}
-                            >
-                              <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-red-600 focus:text-red-700"
-                              onSelect={() => {
-                                setSelectedItem(item);
-                                setDeleteOpen(true);
-                              }}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" /> Delete Item
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                         {!isHrdUser && (
+                            <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button aria-haspopup="true" size="icon" variant="ghost">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
+                                <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                onSelect={() => {
+                                    setSelectedItem(item);
+                                    setEditItemOpen(true);
+                                }}
+                                >
+                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                onSelect={() => {
+                                    setSelectedItemId(item.id);
+                                    setSelectedItemName(item.name);
+                                    setStockInOpen(true);
+                                }}
+                                >
+                                <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                onSelect={() => {
+                                    setSelectedItemId(item.id);
+                                    setSelectedItemName(item.name);
+                                    setStockOutOpen(true);
+                                }}
+                                >
+                                <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                className="text-red-600 focus:text-red-700"
+                                onSelect={() => {
+                                    setSelectedItem(item);
+                                    setDeleteOpen(true);
+                                }}
+                                >
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
+                         )}
                       </TableCell>
                     </TableRow>
                   )})}
@@ -1042,35 +1057,37 @@ export default function InventoryPage() {
                           />
                         )}
                     </div>
-                    <div className="absolute top-2 right-2">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="secondary" className="h-8 w-8 rounded-full">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
-                              <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => { setSelectedItem(item); setEditItemOpen(true); }}>
-                              <Pencil className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockInOpen(true); }}>
-                              <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockOutOpen(true); }}>
-                              <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedItem(item); setDeleteOpen(true); }}>
-                              <Trash2 className="mr-2 h-4 w-4" /> Delete Item
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                    {!isHrdUser && (
+                        <div className="absolute top-2 right-2">
+                            <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button aria-haspopup="true" size="icon" variant="secondary" className="h-8 w-8 rounded-full">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
+                                <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => { setSelectedItem(item); setEditItemOpen(true); }}>
+                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockInOpen(true); }}>
+                                <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockOutOpen(true); }}>
+                                <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedItem(item); setDeleteOpen(true); }}>
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="p-4 flex-1">

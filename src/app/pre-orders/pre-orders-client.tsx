@@ -82,6 +82,7 @@ import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 
 
 type GroupedPO = {
@@ -102,6 +103,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedPo, setSelectedPo] = React.useState<GroupedPO | null>(null);
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [dateFilter, setDateFilter] = React.useState<Date | undefined>(undefined);
@@ -221,9 +223,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     
     await addDoc(collection(db, "pre-orders"), newPreOrderData);
     
-    toast({
-      title: isCreatingNewPo ? "Pre-Order Created" : "Item Added to Pre-Order",
-      description: `Item ${newPreOrderData.itemName} has been added to PO ${newPreOrderData.poNumber}.`,
+    addNotification({
+      title: isCreatingNewPo ? "Pre-Order Created" : "Item Added to PO",
+      description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
+      icon: PlusCircle,
     });
     setCreateOpen(false);
     setSelectedUnit(undefined);
@@ -247,9 +250,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     const itemRef = doc(db, "pre-orders", selectedOrderItem.id);
     await updateDoc(itemRef, updatedData);
 
-    toast({
+    addNotification({
       title: "Item Updated",
       description: `${selectedOrderItem.itemName} has been updated.`,
+      icon: Pencil,
     });
     setEditItemOpen(false);
     setSelectedOrderItem(null);
@@ -259,9 +263,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const handleDeleteOrderItem = async () => {
     if (!selectedOrderItem || !db) return;
     await deleteDoc(doc(db, "pre-orders", selectedOrderItem.id));
-    toast({
+    addNotification({
       title: "Item Deleted",
-      description: `${selectedOrderItem.itemName} has been removed from the pre-order.`
+      description: `${selectedOrderItem.itemName} removed from the pre-order.`,
+      icon: Trash2,
     });
     setDeleteItemOpen(false);
     setSelectedOrderItem(null);
@@ -312,9 +317,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         transaction.update(preOrderItemRef, { status: 'Fulfilled' });
       });
 
-      toast({
+      addNotification({
         title: "Item Fulfilled!",
-        description: `${finalQuantity}x ${itemToFulfill.itemName} have been added to inventory.`,
+        description: `${finalQuantity}x ${itemToFulfill.itemName} added to inventory.`,
+        icon: CheckCircle,
       });
 
       setFulfillOpen(false);
@@ -342,9 +348,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     });
     await batch.commit();
 
-    toast({
+    addNotification({
         title: "Pre-Order Deleted",
-        description: `The pre-order ${selectedPo.poNumber} has been removed.`
+        description: `The pre-order ${selectedPo.poNumber} has been removed.`,
+        icon: Trash2
     });
     setDeleteOpen(false);
     setSelectedPo(null);
@@ -358,9 +365,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         batch.update(orderRef, { status });
     });
     await batch.commit();
-    toast({
+    addNotification({
       title: 'Status Updated',
-      description: `PO ${orders[0].poNumber} marked as ${status}.`
+      description: `PO ${orders[0].poNumber} marked as ${status}.`,
+      icon: CheckCircle,
     });
   };
 
@@ -396,9 +404,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       await batch.commit();
 
       const poNumbers = posToApprove.map(po => po.poNumber).join(', ');
-      toast({
+      addNotification({
         title: 'Approval Requested',
-        description: `${posToApprove.length} pre-order(s) have been sent for approval.`,
+        description: `${posToApprove.length} pre-order(s) sent for approval.`,
+        icon: Send,
       });
 
       // Send WhatsApp Notification
@@ -548,6 +557,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
   }
+  const isHrdUser = user && user.email === 'krezthrd@gmail.com';
   
   if (loading || authLoading) {
     return <FullPageSpinner />;
@@ -633,7 +643,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             )}
            </div>
           
-          {selectedRows.length > 0 && (
+          {selectedRows.length > 0 && !isHrdUser && (
             <>
               <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
                 <Send className="mr-2 h-4 w-4" />
@@ -646,120 +656,124 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             </>
           )}
 
-          <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName("Select an item..."); setPoPrice("")} }}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                 {isCreatingNewPo ? 'Create New PO' : 'Add Item to PO'}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{isCreatingNewPo ? 'Create New Pre-Order' : `Add Item to ${activePoNumber}`}</DialogTitle>
-                <DialogDescription>
-                  {isCreatingNewPo ? 'Fill in the details for the first item of your new pre-order.' : 'Add another item to your pending pre-order.'}
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="poNumber" className="text-right">PO Number</Label>
-                  <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="item" className="text-right">Item</Label>
-                  <div className="col-span-3">
-                    <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={comboPoOpen}
-                          className="w-full justify-between"
-                        >
-                          {selectedItemName}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[300px] p-0">
-                        <Command>
-                          <CommandInput placeholder="Search item..." />
-                          <CommandList>
-                            <CommandEmpty>No item found.</CommandEmpty>
-                            <CommandGroup>
-                              {inventoryItems.map((item) => (
-                                <CommandItem
-                                  key={item.id}
-                                  value={item.name}
-                                  onSelect={() => handleItemSelectForPo(item.id)}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      selectedItemId === item.id ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  {item.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="price" className="text-right">Price</Label>
-                  <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="unit" className="text-right">Unit</Label>
-                  <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select a unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pcs">Pcs</SelectItem>
-                      <SelectItem value="Pack">Pack</SelectItem>
-                      <SelectItem value="Box">Box</SelectItem>
-                      <SelectItem value="Roll">Roll</SelectItem>
-                      <SelectItem value="Rim">Rim</SelectItem>
-                      <SelectItem value="Tube">Tube</SelectItem>
-                      <SelectItem value="Bottle">Bottle</SelectItem>
-                      <SelectItem value="Can">Can</SelectItem>
-                      <SelectItem value="Sheet">Sheet</SelectItem>
-                      <SelectItem value="Cartridge">Cartridge</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="quantity" className="text-right">Quantity</Label>
-                  <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="expectedDate" className="text-right">Expected Date</Label>
-                  <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
-                </div>
-                <DialogFooter>
-                  <Button type="submit">Add Item</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {!isHrdUser && (
+            <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName("Select an item..."); setPoPrice("")} }}>
+                <DialogTrigger asChild>
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    {isCreatingNewPo ? 'Create New PO' : 'Add Item to PO'}
+                </Button>
+                </DialogTrigger>
+                <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{isCreatingNewPo ? 'Create New Pre-Order' : `Add Item to ${activePoNumber}`}</DialogTitle>
+                    <DialogDescription>
+                    {isCreatingNewPo ? 'Fill in the details for the first item of your new pre-order.' : 'Add another item to your pending pre-order.'}
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="poNumber" className="text-right">PO Number</Label>
+                    <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="item" className="text-right">Item</Label>
+                    <div className="col-span-3">
+                        <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={comboPoOpen}
+                            className="w-full justify-between"
+                            >
+                            {selectedItemName}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0">
+                            <Command>
+                            <CommandInput placeholder="Search item..." />
+                            <CommandList>
+                                <CommandEmpty>No item found.</CommandEmpty>
+                                <CommandGroup>
+                                {inventoryItems.map((item) => (
+                                    <CommandItem
+                                    key={item.id}
+                                    value={item.name}
+                                    onSelect={() => handleItemSelectForPo(item.id)}
+                                    >
+                                    <Check
+                                        className={cn(
+                                        "mr-2 h-4 w-4",
+                                        selectedItemId === item.id ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {item.name}
+                                    </CommandItem>
+                                ))}
+                                </CommandGroup>
+                            </CommandList>
+                            </Command>
+                        </PopoverContent>
+                        </Popover>
+                    </div>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="price" className="text-right">Price</Label>
+                    <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="unit" className="text-right">Unit</Label>
+                    <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
+                        <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Select a unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="Pcs">Pcs</SelectItem>
+                        <SelectItem value="Pack">Pack</SelectItem>
+                        <SelectItem value="Box">Box</SelectItem>
+                        <SelectItem value="Roll">Roll</SelectItem>
+                        <SelectItem value="Rim">Rim</SelectItem>
+                        <SelectItem value="Tube">Tube</SelectItem>
+                        <SelectItem value="Bottle">Bottle</SelectItem>
+                        <SelectItem value="Can">Can</SelectItem>
+                        <SelectItem value="Sheet">Sheet</SelectItem>
+                        <SelectItem value="Cartridge">Cartridge</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="quantity" className="text-right">Quantity</Label>
+                    <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="expectedDate" className="text-right">Expected Date</Label>
+                    <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
+                    </div>
+                    <DialogFooter>
+                    <Button type="submit">Add Item</Button>
+                    </DialogFooter>
+                </form>
+                </DialogContent>
+            </Dialog>
+          )}
         </div>
       </header>
       
       <div className="space-y-4">
-        <div className="px-4 hidden sm:flex">
-             <Checkbox
-                checked={isAllSelected}
-                onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                aria-label="Select all"
-                disabled={selectableRowCount === 0}
-                className="mr-4"
-              />
-              <span className="text-sm text-muted-foreground">Select all</span>
-        </div>
+        {!isHrdUser && (
+            <div className="px-4 hidden sm:flex">
+                <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                    aria-label="Select all"
+                    disabled={selectableRowCount === 0}
+                    className="mr-4"
+                    />
+                    <span className="text-sm text-muted-foreground">Select all</span>
+            </div>
+        )}
         {filteredPreOrders.length > 0 ? (
           <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
             {filteredPreOrders.map((po) => {
@@ -784,12 +798,14 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                       <CardHeader className="p-4 pl-8">
                       <div className="flex flex-wrap items-start justify-between gap-y-2">
                           <div className="flex items-center gap-4 flex-grow">
-                             <Checkbox
-                                checked={selectedRows.includes(po.poNumber)}
-                                onCheckedChange={() => handleSelectRow(po.poNumber)}
-                                aria-label="Select PO"
-                                disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
-                              />
+                            {!isHrdUser && (
+                                <Checkbox
+                                    checked={selectedRows.includes(po.poNumber)}
+                                    onCheckedChange={() => handleSelectRow(po.poNumber)}
+                                    aria-label="Select PO"
+                                    disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
+                                />
+                            )}
                             <div className="p-2 bg-primary/10 rounded-lg">
                                <FileText className="h-5 w-5 text-primary" />
                             </div>
@@ -827,6 +843,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
                                   <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
                                 </AccordionTrigger>
+                                {!isHrdUser && (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
@@ -851,6 +868,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
+                                )}
                             </div>
                           </div>
                         </div>
@@ -867,7 +885,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <TableHead className="text-right">Qty</TableHead>
                                 <TableHead className="text-right">Price</TableHead>
                                 <TableHead className="text-right">Total</TableHead>
-                                <TableHead><span className="sr-only">Actions</span></TableHead>
+                                {!isHrdUser && <TableHead><span className="sr-only">Actions</span></TableHead>}
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -898,36 +916,38 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                   <TableCell className="text-right">{order.quantity}</TableCell>
                                   <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
                                   <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
-                                  <TableCell className="text-right">
-                                     <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button size="icon" variant="ghost">
-                                          <MoreHorizontal className="h-4 w-4" />
-                                          <span className="sr-only">Item Actions</span>
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        {order.status === 'Approved' && (
-                                          <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
-                                            <CheckCircle className="mr-2 h-4 w-4" />
-                                            Mark as Fulfilled
-                                          </DropdownMenuItem>
-                                        )}
-                                        {po.status === 'Pending' && (
-                                          <>
-                                            <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                              <Pencil className="mr-2 h-4 w-4" />
-                                              Edit
+                                  {!isHrdUser && (
+                                    <TableCell className="text-right">
+                                        <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button size="icon" variant="ghost">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                            <span className="sr-only">Item Actions</span>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {order.status === 'Approved' && (
+                                            <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
+                                                <CheckCircle className="mr-2 h-4 w-4" />
+                                                Mark as Fulfilled
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                              <Trash2 className="mr-2 h-4 w-4" />
-                                              Delete
-                                            </DropdownMenuItem>
-                                          </>
-                                        )}
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </TableCell>
+                                            )}
+                                            {po.status === 'Pending' && (
+                                            <>
+                                                <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete
+                                                </DropdownMenuItem>
+                                            </>
+                                            )}
+                                        </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                  )}
                                 </TableRow>
                               ))}
                             </TableBody>
