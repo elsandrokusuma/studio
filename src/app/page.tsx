@@ -174,6 +174,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
+  const [showLogin, setShowLogin] = React.useState(false);
 
   // Dialog states
   const [isAddOpen, setAddOpen] = React.useState(false);
@@ -359,6 +360,12 @@ export default function DashboardPage() {
       unsubscribePreOrders();
     };
   }, []);
+
+  React.useEffect(() => {
+    if (!authLoading) {
+      setShowLogin(!user);
+    }
+  }, [user, authLoading]);
 
   React.useEffect(() => {
     const pendingPO = preOrders.find(po => po.status === 'Pending');
@@ -566,8 +573,12 @@ export default function DashboardPage() {
     return <FullPageSpinner />;
   }
   
-  if (!user) {
+  if (showLogin) {
     return <LoginForm />;
+  }
+  
+  if (!user) {
+    return <FullPageSpinner />;
   }
 
   if (user && user.email === 'kreztservice@gmail.com') {
