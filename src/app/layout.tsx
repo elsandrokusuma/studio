@@ -26,9 +26,9 @@ export default function RootLayout({
         <meta name="description" content="Comprehensive inventory and stock management ERP" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         
-        {/* Favicon links for different devices */}
-        <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
-        <link rel="apple-touch-icon" href="/favicon.ico?v=2" />
+        {/* Favicon links for different devices with cache-busting */}
+        <link rel="icon" href="/favicon.ico?v=3" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.ico?v=3" />
         <link rel="manifest" href="/site.webmanifest" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
