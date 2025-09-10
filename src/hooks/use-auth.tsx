@@ -20,7 +20,6 @@ import { useToast } from './use-toast';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, pass: string) => Promise<void>;
   signIn: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -81,23 +80,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     throw error;
   };
 
-  const signUp = async (email: string, pass: string) => {
-    if (!auth) throw new Error("Auth service not initialized.");
-    setLoading(true);
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        setUser(userCredential.user);
-        toast({
-            title: "Sign Up Successful",
-            description: "Your account has been created.",
-        });
-    } catch (error: any) {
-        handleAuthError(error);
-    } finally {
-        setLoading(false);
-    }
-  };
-  
   const signIn = async (email: string, pass: string) => {
     if (!auth) throw new Error("Auth service not initialized.");
     setLoading(true);
@@ -149,7 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
   
-  const value = { user, loading, signUp, signIn, signOut: signOutUser, deleteAccount };
+  const value = { user, loading, signIn, signOut: signOutUser, deleteAccount };
   
   if(loading && !user) {
     // Show spinner only on initial load when user status is unknown
@@ -167,5 +149,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    

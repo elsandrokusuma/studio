@@ -65,18 +65,10 @@ type ActiveMenu = 'main' | 'appearance' | 'account';
 
 
 function AccountSettings({ onBack }: { onBack: () => void }) {
-    const { user, loading, signIn, signUp, signOut, deleteAccount } = useAuth();
+    const { user, loading, signIn, signOut, deleteAccount } = useAuth();
     const { toast } = useToast();
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
-
-    const handleSignUp = async () => {
-        try {
-            await signUp(email, password);
-        } catch (error) {
-            // Error is already handled by toast in useAuth
-        }
-    };
 
     const handleSignIn = async () => {
         try {
@@ -149,7 +141,7 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                                     </Avatar>
                                     <div>
                                         <p className="font-semibold text-lg">Not signed in</p>
-                                        <p className="text-sm">Sign up or sign in to manage your account.</p>
+                                        <p className="text-sm">Sign in to manage your account.</p>
                                     </div>
                                 </div>
                             )}
@@ -162,8 +154,8 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
             {!user && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>Sign In & Sign Up</CardTitle>
-                        <CardDescription>Create a new account or sign in with your existing credentials.</CardDescription>
+                        <CardTitle>Sign In</CardTitle>
+                        <CardDescription>Sign in with your existing credentials.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div>
@@ -175,7 +167,6 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                             <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <Button onClick={handleSignUp} className="w-full">Sign Up</Button>
                             <Button onClick={handleSignIn} variant="secondary" className="w-full">Sign In</Button>
                         </div>
                     </CardContent>
@@ -526,5 +517,3 @@ export default function SettingsPage() {
         </div>
     );
 }
-
-    
