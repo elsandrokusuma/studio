@@ -100,6 +100,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format, subDays } from 'date-fns';
 import { useAuth } from "@/hooks/use-auth";
+import { LoginForm } from "@/components/login-form";
 
 
 const chartConfig = {
@@ -169,7 +170,7 @@ export default function DashboardPage() {
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
   const [greetingInfo, setGreetingInfo] = React.useState<GreetingInfo>({ text: "", icon: Sun });
   const [dailyQuote, setDailyQuote] = React.useState("");
-  const [loading, setLoading] = React.useState(true);
+  const [loadingData, setLoadingData] = React.useState(true);
   const router = useRouter();
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
@@ -266,7 +267,7 @@ export default function DashboardPage() {
 
   React.useEffect(() => {
     if (!db) {
-      setLoading(false);
+      setLoadingData(false);
       return;
     }
     
@@ -303,9 +304,9 @@ export default function DashboardPage() {
           items.push({ id: doc.id, ...doc.data() } as InventoryItem);
         });
         setInventoryItems(items);
-        setLoading(false);
+        setLoadingData(false);
       },
-      () => setLoading(false)
+      () => setLoadingData(false)
     );
 
     const qTransactions = query(
@@ -561,10 +562,14 @@ export default function DashboardPage() {
     }).format(amount);
   };
 
-  if (loading || authLoading) {
+  if (authLoading || loadingData) {
     return <FullPageSpinner />;
   }
   
+  if (!user) {
+    return <LoginForm />;
+  }
+
   if (user && user.email === 'kreztservice@gmail.com') {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">

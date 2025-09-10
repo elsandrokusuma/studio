@@ -65,18 +65,8 @@ type ActiveMenu = 'main' | 'appearance' | 'account';
 
 
 function AccountSettings({ onBack }: { onBack: () => void }) {
-    const { user, loading, signIn, signOut, deleteAccount } = useAuth();
+    const { user, loading, signOut, deleteAccount } = useAuth();
     const { toast } = useToast();
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-
-    const handleSignIn = async () => {
-        try {
-            await signIn(email, password);
-        } catch (error) {
-            // Error is already handled by toast in useAuth
-        }
-    };
 
     const handleDelete = async () => {
         try {
@@ -150,30 +140,6 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                     </div>
                 </CardContent>
             </Card>
-
-            {!user && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Sign In</CardTitle>
-                        <CardDescription>Sign in with your existing credentials.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        </div>
-                        <div>
-                            <Label htmlFor="password">Password</Label>
-                            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                             <Button onClick={handleSignIn} className="w-full" style={{ backgroundColor: '#17b878' }}>
-                                Sign In
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card>
                 <CardHeader>
@@ -494,7 +460,14 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
 }
 
 export default function SettingsPage() {
+    const { user } = useAuth();
     const [activeMenu, setActiveMenu] = React.useState<ActiveMenu>('main');
+
+    // If there is no user, don't render the settings page content.
+    // The main layout or a higher-order component should handle redirecting to login.
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="max-w-2xl mx-auto relative overflow-x-hidden no-scrollbar" style={{ minHeight: 'calc(100vh - 120px)' }}>
