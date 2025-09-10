@@ -3,16 +3,14 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { 
-    getAuth, 
     onAuthStateChanged, 
     signInWithPopup, 
     GoogleAuthProvider, 
     signOut,
     deleteUser,
-    type User,
-    type Auth
+    type User
 } from 'firebase/auth';
-import { firebaseEnabled, app } from '@/lib/firebase';
+import { firebaseEnabled, auth } from '@/lib/firebase';
 import { FullPageSpinner } from '@/components/full-page-spinner';
 import { useToast } from './use-toast';
 
@@ -29,21 +27,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [auth, setAuth] = useState<Auth | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (firebaseEnabled && app) {
-      const authInstance = getAuth(app);
-      setAuth(authInstance);
-      const unsubscribe = onAuthStateChanged(authInstance, (user) => {
-        setUser(user);
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    } else {
+    if (!auth) {
       setLoading(false);
+      return;
     }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
   const signIn = async () => {

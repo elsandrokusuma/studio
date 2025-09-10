@@ -1,7 +1,7 @@
-
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, type FirebaseOptions, type FirebaseApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig: FirebaseOptions = {
@@ -22,10 +22,11 @@ const firebaseEnabled =
 // Initialize Firebase only if the config is valid
 const app: FirebaseApp | null = firebaseEnabled ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
 const db = app ? getFirestore(app) : null;
+const auth = app ? getAuth(app) : null;
 
 
 if (!firebaseEnabled) {
   console.warn("Firebase config is missing or incomplete. Firebase services are disabled.");
 }
 
-export { app, db, firebaseEnabled };
+export { app, db, auth, firebaseEnabled };
