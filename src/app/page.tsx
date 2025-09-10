@@ -581,27 +581,14 @@ export default function DashboardPage() {
     return <LoginForm />;
   }
   
+  // Wait for user status to be confirmed before rendering anything for specific roles
   if (!user) {
     return <FullPageSpinner />;
   }
-
+  
   // Prevent flash of dashboard for service account while redirecting
-  if (user && user.email === 'kreztservice@gmail.com') {
-    return null; 
-  }
-
-  if (user && user.email === 'krezthrd@gmail.com') {
-    // Read-only view for HRD
-    return (
-      <div className="flex flex-col gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome, HRD</CardTitle>
-            <CardDescription>You have read-only access to this dashboard.</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
+  if (user.email === 'kreztservice@gmail.com') {
+    return <FullPageSpinner />;
   }
 
   if (!db) {
@@ -650,6 +637,8 @@ export default function DashboardPage() {
   );
   
   const GreetingIcon = greetingInfo.icon;
+  const isHrdUser = user.email === 'krezthrd@gmail.com';
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -743,70 +732,72 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-3">
-            <div className="bg-primary/10 p-2 rounded-full">
-              <Zap className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common tasks</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            <Button
-              onClick={() => setAddOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
-            >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
-                <Plus className="h-5 w-5" />
+        {!isHrdUser && (
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-3">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <Zap className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-base">Add Item</p>
-                <p className="font-normal text-sm text-left">
-                  New inventory item
-                </p>
+                <CardTitle>Quick Actions</CardTitle>
+                <CardDescription>Common tasks</CardDescription>
               </div>
-            </Button>
-            <Button
-              onClick={() => setStockInOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
-            >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-base">Stock In</p>
-                <p className="font-normal text-sm text-left">Receive items</p>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setStockOutOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500"
-            >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
-                <TrendingDown className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-base">Stock Out</p>
-                <p className="font-normal text-sm text-left">Issue items</p>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setCreatePoOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
-            >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-semibold text-base">Create PO</p>
-                <p className="font-normal text-sm text-left">Purchase order</p>
-              </div>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-2">
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              <Button
+                onClick={() => setAddOpen(true)}
+                className="w-full justify-start h-auto p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
+              >
+                <div className="bg-white/20 p-2 rounded-lg mr-4">
+                  <Plus className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-base">Add Item</p>
+                  <p className="font-normal text-sm text-left">
+                    New inventory item
+                  </p>
+                </div>
+              </Button>
+              <Button
+                onClick={() => setStockInOpen(true)}
+                className="w-full justify-start h-auto p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
+              >
+                <div className="bg-white/20 p-2 rounded-lg mr-4">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-base">Stock In</p>
+                  <p className="font-normal text-sm text-left">Receive items</p>
+                </div>
+              </Button>
+              <Button
+                onClick={() => setStockOutOpen(true)}
+                className="w-full justify-start h-auto p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500"
+              >
+                <div className="bg-white/20 p-2 rounded-lg mr-4">
+                  <TrendingDown className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-base">Stock Out</p>
+                  <p className="font-normal text-sm text-left">Issue items</p>
+                </div>
+              </Button>
+              <Button
+                onClick={() => setCreatePoOpen(true)}
+                className="w-full justify-start h-auto p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
+              >
+                <div className="bg-white/20 p-2 rounded-lg mr-4">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-base">Create PO</p>
+                  <p className="font-normal text-sm text-left">Purchase order</p>
+                </div>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+        <Card className={isHrdUser ? "lg:col-span-3" : "lg:col-span-2"}>
           <CardHeader>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-2">
@@ -873,7 +864,7 @@ export default function DashboardPage() {
                 config={chartConfig}
                 className="min-w-[300px] w-full h-[300px]"
               >
-                {chartType === 'bar' && (
+                {chartType === 'bar' ? (
                   <BarChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
@@ -883,8 +874,7 @@ export default function DashboardPage() {
                     <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={[4, 4, 0, 0]} name="Stock In" />
                     <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={[4, 4, 0, 0]} name="Stock Out" />
                   </BarChart>
-                )}
-                {chartType === 'line' && (
+                ) : chartType === 'line' ? (
                   <LineChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
@@ -894,8 +884,7 @@ export default function DashboardPage() {
                     <Line type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" strokeWidth={2} dot={false} name="Stock In" />
                     <Line type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" strokeWidth={2} dot={false} name="Stock Out" />
                   </LineChart>
-                )}
-                {chartType === 'area' && (
+                ) : (
                   <AreaChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
@@ -1568,3 +1557,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
