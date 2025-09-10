@@ -28,8 +28,8 @@ export default function RootLayout({
         
         {/* Favicon links for different devices */}
         <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
+        <link rel="icon" type="image/svg+xml" href="https://i.imgur.com/vofm5PY.png" />
+        <link rel="apple-touch-icon" href="https://i.imgur.com/vofm5PY.png" />
         <link rel="manifest" href="/site.webmanifest?v=2" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
