@@ -384,10 +384,19 @@ export default function DashboardPage() {
     const newItemData = {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
-      unit: selectedUnit || "Pcs",
+      unit: selectedUnit,
       quantity: Number(formData.get("quantity")),
       photoUrl: (formData.get("photoUrl") as string) || undefined,
     };
+
+    if (!newItemData.unit) {
+        toast({
+            variant: "destructive",
+            title: "Unit is required",
+            description: "Please select a unit for the item.",
+        });
+        return;
+    }
 
     const docRef = await addDoc(collection(db, "inventory"), newItemData);
 
