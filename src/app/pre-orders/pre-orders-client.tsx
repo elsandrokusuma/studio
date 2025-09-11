@@ -368,14 +368,17 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         const batch = writeBatch(db);
         po.orders.forEach(order => {
             if (!db) return;
-            const orderRef = doc(db, "pre-orders", order.id);
-            batch.update(orderRef, { status: newStatus });
+            // Only update items that are still awaiting approval
+            if (order.status === 'Awaiting Approval') {
+                const orderRef = doc(db, "pre-orders", order.id);
+                batch.update(orderRef, { status: newStatus });
+            }
         });
         await batch.commit();
 
         addNotification({
           title: `Pre-Order ${decision}`,
-          description: `The pre-order ${po.poNumber} has been ${decision}.`,
+          description: `The pre-order ${po.poNumber} has been updated.`,
           icon: decision === "approved" ? Check : X,
         });
         
@@ -396,7 +399,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         
         addNotification({
           title: `Item ${decision}`,
-          description: `Item ${item.itemName} has been ${decision}.`,
+          description: `Item ${item.itemName} has been ${decision.toLowerCase()}.`,
           icon: decision === "Approved" ? Check : X,
         });
 
@@ -552,7 +555,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       const getOverallStatus = (): PreOrder['status'] => {
         if (orders.every(o => o.status === 'Fulfilled')) return 'Fulfilled';
         if (orders.every(o => o.status === 'Cancelled')) return 'Cancelled';
-        if (orders.every(o => o.status === 'Rejected')) return 'Rejected';
+        if (orders.every(o => o.status === 'Rejected' && o.status !== 'Awaiting Approval')) return 'Rejected';
+        if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
         if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
         if (orders.some(o => o.status === 'Pending')) return 'Pending';
         return orders[0]?.status || 'Pending';
@@ -810,11 +814,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                                <AccordionTrigger asChild>
-                                  <div className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
+                              <div className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
+                                <AccordionTrigger>
                                     <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                                  </div>
                                 </AccordionTrigger>
+                              </div>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
