@@ -14,8 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { PreOrder } from "@/lib/types";
 import { Printer } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 export function SuratJalanClientContent({ orders }: { orders: PreOrder[] }) {
+  const { componentOpacity } = useTheme();
 
   const handlePrint = () => {
     window.print();
@@ -35,6 +37,11 @@ export function SuratJalanClientContent({ orders }: { orders: PreOrder[] }) {
       </div>
     );
   }
+  
+  const cardStyle = {
+    '--component-opacity': componentOpacity,
+    backgroundColor: `hsl(var(--card) / var(--component-opacity))`,
+  } as React.CSSProperties;
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -42,17 +49,22 @@ export function SuratJalanClientContent({ orders }: { orders: PreOrder[] }) {
         {`
           @media print {
             body {
-              background-color: #fff;
+              background-color: #fff !important;
+              background-image: none !important;
             }
             .no-print {
               display: none;
             }
             .printable-area {
-              border: none;
-              box-shadow: none;
-              margin: 0;
-              padding: 0;
+              border: none !important;
+              box-shadow: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background-color: #fff !important;
             }
+             .printable-area, .printable-area * {
+               color: #000 !important;
+             }
           }
         `}
       </style>
@@ -65,7 +77,10 @@ export function SuratJalanClientContent({ orders }: { orders: PreOrder[] }) {
             </Button>
         </div>
 
-        <Card className="printable-area p-8">
+        <Card 
+          className="printable-area p-8"
+          style={cardStyle}
+        >
           <CardContent>
             <header className="mb-12">
               <div className="flex justify-between items-start">
@@ -87,25 +102,25 @@ export function SuratJalanClientContent({ orders }: { orders: PreOrder[] }) {
                   {/* Recipient area */}
                 </div>
               </div>
-              <p className="mb-4">
+              <p className="mb-4 text-muted-foreground">
                 Dengan hormat, Bersama ini kami membuat re-order barang-barang ATK sebagai berikut:
               </p>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[60%]">Nama Barang</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead className="text-right">Jumlah</TableHead>
+                    <TableHead className="w-[60%] text-foreground font-semibold">Nama Barang</TableHead>
+                    <TableHead className="text-foreground font-semibold">Unit</TableHead>
+                    <TableHead className="text-right text-foreground font-semibold">Jumlah</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">
+                    <TableRow key={order.id} className="border-b">
+                      <TableCell className="font-medium text-foreground">
                         {order.itemName}
                       </TableCell>
-                      <TableCell>{order.unit}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-muted-foreground">{order.unit}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">
                         {order.quantity}
                       </TableCell>
                     </TableRow>
