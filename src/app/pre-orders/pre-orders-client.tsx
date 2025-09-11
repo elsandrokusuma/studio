@@ -418,7 +418,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     try {
         const batch = writeBatch(db);
         po.orders.forEach(request => {
-            if (request.status === 'Awaiting Approval') {
+            // Approve all items that are awaiting approval
+            if (request.status === 'Awaiting Approval' || request.status === 'Pending') {
                 const docRef = doc(db, "pre-orders", request.id);
                 batch.update(docRef, { status: 'Approved' });
             }
@@ -526,7 +527,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       toast({
         variant: "destructive",
         title: "No exportable items found",
-        description: "The selected POs do not contain any 'Approved' or 'Fulfilled' items.",
+        description: "The selected POs do not contain any 'Approved', 'Fulfilled' or 'Awaiting Approval' items.",
       });
       return;
     }
@@ -584,8 +585,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
         if (orders.some(o => o.status === 'Rejected')) return 'Rejected';
         if (orders.some(o => o.status === 'Pending')) return 'Pending';
+        // If all items are either Approved or Fulfilled, the overall status is Approved
         if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
-        return orders[0]?.status || 'Pending';
+        return 'Awaiting Approval';
       };
 
       return {
@@ -858,7 +860,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      {isAdminUser && po.status === 'Awaiting Approval' && (
+                                      {canApprove && po.status === 'Awaiting Approval' && (
                                         <DropdownMenuItem onSelect={() => handleMarkAsApproved(po)}>
                                           <Check className="mr-2 h-4 w-4" />Mark as Approved
                                         </DropdownMenuItem>
@@ -905,7 +907,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[order.status] }> {order.status} </Badge> </TableCell>
                                 <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
                                 <TableCell className="text-right">
-                                  {order.status !== 'Approved' && order.status !== 'Fulfilled' && (
+                                  {order.status !== 'Fulfilled' && (
                                     <DropdownMenu>
                                       <DropdownMenuTrigger asChild>
                                         <Button size="icon" variant="ghost">
@@ -937,22 +939,13 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                             </DropdownMenuItem>
                                           </>
                                         )}
+                                        {order.status === 'Approved' && canPerformWriteActions && (
+                                            <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
+                                                <CheckCircle className="mr-2 h-4 w-4" /> Mark as Fulfilled
+                                            </DropdownMenuItem>
+                                        )}
                                       </DropdownMenuContent>
                                     </DropdownMenu>
-                                  )}
-                                  {order.status === 'Approved' && canPerformWriteActions && (
-                                      <DropdownMenu>
-                                          <DropdownMenuTrigger asChild>
-                                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                  <MoreHorizontal className="h-4 w-4" />
-                                              </Button>
-                                          </DropdownMenuTrigger>
-                                          <DropdownMenuContent align="end">
-                                              <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
-                                                  <CheckCircle className="mr-2 h-4 w-4" /> Mark as Fulfilled
-                                              </DropdownMenuItem>
-                                          </DropdownMenuContent>
-                                      </DropdownMenu>
                                   )}
                                 </TableCell>
                               </TableRow>
