@@ -821,10 +821,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                       {canApprove && po.status === 'Awaiting Approval' && (
-                                        <>
                                           <DropdownMenuItem onSelect={() => handleDecision(po, "approved")}> <Check className="mr-2 h-4 w-4" />Mark as Approved </DropdownMenuItem>
-                                          <DropdownMenuItem onSelect={() => handleDecision(po, "rejected")} className="text-red-600"> <X className="mr-2 h-4 w-4" />Reject </DropdownMenuItem>
-                                        </>
                                       )}
                                       
                                       {/* Undo Logic */}
@@ -898,10 +895,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                             <Pencil className="mr-2 h-4 w-4" /> Edit
                                           </DropdownMenuItem>
                                           <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
-                                            <Check className="mr-2 h-4 w-4" /> Approve Item
+                                            <Check className="mr-2 h-4 w-4" /> Approve
                                           </DropdownMenuItem>
                                           <DropdownMenuItem className="text-red-600" onSelect={() => handleItemDecision(order, 'Rejected')}>
-                                            <X className="mr-2 h-4 w-4" /> Reject Item
+                                            <X className="mr-2 h-4 w-4" /> Reject
                                           </DropdownMenuItem>
                                         </>
                                       )}
