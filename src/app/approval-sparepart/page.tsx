@@ -13,6 +13,7 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Papa from "papaparse";
@@ -164,7 +165,7 @@ export default function ApprovalSparepartPage() {
       return;
     }
     
-    const qAll = query(collection(db, "sparepart-requests"));
+    const qAll = query(collection(db, "sparepart-requests"), orderBy("requestDate", "desc"));
     const unsubscribeAll = onSnapshot(qAll, (querySnapshot) => {
       const requests: SparepartRequest[] = [];
       querySnapshot.forEach((doc) => {
@@ -527,7 +528,8 @@ export default function ApprovalSparepartPage() {
           requestDate: requests[0].requestDate,
           location: location
       }
-    }).filter(req => req.requests.length > 0);
+    }).filter(req => req.requests.length > 0)
+    .sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime());
   }, [allRequests]);
   
   const filteredRequests = React.useMemo(() => {
