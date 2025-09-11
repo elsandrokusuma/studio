@@ -418,8 +418,6 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     try {
         const batch = writeBatch(db);
         po.orders.forEach(request => {
-            // Only items that are awaiting approval will be marked as approved.
-            // Items that were individually rejected will remain rejected.
             if (request.status === 'Awaiting Approval') {
                 const docRef = doc(db, "pre-orders", request.id);
                 batch.update(docRef, { status: 'Approved' });
@@ -583,11 +581,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       const getOverallStatus = (): PreOrder['status'] => {
         if (orders.every(o => o.status === 'Fulfilled')) return 'Fulfilled';
         if (orders.every(o => o.status === 'Cancelled')) return 'Cancelled';
-        // If all items that were awaiting approval are now rejected, the PO is rejected.
-        if (orders.filter(o => o.status !== 'Awaiting Approval').every(o => o.status === 'Rejected')) return 'Rejected';
-        // If all items are either approved or fulfilled, the PO is approved.
         if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
         if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
+        if (orders.some(o => o.status === 'Rejected')) return 'Rejected';
         if (orders.some(o => o.status === 'Pending')) return 'Pending';
         return orders[0]?.status || 'Pending';
       };
@@ -619,7 +615,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const canRequestApproval = selectedRows.some(poNumber => groupedPreOrders.find(po => po.poNumber === poNumber)?.status === 'Pending');
   const canExport = selectedRows.some(poNumber => {
     const po = groupedPreOrders.find(p => p.poNumber === poNumber);
-    return po?.status === 'Approved' || po?.status === 'Fulfilled' || po?.status === 'Awaiting Approval';
+    return po?.orders.some(item => item.status === 'Approved' || item.status === 'Fulfilled');
   });
   
   const formatCurrency = (amount: number) => {
@@ -628,7 +624,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const isAdminUser = user && user.email === 'devaadmin@gmail.com';
   const isHrdUser = user && user.email === 'krezthrd@gmail.com';
   const canApprove = isAdminUser || isHrdUser;
-  const canPerformWriteActions = !isHrdUser; // Admin and standard users can write
+  const canPerformWriteActions = user && user.email !== 'krezthrd@gmail.com';
   
   if (loading || authLoading) {
     return <FullPageSpinner />;
@@ -858,23 +854,23 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      {canApprove && po.status === 'Awaiting Approval' && (
+                                      {(canApprove || isAdminUser) && po.status === 'Awaiting Approval' && (
                                         <DropdownMenuItem onSelect={() => handleMarkAsApproved(po)}>
                                           <Check className="mr-2 h-4 w-4" />Mark as Approved
                                         </DropdownMenuItem>
                                       )}
                                       
-                                      {canPerformWriteActions && po.status === 'Fulfilled' && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Approved')}>
+                                      {po.status === 'Fulfilled' && (
+                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders.filter(o => o.status === 'Fulfilled'), 'Approved')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo Fulfill
                                         </DropdownMenuItem>
                                       )}
-                                      {canApprove && po.status === 'Approved' && (
+                                      {(po.status === 'Approved' || po.status === 'Rejected') && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo Decision
                                         </DropdownMenuItem>
                                       )}
-                                      {(canPerformWriteActions || canApprove) && (po.status === 'Rejected' || po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
+                                      {(po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo
                                         </DropdownMenuItem>
@@ -913,12 +909,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      {canPerformWriteActions && order.status === 'Approved' && (
+                                      {order.status === 'Approved' && canPerformWriteActions && (
                                         <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
                                           <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled
                                         </DropdownMenuItem>
                                       )}
-                                      {canPerformWriteActions && po.status === 'Pending' && (
+                                      {order.status === 'Pending' && canPerformWriteActions && (
                                         <>
                                           <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
                                             <Pencil className="mr-2 h-4 w-4" /> Edit
@@ -928,7 +924,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                           </DropdownMenuItem>
                                         </>
                                       )}
-                                      {canApprove && po.status === 'Awaiting Approval' && (
+                                      {order.status === 'Awaiting Approval' && canApprove && (
                                         <>
                                           <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
                                             <Pencil className="mr-2 h-4 w-4" /> Edit
