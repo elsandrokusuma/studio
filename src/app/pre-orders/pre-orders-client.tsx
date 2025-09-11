@@ -782,9 +782,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
-                                  <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                                </AccordionTrigger>
+                                  <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
+                                    <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                                  </AccordionTrigger>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
@@ -800,16 +800,27 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                           <DropdownMenuItem onSelect={() => handleDecision(po, "rejected")} className="text-red-600"> <X className="mr-2 h-4 w-4" />Reject </DropdownMenuItem>
                                         </>
                                       )}
-                                      {!isHrdUser && po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
-                                      {((isHrdUser && po.status === 'Approved') || (!isHrdUser && po.status === 'Rejected')) && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
-                                          <Undo2 className="mr-2 h-4 w-4" />
-                                          Undo Decision
+                                      {!isHrdUser && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                      
+                                      {/* Undo Logic */}
+                                      {!isHrdUser && po.status === 'Fulfilled' && (
+                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Approved')}>
+                                          <Undo2 className="mr-2 h-4 w-4" /> Undo Fulfilled
                                         </DropdownMenuItem>
                                       )}
-                                      {!isHrdUser && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                      {isHrdUser && po.status === 'Approved' && (
+                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
+                                          <Undo2 className="mr-2 h-4 w-4" /> Undo Decision
+                                        </DropdownMenuItem>
+                                      )}
+                                      {!isHrdUser && (po.status === 'Rejected' || po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
+                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
+                                          <Undo2 className="mr-2 h-4 w-4" /> Revert to Pending
+                                        </DropdownMenuItem>
+                                      )}
+
                                       <DropdownMenuSeparator />
-                                      {!isHrdUser && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>}
+                                      {!isHrdUser && po.status !== 'Fulfilled' && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                             </div>
