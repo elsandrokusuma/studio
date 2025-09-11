@@ -52,13 +52,13 @@ import {
 } from "lucide-react";
 import {
   collection,
-  onSnapshot,
   query,
   orderBy,
   limit,
   addDoc,
   doc,
   updateDoc,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
@@ -270,11 +270,6 @@ export default function DashboardPage() {
 
 
   React.useEffect(() => {
-    if (!db) {
-      setLoadingData(false);
-      return;
-    }
-    
     const getGreeting = (): GreetingInfo => {
         const now = new Date();
         const utcOffset = now.getTimezoneOffset() * 60000;
@@ -298,71 +293,63 @@ export default function DashboardPage() {
     const dayOfMonth = new Date().getDate();
     setDailyQuote(motivationalQuotes[dayOfMonth - 1]);
 
+    const fetchData = async () => {
+        if (!db) {
+            setLoadingData(false);
+            return;
+        }
 
-    const qInventory = query(collection(db, "inventory"), orderBy("name"));
-    const unsubscribeInventory = onSnapshot(
-      qInventory,
-      (querySnapshot) => {
-        const items: InventoryItem[] = [];
-        querySnapshot.forEach((doc) => {
-          items.push({ id: doc.id, ...doc.data() } as InventoryItem);
-        });
-        setInventoryItems(items);
-        setLoadingData(false);
-      },
-      () => setLoadingData(false)
-    );
+        try {
+            // Fetch Inventory
+            const qInventory = query(collection(db, "inventory"), orderBy("name"));
+            const inventorySnapshot = await getDocs(qInventory);
+            const items: InventoryItem[] = [];
+            inventorySnapshot.forEach((doc) => {
+                items.push({ id: doc.id, ...doc.data() } as InventoryItem);
+            });
+            setInventoryItems(items);
 
-    const qTransactions = query(
-      collection(db, "transactions"),
-      orderBy("date", "desc")
-    );
-    const unsubscribeTransactions = onSnapshot(
-      qTransactions,
-      (querySnapshot) => {
-        const trans: Transaction[] = [];
-        querySnapshot.forEach((doc) => {
-          trans.push({ id: doc.id, ...doc.data() } as Transaction);
-        });
-        setTransactions(trans);
-      }
-    );
+            // Fetch all Transactions for chart
+            const qTransactions = query(collection(db, "transactions"), orderBy("date", "desc"));
+            const transactionsSnapshot = await getDocs(qTransactions);
+            const trans: Transaction[] = [];
+            transactionsSnapshot.forEach((doc) => {
+                trans.push({ id: doc.id, ...doc.data() } as Transaction);
+            });
+            setTransactions(trans);
 
-    const qRecentTransactions = query(
-      collection(db, "transactions"),
-      orderBy("date", "desc"),
-      limit(5)
-    );
-    const unsubscribeRecentTransactions = onSnapshot(
-      qRecentTransactions,
-      (querySnapshot) => {
-        const trans: Transaction[] = [];
-        querySnapshot.forEach((doc) => {
-          trans.push({ id: doc.id, ...doc.data() } as Transaction);
-        });
-        setRecentTransactions(trans);
-      }
-    );
+            // Fetch Recent Transactions
+            const qRecentTransactions = query(collection(db, "transactions"), orderBy("date", "desc"), limit(5));
+            const recentTransactionsSnapshot = await getDocs(qRecentTransactions);
+            const recentTrans: Transaction[] = [];
+            recentTransactionsSnapshot.forEach((doc) => {
+                recentTrans.push({ id: doc.id, ...doc.data() } as Transaction);
+            });
+            setRecentTransactions(recentTrans);
 
-    const qPreOrders = query(
-      collection(db, "pre-orders"),
-      orderBy("orderDate", "desc")
-    );
-    const unsubscribePreOrders = onSnapshot(qPreOrders, (querySnapshot) => {
-      const orders: PreOrder[] = [];
-      querySnapshot.forEach((doc) => {
-        orders.push({ id: doc.id, ...doc.data() } as PreOrder);
-      });
-      setPreOrders(orders);
-    });
+            // Fetch Pre-Orders
+            const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
+            const preOrdersSnapshot = await getDocs(qPreOrders);
+            const orders: PreOrder[] = [];
+            preOrdersSnapshot.forEach((doc) => {
+                orders.push({ id: doc.id, ...doc.data() } as PreOrder);
+            });
+            setPreOrders(orders);
 
-    return () => {
-      unsubscribeInventory();
-      unsubscribeTransactions();
-      unsubscribeRecentTransactions();
-      unsubscribePreOrders();
+        } catch (error) {
+            console.error("Error fetching dashboard data:", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Could not fetch dashboard data.",
+            });
+        } finally {
+            setLoadingData(false);
+        }
     };
-  }, []);
+
+    fetchData();
+  }, [toast]);
 
   React.useEffect(() => {
     if (!authLoading) {
