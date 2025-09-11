@@ -759,7 +759,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
               return (
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
-                   <Card data-state={selectedRows.includes(po.poNumber) && "selected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
+                   <Card data-state={selectedRows.includes(po.poNumber) ? "selected" : "unselected"} className="data-[state=selected]:ring-2 ring-primary relative overflow-hidden">
                      <div className={cn("absolute left-0 top-0 h-full w-1.5", statusColor)}></div>
                       <CardHeader className="p-4 pl-8">
                       <div className="flex flex-wrap items-start justify-between gap-y-2">
@@ -782,9 +782,16 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180"> <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" /> </AccordionTrigger>
+                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
+                                  <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                                </AccordionTrigger>
                                   <DropdownMenu>
-                                    <DropdownMenuTrigger asChild> <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8"> <MoreHorizontal className="h-4 w-4" /> <span className="sr-only">Toggle menu</span> </Button> </DropdownMenuTrigger>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">Toggle menu</span>
+                                      </Button>
+                                    </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                       {isHrdUser && po.status === 'Awaiting Approval' && (
@@ -826,7 +833,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 {!isHrdUser && (
                                   <TableCell className="text-right">
                                       <DropdownMenu>
-                                        <DropdownMenuTrigger asChild> <Button size="icon" variant="ghost"> <MoreHorizontal className="h-4 w-4" /> <span className="sr-only">Item Actions</span> </Button> </DropdownMenuTrigger>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button size="icon" variant="ghost">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                            <span className="sr-only">Item Actions</span>
+                                          </Button>
+                                        </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             {order.status === 'Approved' && ( <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}> <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled </DropdownMenuItem> )}
                                             {po.status === 'Pending' && ( <> <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}> <Pencil className="mr-2 h-4 w-4" /> Edit </DropdownMenuItem> <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem> </> )}
