@@ -9,20 +9,12 @@ import {
   LayoutDashboard,
   Boxes,
   ShoppingCart,
-  ClipboardCheck,
   Menu,
   Settings,
   Wrench,
   Bell,
-  AlertCircle,
-  Clock,
   Trash2,
 } from "lucide-react"
-import { collection, onSnapshot, query, where } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -30,31 +22,20 @@ import {
 } from "@/components/ui/sheet"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useAuth } from "@/hooks/use-auth"
-import { useNotifications, type Notification } from "@/hooks/use-notifications"
+import { useNotifications } from "@/hooks/use-notifications"
 import { ScrollArea } from "./ui/scroll-area"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/inventory", label: "Inventory", icon: Boxes },
-  { href: "/pre-orders", label: "Pre-Orders", icon: ShoppingCart },
-  { href: "/approval", label: "Approval Stationery", icon: ClipboardCheck },
+  { href: "/pre-orders", label: "Pre-Order & Approval", icon: ShoppingCart },
   { href: "/approval-sparepart", label: "Approval Sparepart", icon: Wrench },
 ]
 
 function NotificationBell() {
   const { notifications, clearNotifications } = useNotifications();
-
-  React.useEffect(() => {
-    if (!db) return;
-
-    // This effect is now just for listening to real-time data notifications.
-    // The state is managed by the useNotifications hook.
-    // Let's assume the hook itself handles adding/removing these listeners if needed,
-    // or we can add them here and call `addNotification`. For now, we assume
-    // the hook is self-contained for simplicity.
-
-  }, []);
-
   const hasNotifications = notifications.length > 0;
 
   return (

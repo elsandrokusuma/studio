@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   collection,
   onSnapshot,
@@ -61,7 +61,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Folder, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, MapPin, ChevronDown, Ban } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, Ban, Eye } from "lucide-react";
 import type { PreOrder, InventoryItem } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -84,6 +84,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 type GroupedPO = {
@@ -126,6 +127,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [isFulfillOpen, setFulfillOpen] = React.useState(false);
   const [itemToFulfill, setItemToFulfill] = React.useState<PreOrder | null>(null);
   const [fulfillQuantity, setFulfillQuantity] = React.useState<number | string>('');
+
+  // State for viewing details
+  const [isDetailsOpen, setDetailsOpen] = React.useState(false);
 
 
   // State for combobox
@@ -299,28 +303,14 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         const currentQuantity = inventoryItemDoc.data().quantity;
         const newQuantity = currentQuantity + finalQuantity;
         
-        // 1. Update inventory stock
         transaction.update(inventoryItemRef, { quantity: newQuantity });
 
-        // 2. Add 'in' transaction log using the new manager
-        // The manageTransaction function needs to be adapted or called differently inside a transaction
-        // For now, let's create the transaction data and we'll call manageTransaction outside
-        const transactionData = {
-          itemId: itemToFulfill.itemId,
-          itemName: itemToFulfill.itemName,
-          type: 'in' as const,
-          quantity: finalQuantity,
-          person: `From PO ${itemToFulfill.poNumber}`,
-        };
-
-        // 3. Update pre-order item status
         const preOrderItemRef = doc(db, "pre-orders", itemToFulfill.id);
         transaction.update(preOrderItemRef, { status: 'Fulfilled' });
         
-        return transactionData;
+        return;
       });
 
-      // Call manageTransaction *after* the Firestore transaction is successful
       await manageTransaction({
         itemId: itemToFulfill.itemId,
         itemName: itemToFulfill.itemName,
@@ -370,6 +360,34 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     setSelectedPo(null);
   }
 
+  const handleDecision = async (po: GroupedPO, decision: "approved" | "rejected") => {
+    if (!db) return;
+    const newStatus = decision === "approved" ? "Approved" : "Rejected";
+    
+    try {
+        const batch = writeBatch(db);
+        po.orders.forEach(order => {
+            if (!db) return;
+            const orderRef = doc(db, "pre-orders", order.id);
+            batch.update(orderRef, { status: newStatus });
+        });
+        await batch.commit();
+
+        addNotification({
+          title: `Pre-Order ${decision}`,
+          description: `The pre-order ${po.poNumber} has been ${decision}.`,
+          icon: decision === "approved" ? Check : X,
+        });
+        
+    } catch(error) {
+        console.error("Failed to update pre-order status", error);
+        toast({
+            variant: "destructive",
+            title: "Error updating pre-order status",
+        });
+    }
+  };
+  
   const updateStatus = async (orders: PreOrder[], status: PreOrder['status']) => {
     if (!db) return;
     const batch = writeBatch(db);
@@ -416,18 +434,16 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
       await batch.commit();
 
-      const poNumbers = posToApprove.map(po => po.poNumber).join(', ');
       addNotification({
         title: 'Approval Requested',
         description: `${posToApprove.length} pre-order(s) sent for approval.`,
         icon: Send,
       });
 
-      // Send WhatsApp Notification
-      const phoneNumber = "628563866500"; // Indonesian country code
-      const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\n');
+      const phoneNumber = "628563866500";
+      const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\\n');
       const message = encodeURIComponent(
-        `Dengan hormat,\n\nMohon untuk ditinjau dan disetujui permintaan Pre-Order berikut:\n\n${poList}\n\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\nhttps://stationeryinventory-gwk.vercel.app/approval\n\nTerima kasih.`
+        `Dengan hormat,\\n\\nMohon untuk ditinjau dan disetujui permintaan Pre-Order berikut:\\n\\n${poList}\\n\\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\\nhttps://stationeryinventory-gwk.vercel.app/pre-orders\\n\\nTerima kasih.`
       );
       
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
@@ -438,27 +454,20 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       toast({
         variant: 'destructive',
         title: 'Failed to request approvals',
-        description: 'Could not update pre-order statuses in the database.',
       });
     }
   };
   
   const handleExportPdf = () => {
     if (selectedRows.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "No items selected",
-        description: "Please select one or more POs to export.",
-      });
+      toast({ variant: "destructive", title: "No items selected" });
       return;
     }
   
-    // 1. Get all individual orders from the selected PO groups.
     const allItemsInSelectedPOs = groupedPreOrders
       .filter(po => selectedRows.includes(po.poNumber))
       .flatMap(po => po.orders);
   
-    // 2. Filter these items to only include those that are 'Approved' or 'Fulfilled'.
     const itemsToExport = allItemsInSelectedPOs.filter(
       item => item.status === 'Approved' || item.status === 'Fulfilled'
     );
@@ -520,21 +529,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
     return Object.entries(groups).map(([poNumber, orders]) => {
       const allFulfilled = orders.every(o => o.status === 'Fulfilled');
-      const anyApproved = orders.some(o => o.status === 'Approved');
-
       let overallStatus: PreOrder['status'] = orders[0]?.status || 'Pending';
-      if (allFulfilled) {
+      if(allFulfilled) {
         overallStatus = 'Fulfilled';
-      } else if (anyApproved) {
-        // If some are approved but not all fulfilled, the PO is still considered 'Approved' at a high level
-        // to allow fulfilling other items. The single status on GroupedPO is a simplification.
-        // We will show 'Approved' if not all are Fulfilled.
-        const firstNonFulfilled = orders.find(o => o.status !== 'Fulfilled');
-        if (firstNonFulfilled) {
-          overallStatus = firstNonFulfilled.status;
-        }
       }
-
       return {
         poNumber,
         orders,
@@ -545,15 +543,13 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         orderDate: orders[0]?.orderDate,
         expectedDate: orders[0]?.expectedDate,
       };
-    }).filter(po => po.orders.length > 0); // Filter out empty POs
+    }).filter(po => po.orders.length > 0);
   }, [preOrders]);
 
   const filteredPreOrders = React.useMemo(() => {
     return groupedPreOrders.filter(po => {
-      // If an accordion is open, don't filter the main list
       if (openAccordion) return true;
-      
-      const statusMatch = statusFilter === 'all' || po.orders.some(order => order.status === statusFilter);
+      const statusMatch = statusFilter === 'all' || po.status === statusFilter;
       const dateMatch = !dateFilter || format(new Date(po.expectedDate), 'yyyy-MM-dd') === format(dateFilter, 'yyyy-MM-dd');
       return statusMatch && dateMatch;
     });
@@ -596,7 +592,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         <Alert variant="destructive" className="max-w-md">
           <AlertTitle>Firebase Not Configured</AlertTitle>
           <AlertDescription>
-            Please configure your Firebase credentials in the environment variables to use this application.
+            Please configure your Firebase credentials to use this application.
           </AlertDescription>
         </Alert>
       </div>
@@ -608,9 +604,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     <div className="flex flex-col gap-8">
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pre-Orders</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Pre-Order & Approval</h1>
           <p className="text-muted-foreground">
-            Track and manage your upcoming stock deliveries.
+            Manage all stationery pre-orders and approvals in one place.
           </p>
         </div>
         <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
@@ -632,21 +628,13 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
            <div className="flex w-full md:w-auto items-center gap-2">
              <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className="w-full md:w-auto justify-start text-left font-normal"
-                >
+                <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateFilter ? format(dateFilter, "PPP") : <span>Filter by date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateFilter}
-                  onSelect={setDateFilter}
-                  initialFocus
-                />
+                <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus />
               </PopoverContent>
             </Popover>
             {dateFilter && (
@@ -694,12 +682,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     <div className="col-span-3">
                         <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
                         <PopoverTrigger asChild>
-                            <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={comboPoOpen}
-                            className="w-full justify-between"
-                            >
+                            <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
                             {selectedItemName}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -711,17 +694,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <CommandEmpty>No item found.</CommandEmpty>
                                 <CommandGroup>
                                 {inventoryItems.map((item) => (
-                                    <CommandItem
-                                    key={item.id}
-                                    value={item.name}
-                                    onSelect={() => handleItemSelectForPo(item.id)}
-                                    >
-                                    <Check
-                                        className={cn(
-                                        "mr-2 h-4 w-4",
-                                        selectedItemId === item.id ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
+                                    <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                    <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
                                     {item.name}
                                     </CommandItem>
                                 ))}
@@ -739,20 +713,18 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="unit" className="text-right">Unit</Label>
                     <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
-                        <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Select a unit" />
-                        </SelectTrigger>
+                        <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
                         <SelectContent>
-                        <SelectItem value="Pcs">Pcs</SelectItem>
-                        <SelectItem value="Pack">Pack</SelectItem>
-                        <SelectItem value="Box">Box</SelectItem>
-                        <SelectItem value="Roll">Roll</SelectItem>
-                        <SelectItem value="Rim">Rim</SelectItem>
-                        <SelectItem value="Tube">Tube</SelectItem>
-                        <SelectItem value="Bottle">Bottle</SelectItem>
-                        <SelectItem value="Can">Can</SelectItem>
-                        <SelectItem value="Sheet">Sheet</SelectItem>
-                        <SelectItem value="Cartridge">Cartridge</SelectItem>
+                          <SelectItem value="Pcs">Pcs</SelectItem>
+                          <SelectItem value="Pack">Pack</SelectItem>
+                          <SelectItem value="Box">Box</SelectItem>
+                          <SelectItem value="Roll">Roll</SelectItem>
+                          <SelectItem value="Rim">Rim</SelectItem>
+                          <SelectItem value="Tube">Tube</SelectItem>
+                          <SelectItem value="Bottle">Bottle</SelectItem>
+                          <SelectItem value="Can">Can</SelectItem>
+                          <SelectItem value="Sheet">Sheet</SelectItem>
+                          <SelectItem value="Cartridge">Cartridge</SelectItem>
                         </SelectContent>
                     </Select>
                     </div>
@@ -775,34 +747,15 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       </header>
       
       <div className="space-y-4">
-        {!isHrdUser && (
-            <div className="px-4 hidden sm:flex">
-                <Checkbox
-                    checked={isAllSelected}
-                    onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                    aria-label="Select all"
-                    disabled={selectableRowCount === 0}
-                    className="mr-4"
-                    />
-                    <span className="text-sm text-muted-foreground">Select all</span>
-            </div>
-        )}
+        <div className="px-4 hidden sm:flex">
+            <Checkbox checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} aria-label="Select all" disabled={selectableRowCount === 0} className="mr-4" />
+            <span className="text-sm text-muted-foreground">Select all</span>
+        </div>
         {filteredPreOrders.length > 0 ? (
           <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
             {filteredPreOrders.map((po) => {
-               const itemsToDisplay =
-                openAccordion === po.poNumber && statusFilter !== "all"
-                  ? po.orders.filter((order) => order.status === statusFilter)
-                  : po.orders;
-               
-               const statusColor = {
-                'Pending': 'bg-yellow-500',
-                'Awaiting Approval': 'bg-yellow-500',
-                'Approved': 'bg-green-500',
-                'Fulfilled': 'bg-blue-500',
-                'Rejected': 'bg-red-500',
-                'Cancelled': 'bg-red-500',
-               }[po.status] || 'bg-gray-500';
+               const itemsToDisplay = openAccordion === po.poNumber && statusFilter !== "all" ? po.orders.filter((order) => order.status === statusFilter) : po.orders;
+               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-orange-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
 
               return (
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
@@ -811,36 +764,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                       <CardHeader className="p-4 pl-8">
                       <div className="flex flex-wrap items-start justify-between gap-y-2">
                           <div className="flex items-center gap-4 flex-grow">
-                            {!isHrdUser && (
-                                <Checkbox
-                                    checked={selectedRows.includes(po.poNumber)}
-                                    onCheckedChange={() => handleSelectRow(po.poNumber)}
-                                    aria-label="Select PO"
-                                    disabled={!(po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')}
-                                />
-                            )}
-                            <div className="p-2 bg-primary/10 rounded-lg">
-                               <FileText className="h-5 w-5 text-primary" />
-                            </div>
+                            <Checkbox checked={selectedRows.includes(po.poNumber)} onCheckedChange={() => handleSelectRow(po.poNumber)} aria-label="Select PO" disabled={!['Pending', 'Approved', 'Fulfilled'].includes(po.status)} />
+                            <div className="p-2 bg-primary/10 rounded-lg"> <FileText className="h-5 w-5 text-primary" /> </div>
                             <div className="flex-grow">
                                 <h3 className="font-semibold text-base">{po.poNumber}</h3>
                                 <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
-                                    <Badge
-                                        variant={
-                                        po.status === 'Approved' ? 'default' :
-                                        po.status === 'Fulfilled' ? 'default' :
-                                        po.status === 'Rejected' || po.status === 'Cancelled' ? 'destructive' :
-                                        po.status === 'Pending' ? 'warning' :
-                                        po.status === 'Awaiting Approval' ? 'warning' : 'outline'
-                                        }
-                                        className={
-                                        po.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                        po.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
-                                        po.status === 'Rejected' || po.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                        po.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                        po.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
-                                        }
-                                    >
+                                    <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[po.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-orange-100 text-orange-800'}[po.status] }>
                                         {po.status}
                                     </Badge>
                                     <span>• {po.totalQuantity} units</span>
@@ -853,135 +782,66 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
-                                  <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                                </AccordionTrigger>
-                                {!isHrdUser && (
+                                <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180"> <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" /> </AccordionTrigger>
                                   <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Toggle menu</span>
-                                      </Button>
-                                    </DropdownMenuTrigger>
+                                    <DropdownMenuTrigger asChild> <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8"> <MoreHorizontal className="h-4 w-4" /> <span className="sr-only">Toggle menu</span> </Button> </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      {po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
-                                      {(po.status === 'Approved' || po.status === 'Rejected') && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
+                                      {isHrdUser && po.status === 'Awaiting Approval' && (
+                                        <>
+                                          <DropdownMenuItem onSelect={() => handleDecision(po, "approved")} className="text-green-600"> <Check className="mr-2 h-4 w-4" />Approve </DropdownMenuItem>
+                                          <DropdownMenuItem onSelect={() => handleDecision(po, "rejected")} className="text-red-600"> <X className="mr-2 h-4 w-4" />Reject </DropdownMenuItem>
+                                        </>
+                                      )}
+                                      {!isHrdUser && po.status === 'Rejected' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>Re-submit</DropdownMenuItem>}
+                                      {((isHrdUser && po.status === 'Approved') || (!isHrdUser && po.status === 'Rejected')) && (
+                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
                                           <Undo2 className="mr-2 h-4 w-4" />
                                           Undo Decision
                                         </DropdownMenuItem>
                                       )}
-                                      {po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                      {!isHrdUser && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
                                       <DropdownMenuSeparator />
-                                      <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}>
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete
-                                      </DropdownMenuItem>
+                                      {!isHrdUser && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
-                                )}
                             </div>
                           </div>
                         </div>
                      </CardHeader>
                     <AccordionContent>
                       <CardContent className="p-4 pt-0 pl-8">
-                        <div className="overflow-x-auto">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Item</TableHead>
-                                <TableHead>Unit</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Qty</TableHead>
-                                <TableHead className="text-right">Price</TableHead>
-                                <TableHead className="text-right">Total</TableHead>
-                                {!isHrdUser && <TableHead><span className="sr-only">Actions</span></TableHead>}
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {itemsToDisplay.map(order => (
-                                <TableRow key={order.id}>
-                                  <TableCell className="font-medium">{order.itemName}</TableCell>
-                                  <TableCell>{order.unit}</TableCell>
-                                  <TableCell>
-                                     <Badge
-                                          variant={
-                                          order.status === 'Approved' ? 'default' :
-                                          order.status === 'Fulfilled' ? 'default' :
-                                          order.status === 'Rejected' || order.status === 'Cancelled' ? 'destructive' :
-                                          order.status === 'Pending' ? 'warning' :
-                                          order.status === 'Awaiting Approval' ? 'warning' : 'outline'
-                                          }
-                                          className={
-                                          order.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                          order.status === 'Fulfilled' ? 'bg-blue-100 text-blue-800' :
-                                          order.status === 'Rejected' || order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                          order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                          order.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
-                                          }
-                                      >
-                                          {order.status}
-                                      </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">{order.quantity}</TableCell>
-                                  <TableCell className="text-right">{formatCurrency(order.price)}</TableCell>
-                                  <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
-                                  {!isHrdUser && (
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button size="icon" variant="ghost">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">Item Actions</span>
-                                            </Button>
-                                        </DropdownMenuTrigger>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Item</TableHead> <TableHead>Unit</TableHead> <TableHead>Status</TableHead> <TableHead className="text-right">Qty</TableHead> <TableHead className="text-right">Price</TableHead> <TableHead className="text-right">Total</TableHead> {!isHrdUser && <TableHead><span className="sr-only">Actions</span></TableHead>}
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {itemsToDisplay.map(order => (
+                              <TableRow key={order.id}>
+                                <TableCell className="font-medium">{order.itemName}</TableCell> <TableCell>{order.unit}</TableCell>
+                                <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-orange-100 text-orange-800'}[order.status] }> {order.status} </Badge> </TableCell>
+                                <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
+                                {!isHrdUser && (
+                                  <TableCell className="text-right">
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild> <Button size="icon" variant="ghost"> <MoreHorizontal className="h-4 w-4" /> <span className="sr-only">Item Actions</span> </Button> </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            {order.status === 'Approved' && (
-                                            <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
-                                                <CheckCircle className="mr-2 h-4 w-4" />
-                                                Mark as Fulfilled
-                                            </DropdownMenuItem>
-                                            )}
-                                            {po.status === 'Pending' && (
-                                            <>
-                                                <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                                <Pencil className="mr-2 h-4 w-4" />
-                                                Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete
-                                                </DropdownMenuItem>
-                                            </>
-                                            )}
+                                            {order.status === 'Approved' && ( <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}> <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled </DropdownMenuItem> )}
+                                            {po.status === 'Pending' && ( <> <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}> <Pencil className="mr-2 h-4 w-4" /> Edit </DropdownMenuItem> <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem> </> )}
                                         </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                  )}
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
+                                      </DropdownMenu>
+                                  </TableCell>
+                                )}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </CardContent>
                       <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
-                           <div className="flex items-center gap-2">
-                             <Box className="h-4 w-4 text-muted-foreground" />
-                             <div>
-                                <p className="text-muted-foreground text-xs">Total Quantity</p>
-                                <p className="font-medium">{po.totalQuantity} units</p>
-                             </div>
-                          </div>
-                           <div className="flex items-center gap-2">
-                             <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                             <div>
-                                <p className="text-muted-foreground text-xs">Expected Delivery</p>
-                                <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p>
-                             </div>
-                          </div>
+                           <div className="flex items-center gap-2"> <Box className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">Total Quantity</p> <p className="font-medium">{po.totalQuantity} units</p> </div> </div>
+                           <div className="flex items-center gap-2"> <CalendarDays className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">Expected Delivery</p> <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p> </div> </div>
                       </CardFooter>
                     </AccordionContent>
                    </Card>
@@ -991,127 +851,53 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         ) : (
             <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-24">
               <div className="flex flex-col items-center gap-1 text-center">
-                <h3 className="text-2xl font-bold tracking-tight">
-                  No pre-orders found
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Create your first pre-order to get started.
-                </p>
+                <h3 className="text-2xl font-bold tracking-tight"> No pre-orders found </h3>
+                <p className="text-sm text-muted-foreground"> Create your first pre-order to get started. </p>
               </div>
             </div>
         )}
       </div>
 
-        {/* Dialogs */}
         <AlertDialog open={isDeleteOpen} onOpenChange={setDeleteOpen}>
           <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the pre-order
-                <span className="font-semibold"> {selectedPo?.poNumber}</span> and all its items.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setSelectedPo(null)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeletePreOrder}>
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
+            <AlertDialogHeader> <AlertDialogTitle>Are you sure?</AlertDialogTitle> <AlertDialogDescription> This action cannot be undone. This will permanently delete the pre-order <span className="font-semibold"> {selectedPo?.poNumber}</span> and all its items. </AlertDialogDescription> </AlertDialogHeader>
+            <AlertDialogFooter> <AlertDialogCancel onClick={() => setSelectedPo(null)}>Cancel</AlertDialogCancel> <AlertDialogAction onClick={handleDeletePreOrder}> Delete </AlertDialogAction> </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
         <Dialog open={isEditItemOpen} onOpenChange={setEditItemOpen}>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Item: {selectedOrderItem?.itemName}</DialogTitle>
-              <DialogDescription>
-                Update the quantity, unit, or price for this item.
-              </DialogDescription>
-            </DialogHeader>
+            <DialogHeader> <DialogTitle>Edit Item: {selectedOrderItem?.itemName}</DialogTitle> <DialogDescription> Update the quantity, unit, or price for this item. </DialogDescription> </DialogHeader>
             <form onSubmit={handleEditOrderItem} className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="price" className="text-right">Price</Label>
-                <Input id="price" name="price" type="number" min="0" className="col-span-3" defaultValue={selectedOrderItem?.price} required />
-              </div>
+              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="price" className="text-right">Price</Label> <Input id="price" name="price" type="number" min="0" className="col-span-3" defaultValue={selectedOrderItem?.price} required /> </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="unit" className="text-right">Unit</Label>
                 <Select name="unit" required onValueChange={setSelectedUnit} defaultValue={selectedOrderItem?.unit}>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select a unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Pcs">Pcs</SelectItem>
-                    <SelectItem value="Pack">Pack</SelectItem>
-                    <SelectItem value="Box">Box</SelectItem>
-                    <SelectItem value="Roll">Roll</SelectItem>
-                    <SelectItem value="Rim">Rim</SelectItem>
-                    <SelectItem value="Tube">Tube</SelectItem>
-                    <SelectItem value="Bottle">Bottle</SelectItem>
-                    <SelectItem value="Can">Can</SelectItem>
-                    <SelectItem value="Sheet">Sheet</SelectItem>
-                    <SelectItem value="Cartridge">Cartridge</SelectItem>
-                  </SelectContent>
+                  <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
+                  <SelectContent> <SelectItem value="Pcs">Pcs</SelectItem> <SelectItem value="Pack">Pack</SelectItem> <SelectItem value="Box">Box</SelectItem> <SelectItem value="Roll">Roll</SelectItem> <SelectItem value="Rim">Rim</SelectItem> <SelectItem value="Tube">Tube</SelectItem> <SelectItem value="Bottle">Bottle</SelectItem> <SelectItem value="Can">Can</SelectItem> <SelectItem value="Sheet">Sheet</SelectItem> <SelectItem value="Cartridge">Cartridge</SelectItem> </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="quantity" className="text-right">Quantity</Label>
-                <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required />
-              </div>
-              <DialogFooter>
-                <Button type="submit">Save Changes</Button>
-              </DialogFooter>
+              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="quantity" className="text-right">Quantity</Label> <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required /> </div>
+              <DialogFooter> <Button type="submit">Save Changes</Button> </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
 
         <AlertDialog open={isDeleteItemOpen} onOpenChange={setDeleteItemOpen}>
           <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete this item?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently remove <span className="font-semibold">{selectedOrderItem?.itemName}</span> from this pre-order. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setSelectedOrderItem(null)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteOrderItem}>
-                Delete Item
-              </AlertDialogAction>
-            </AlertDialogFooter>
+            <AlertDialogHeader> <AlertDialogTitle>Delete this item?</AlertDialogTitle> <AlertDialogDescription> This will permanently remove <span className="font-semibold">{selectedOrderItem?.itemName}</span> from this pre-order. This action cannot be undone. </AlertDialogDescription> </AlertDialogHeader>
+            <AlertDialogFooter> <AlertDialogCancel onClick={() => setSelectedOrderItem(null)}>Cancel</AlertDialogCancel> <AlertDialogAction onClick={handleDeleteOrderItem}> Delete Item </AlertDialogAction> </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
         <Dialog open={isFulfillOpen} onOpenChange={setFulfillOpen}>
           <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Fulfill Item: {itemToFulfill?.itemName}</DialogTitle>
-                <DialogDescription>
-                  Confirm the quantity of items received to add them to your inventory.
-                </DialogDescription>
-              </DialogHeader>
+              <DialogHeader> <DialogTitle>Fulfill Item: {itemToFulfill?.itemName}</DialogTitle> <DialogDescription> Confirm the quantity of items received to add them to your inventory. </DialogDescription> </DialogHeader>
               <form onSubmit={handleFulfillItem}>
                 <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="fulfill-quantity" className="text-right">
-                      Quantity Received
-                    </Label>
-                    <Input
-                      id="fulfill-quantity"
-                      name="fulfill-quantity"
-                      type="number"
-                      min="1"
-                      className="col-span-3"
-                      value={fulfillQuantity}
-                      onChange={(e) => setFulfillQuantity(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="fulfill-quantity" className="text-right"> Quantity Received </Label> <Input id="fulfill-quantity" name="fulfill-quantity" type="number" min="1" className="col-span-3" value={fulfillQuantity} onChange={(e) => setFulfillQuantity(e.target.value)} required /> </div>
                 </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>Cancel</Button>
-                  <Button type="submit">Confirm & Add to Stock</Button>
-                </DialogFooter>
+                <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>Cancel</Button> <Button type="submit">Confirm & Add to Stock</Button> </DialogFooter>
               </form>
           </DialogContent>
         </Dialog>
