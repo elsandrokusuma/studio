@@ -102,6 +102,7 @@ import { format, subDays } from 'date-fns';
 import { useAuth } from "@/hooks/use-auth";
 import { LoginForm } from "@/components/login-form";
 import { useNotifications } from "@/hooks/use-notifications";
+import { manageTransaction } from "@/lib/transactions";
 
 
 const chartConfig = {
@@ -389,16 +390,6 @@ export default function DashboardPage() {
     }
   }, [preOrders]);
 
-  const addTransaction = async (
-    transaction: Omit<Transaction, "id" | "date">
-  ) => {
-    if (!db) return;
-    await addDoc(collection(db, "transactions"), {
-      ...transaction,
-      date: new Date().toISOString(),
-    });
-  };
-
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!db) return;
@@ -413,7 +404,7 @@ export default function DashboardPage() {
 
     const docRef = await addDoc(collection(db, "inventory"), newItemData);
 
-    addTransaction({
+    manageTransaction({
       itemId: docRef.id,
       itemName: newItemData.name,
       type: "add",
@@ -475,7 +466,7 @@ export default function DashboardPage() {
         }
 
         await updateDoc(itemRef, { quantity: newQuantity });
-        await addTransaction({
+        await manageTransaction({
           itemId: selectedItem.id,
           itemName: selectedItem.name,
           type,

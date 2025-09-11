@@ -99,6 +99,7 @@ import { FullPageSpinner } from "@/components/full-page-spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
+import { manageTransaction } from "@/lib/transactions";
 
 
 const seedData = [
@@ -304,15 +305,6 @@ export default function InventoryPage() {
   }, [isEditItemOpen, selectedItem]);
   
 
-  const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
-    if (!db) return;
-    await addDoc(collection(db, "transactions"), {
-      ...transaction,
-      date: new Date().toISOString(),
-    });
-  };
-
-
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!db) return;
@@ -327,7 +319,7 @@ export default function InventoryPage() {
 
     const docRef = await addDoc(collection(db, "inventory"), newItemData);
     
-    addTransaction({
+    manageTransaction({
         itemId: docRef.id,
         itemName: newItemData.name,
         type: 'add',
@@ -375,7 +367,7 @@ export default function InventoryPage() {
     await updateDoc(itemRef, updatedItemData);
 
     if (originalQuantity !== updatedQuantity) {
-        addTransaction({
+        manageTransaction({
           itemId: selectedItem.id,
           itemName: updatedItemData.name,
           type: 'edit',
@@ -433,7 +425,7 @@ export default function InventoryPage() {
         }
         
         await updateDoc(itemRef, { quantity: newQuantity });
-        await addTransaction({ itemId: selectedItemToUpdate.id, itemName: selectedItemToUpdate.name, type, quantity, person });
+        await manageTransaction({ itemId: selectedItemToUpdate.id, itemName: selectedItemToUpdate.name, type, quantity, person });
         
         addNotification({
           title: "Stock Updated",
@@ -459,7 +451,7 @@ export default function InventoryPage() {
 
     await deleteDoc(doc(db, "inventory", selectedItem.id));
     
-    addTransaction({
+    manageTransaction({
         itemId: selectedItem.id,
         itemName: selectedItem.name,
         type: 'delete',

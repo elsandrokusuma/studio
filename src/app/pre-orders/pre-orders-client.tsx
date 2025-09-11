@@ -83,6 +83,7 @@ import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
+import { manageTransaction } from "@/lib/transactions";
 
 
 type GroupedPO = {
@@ -301,21 +302,33 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         // 1. Update inventory stock
         transaction.update(inventoryItemRef, { quantity: newQuantity });
 
-        // 2. Add 'in' transaction log
-        const transactionRef = doc(collection(db, "transactions"));
-        transaction.set(transactionRef, {
+        // 2. Add 'in' transaction log using the new manager
+        // The manageTransaction function needs to be adapted or called differently inside a transaction
+        // For now, let's create the transaction data and we'll call manageTransaction outside
+        const transactionData = {
           itemId: itemToFulfill.itemId,
           itemName: itemToFulfill.itemName,
-          type: 'in',
+          type: 'in' as const,
           quantity: finalQuantity,
-          date: new Date().toISOString(),
           person: `From PO ${itemToFulfill.poNumber}`,
-        });
+        };
 
         // 3. Update pre-order item status
         const preOrderItemRef = doc(db, "pre-orders", itemToFulfill.id);
         transaction.update(preOrderItemRef, { status: 'Fulfilled' });
+        
+        return transactionData;
       });
+
+      // Call manageTransaction *after* the Firestore transaction is successful
+      await manageTransaction({
+        itemId: itemToFulfill.itemId,
+        itemName: itemToFulfill.itemName,
+        type: 'in',
+        quantity: finalQuantity,
+        person: `From PO ${itemToFulfill.poNumber}`,
+      });
+
 
       addNotification({
         title: "Item Fulfilled!",
