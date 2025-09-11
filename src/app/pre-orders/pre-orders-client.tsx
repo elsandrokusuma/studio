@@ -387,6 +387,27 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         });
     }
   };
+
+  const handleItemDecision = async (item: PreOrder, decision: 'Approved' | 'Rejected') => {
+    if (!db) return;
+    try {
+        const itemRef = doc(db, "pre-orders", item.id);
+        await updateDoc(itemRef, { status: decision });
+        
+        addNotification({
+          title: `Item ${decision}`,
+          description: `Item ${item.itemName} has been ${decision}.`,
+          icon: decision === "Approved" ? Check : X,
+        });
+
+    } catch(error) {
+        console.error("Failed to update item status", error);
+        toast({
+            variant: "destructive",
+            title: "Error updating item status",
+        });
+    }
+  };
   
   const updateStatus = async (orders: PreOrder[], status: PreOrder['status']) => {
     if (!db) return;
@@ -832,7 +853,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Item</TableHead> <TableHead>Unit</TableHead> <TableHead>Status</TableHead> <TableHead className="text-right">Qty</TableHead> <TableHead className="text-right">Price</TableHead> <TableHead className="text-right">Total</TableHead> {!isHrdUser && <TableHead><span className="sr-only">Actions</span></TableHead>}
+                              <TableHead>Item</TableHead> <TableHead>Unit</TableHead> <TableHead>Status</TableHead> <TableHead className="text-right">Qty</TableHead> <TableHead className="text-right">Price</TableHead> <TableHead className="text-right">Total</TableHead> <TableHead><span className="sr-only">Actions</span></TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -841,22 +862,43 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <TableCell className="font-medium">{order.itemName}</TableCell> <TableCell>{order.unit}</TableCell>
                                 <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-orange-100 text-orange-800'}[order.status] }> {order.status} </Badge> </TableCell>
                                 <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
-                                {!isHrdUser && (
-                                  <TableCell className="text-right">
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                          <Button size="icon" variant="ghost">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">Item Actions</span>
-                                          </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            {order.status === 'Approved' && ( <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}> <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled </DropdownMenuItem> )}
-                                            {po.status === 'Pending' && ( <> <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}> <Pencil className="mr-2 h-4 w-4" /> Edit </DropdownMenuItem> <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem> </> )}
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
-                                  </TableCell>
-                                )}
+                                <TableCell className="text-right">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button size="icon" variant="ghost">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">Item Actions</span>
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      {!isHrdUser && order.status === 'Approved' && (
+                                        <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
+                                          <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled
+                                        </DropdownMenuItem>
+                                      )}
+                                      {!isHrdUser && po.status === 'Pending' && (
+                                        <>
+                                          <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                          </DropdownMenuItem>
+                                        </>
+                                      )}
+                                      {isHrdUser && po.status === 'Awaiting Approval' && (
+                                        <>
+                                          <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
+                                            <Check className="mr-2 h-4 w-4" /> Approve Item
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem className="text-red-600" onSelect={() => handleItemDecision(order, 'Rejected')}>
+                                            <X className="mr-2 h-4 w-4" /> Reject Item
+                                          </DropdownMenuItem>
+                                        </>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
