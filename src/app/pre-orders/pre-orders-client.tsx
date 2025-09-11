@@ -412,6 +412,34 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     }
   };
   
+  const handleMarkAsApproved = async (po: GroupedPO) => {
+    if (!db) return;
+
+    try {
+        const batch = writeBatch(db);
+        po.orders.forEach(request => {
+            // Only items that are awaiting approval will be marked as approved.
+            // Items that were individually rejected will remain rejected.
+            if (request.status === 'Awaiting Approval') {
+                const docRef = doc(db, "pre-orders", request.id);
+                batch.update(docRef, { status: 'Approved' });
+            }
+        });
+        await batch.commit();
+        addNotification({
+            title: "PO Approved",
+            description: `Request ${po.poNumber} has been marked as Approved.`,
+            icon: Check,
+        });
+    } catch (error) {
+        console.error("Error marking PO as approved:", error);
+        toast({
+            variant: "destructive",
+            title: "Failed to approve PO."
+        });
+    }
+  };
+
   const updateStatus = async (orders: PreOrder[], status: PreOrder['status']) => {
     if (!db) return;
     const batch = writeBatch(db);
@@ -512,7 +540,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const selectableRows = groupedPreOrders
-        .filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled')
+        .filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled' || po.status === 'Awaiting Approval')
         .map(po => po.poNumber);
       setSelectedRows(selectableRows);
     } else {
@@ -555,7 +583,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       const getOverallStatus = (): PreOrder['status'] => {
         if (orders.every(o => o.status === 'Fulfilled')) return 'Fulfilled';
         if (orders.every(o => o.status === 'Cancelled')) return 'Cancelled';
-        if (orders.every(o => o.status === 'Rejected' && o.status !== 'Awaiting Approval')) return 'Rejected';
+        // If all items that were awaiting approval are now rejected, the PO is rejected.
+        if (orders.filter(o => o.status !== 'Awaiting Approval').every(o => o.status === 'Rejected')) return 'Rejected';
+        // If all items are either approved or fulfilled, the PO is approved.
         if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
         if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
         if (orders.some(o => o.status === 'Pending')) return 'Pending';
@@ -584,12 +614,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     });
   }, [groupedPreOrders, statusFilter, dateFilter, openAccordion]);
   
-  const selectableRowCount = filteredPreOrders.filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled').length;
+  const selectableRowCount = filteredPreOrders.filter(po => po.status === 'Pending' || po.status === 'Approved' || po.status === 'Fulfilled' || po.status === 'Awaiting Approval').length;
   const isAllSelected = selectedRows.length > 0 && selectableRowCount > 0 && selectedRows.length === selectableRowCount;
   const canRequestApproval = selectedRows.some(poNumber => groupedPreOrders.find(po => po.poNumber === poNumber)?.status === 'Pending');
   const canExport = selectedRows.some(poNumber => {
     const po = groupedPreOrders.find(p => p.poNumber === poNumber);
-    return po?.status === 'Approved' || po?.status === 'Fulfilled';
+    return po?.status === 'Approved' || po?.status === 'Fulfilled' || po?.status === 'Awaiting Approval';
   });
   
   const formatCurrency = (amount: number) => {
@@ -784,7 +814,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             <span className="text-sm text-muted-foreground">Select all</span>
         </div>
         {filteredPreOrders.length > 0 ? (
-          <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+          <Accordion type="single" collapsible value={openAccordion} onOpenChange={setOpenAccordion}>
             {filteredPreOrders.map((po) => {
                const itemsToDisplay = openAccordion === po.poNumber && statusFilter !== "all" ? po.orders.filter((order) => order.status === statusFilter) : po.orders;
                const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-yellow-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
@@ -796,7 +826,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                       <CardHeader className="p-4 pl-8">
                       <div className="flex flex-wrap items-start justify-between gap-y-2">
                           <div className="flex items-center gap-4 flex-grow">
-                            <Checkbox checked={selectedRows.includes(po.poNumber)} onCheckedChange={() => handleSelectRow(po.poNumber)} aria-label="Select PO" disabled={!['Pending', 'Approved', 'Fulfilled'].includes(po.status)} />
+                            <Checkbox checked={selectedRows.includes(po.poNumber)} onCheckedChange={() => handleSelectRow(po.poNumber)} aria-label="Select PO" disabled={!['Pending', 'Approved', 'Fulfilled', 'Awaiting Approval'].includes(po.status)} />
                             <div className="p-2 bg-primary/10 rounded-lg"> <FileText className="h-5 w-5 text-primary" /> </div>
                             <div className="flex-grow">
                                 <h3 className="font-semibold text-base">{po.poNumber}</h3>
@@ -814,11 +844,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                              <div className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
-                                <AccordionTrigger>
+                              <AccordionTrigger>
+                                <div className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
                                     <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                                </AccordionTrigger>
-                              </div>
+                                </div>
+                              </AccordionTrigger>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
@@ -829,10 +859,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                       {canApprove && po.status === 'Awaiting Approval' && (
-                                          <DropdownMenuItem onSelect={() => handleDecision(po, "approved")}> <Check className="mr-2 h-4 w-4" />Mark as Approved </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => handleMarkAsApproved(po)}>
+                                          <Check className="mr-2 h-4 w-4" />Mark as Approved
+                                        </DropdownMenuItem>
                                       )}
                                       
-                                      {/* Undo Logic */}
                                       {canPerformWriteActions && po.status === 'Fulfilled' && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Approved')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo Fulfill
