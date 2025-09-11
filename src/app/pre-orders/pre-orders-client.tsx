@@ -61,7 +61,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, Ban, Eye } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, Ban, Eye, ChevronDown } from "lucide-react";
 import type { PreOrder, InventoryItem } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import {
