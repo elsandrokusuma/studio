@@ -776,7 +776,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
           <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
             {filteredPreOrders.map((po) => {
                const itemsToDisplay = openAccordion === po.poNumber && statusFilter !== "all" ? po.orders.filter((order) => order.status === statusFilter) : po.orders;
-               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-orange-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
+               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-yellow-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
 
               return (
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
@@ -790,7 +790,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                             <div className="flex-grow">
                                 <h3 className="font-semibold text-base">{po.poNumber}</h3>
                                 <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
-                                    <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[po.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-orange-100 text-orange-800'}[po.status] }>
+                                    <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[po.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[po.status] }>
                                         {po.status}
                                     </Badge>
                                     <span>• {po.totalQuantity} units</span>
@@ -803,9 +803,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
-                                  <AccordionTrigger className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
+                                <AccordionTrigger asChild>
+                                  <div className="p-2 hover:bg-muted rounded-md [&[data-state=open]>svg]:rotate-180">
                                     <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-                                  </AccordionTrigger>
+                                  </div>
+                                </AccordionTrigger>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button aria-haspopup="true" size="icon" variant="ghost" className="h-8 w-8">
@@ -860,7 +862,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                             {itemsToDisplay.map(order => (
                               <TableRow key={order.id}>
                                 <TableCell className="font-medium">{order.itemName}</TableCell> <TableCell>{order.unit}</TableCell>
-                                <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-orange-100 text-orange-800'}[order.status] }> {order.status} </Badge> </TableCell>
+                                <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[order.status] }> {order.status} </Badge> </TableCell>
                                 <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
                                 <TableCell className="text-right">
                                   <DropdownMenu>
