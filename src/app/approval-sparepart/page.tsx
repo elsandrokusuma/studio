@@ -620,13 +620,14 @@ export default function ApprovalSparepartPage() {
   };
   
   const canRequestApproval = selectedRows.some(poNumber => groupedRequests.find(po => po.requestNumber === poNumber)?.status === 'Pending');
+  const isHrdUser = user && user.email === 'krezthrd@gmail.com';
 
 
   if (loading || authLoading) {
     return <FullPageSpinner />;
   }
   
-  if (user && user.email === 'krezthrd@gmail.com') {
+  if (isHrdUser) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-150px)] text-center">
         <div className="p-4 bg-destructive/10 rounded-full mb-4">

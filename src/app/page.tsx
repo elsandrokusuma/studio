@@ -641,7 +641,7 @@ export default function DashboardPage() {
               <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{`${greetingInfo.text}!`}</h1>
+              <h1 className="text-2xl font-bold">{`${greetingInfo.text}!`}</h1>
               <p className="text-muted-foreground">
                 {dailyQuote}
               </p>
@@ -707,7 +707,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card
-          onClick={() => router.push("/approval")}
+          onClick={() => router.push("/pre-orders")}
           className="cursor-pointer hover:shadow-lg transition-shadow text-white"
           style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
         >
