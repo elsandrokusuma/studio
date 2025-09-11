@@ -921,6 +921,12 @@ export default function ApprovalSparepartPage() {
                                             </DropdownMenuItem>
                                             </>
                                         )}
+                                        {req.status === 'Approved' && (
+                                            <DropdownMenuItem onSelect={() => updateStatus(req, 'Awaiting Approval')}>
+                                                <Undo2 className="mr-2 h-4 w-4" />
+                                                Undo Decision
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             className="text-red-600 focus:text-red-700"
