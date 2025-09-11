@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -398,7 +397,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         await updateDoc(itemRef, { status: decision });
         
         addNotification({
-          title: `Item ${decision}`,
+          title: `${decision}`,
           description: `Item ${item.itemName} has been ${decision.toLowerCase()}.`,
           icon: decision === "Approved" ? Check : X,
         });
@@ -581,10 +580,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       const getOverallStatus = (): PreOrder['status'] => {
         if (orders.every(o => o.status === 'Fulfilled')) return 'Fulfilled';
         if (orders.every(o => o.status === 'Cancelled')) return 'Cancelled';
-        if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
         if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
         if (orders.some(o => o.status === 'Rejected')) return 'Rejected';
         if (orders.some(o => o.status === 'Pending')) return 'Pending';
+        if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
         return orders[0]?.status || 'Pending';
       };
 
@@ -615,7 +614,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const canRequestApproval = selectedRows.some(poNumber => groupedPreOrders.find(po => po.poNumber === poNumber)?.status === 'Pending');
   const canExport = selectedRows.some(poNumber => {
     const po = groupedPreOrders.find(p => p.poNumber === poNumber);
-    return po?.orders.some(item => item.status === 'Approved' || item.status === 'Fulfilled');
+    return po?.orders.some(item => item.status === 'Approved' || item.status === 'Fulfilled' || item.status === 'Awaiting Approval');
   });
   
   const formatCurrency = (amount: number) => {
@@ -662,7 +661,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     <div className="flex flex-col gap-8">
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pre-Order & Approval</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Pre-Order &amp; Approval</h1>
           <p className="text-muted-foreground">
             Manage all stationery pre-orders and approvals in one place.
           </p>
@@ -702,12 +701,14 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             )}
            </div>
           
-          {selectedRows.length > 0 && canPerformWriteActions && (
+          {selectedRows.length > 0 && (
             <>
-              <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
-                <Send className="mr-2 h-4 w-4" />
-                Request Approval
-              </Button>
+              {canPerformWriteActions && (
+                <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
+                  <Send className="mr-2 h-4 w-4" />
+                  Request Approval
+                </Button>
+              )}
               <Button onClick={handleExportPdf} disabled={!canExport}>
                 <FileDown className="mr-2 h-4 w-4" />
                 Export
@@ -1003,7 +1004,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="fulfill-quantity" className="text-right"> Quantity Received </Label> <Input id="fulfill-quantity" name="fulfill-quantity" type="number" min="1" className="col-span-3" value={fulfillQuantity} onChange={(e) => setFulfillQuantity(e.target.value)} required /> </div>
                 </div>
-                <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>Cancel</Button> <Button type="submit">Confirm & Add to Stock</Button> </DialogFooter>
+                <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>Cancel</Button> <Button type="submit">Confirm &amp; Add to Stock</Button> </DialogFooter>
               </form>
           </DialogContent>
         </Dialog>
