@@ -779,7 +779,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
           <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
             {filteredPreOrders.map((po) => {
                const itemsToDisplay = openAccordion === po.poNumber && statusFilter !== "all" ? po.orders.filter((order) => order.status === statusFilter) : po.orders;
-               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-orange-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
+               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-yellow-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
 
               return (
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
@@ -894,6 +894,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       )}
                                       {canApprove && po.status === 'Awaiting Approval' && (
                                         <>
+                                          <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                                          </DropdownMenuItem>
                                           <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
                                             <Check className="mr-2 h-4 w-4" /> Approve Item
                                           </DropdownMenuItem>
