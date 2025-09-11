@@ -217,7 +217,7 @@ export default function ApprovalSparepartPage() {
         const batch = writeBatch(db);
         po.requests.forEach(request => {
             const docRef = doc(db, "sparepart-requests", request.id);
-            batch.update(docRef, { status: 'Approved' });
+            batch.update(docRef, { status: 'Approved', itemStatus: 'Approved' });
         });
         await batch.commit();
         addNotification({
