@@ -549,18 +549,22 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     });
 
     return Object.entries(groups).map(([poNumber, orders]) => {
-      const allFulfilled = orders.every(o => o.status === 'Fulfilled');
-      let overallStatus: PreOrder['status'] = orders[0]?.status || 'Pending';
-      if(allFulfilled) {
-        overallStatus = 'Fulfilled';
-      }
+      const getOverallStatus = (): PreOrder['status'] => {
+        if (orders.every(o => o.status === 'Fulfilled')) return 'Fulfilled';
+        if (orders.every(o => o.status === 'Cancelled')) return 'Cancelled';
+        if (orders.every(o => o.status === 'Rejected')) return 'Rejected';
+        if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
+        if (orders.some(o => o.status === 'Pending')) return 'Pending';
+        return orders[0]?.status || 'Pending';
+      };
+
       return {
         poNumber,
         orders,
         totalItems: orders.length,
         totalValue: orders.reduce((sum, item) => sum + (item.price * item.quantity), 0),
         totalQuantity: orders.reduce((sum, item) => sum + item.quantity, 0),
-        status: allFulfilled ? 'Fulfilled' : orders[0]?.status,
+        status: getOverallStatus(),
         orderDate: orders[0]?.orderDate,
         expectedDate: orders[0]?.expectedDate,
       };
@@ -835,7 +839,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo Decision
                                         </DropdownMenuItem>
                                       )}
-                                      {canPerformWriteActions && (po.status === 'Rejected' || po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
+                                      {(canPerformWriteActions || canApprove) && (po.status === 'Rejected' || po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo
                                         </DropdownMenuItem>
