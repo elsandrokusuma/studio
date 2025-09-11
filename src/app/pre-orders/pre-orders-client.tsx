@@ -587,7 +587,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
   }
+  const isAdminUser = user && user.email === 'devaadmin@gmail.com';
   const isHrdUser = user && user.email === 'krezthrd@gmail.com';
+  const canApprove = isAdminUser || isHrdUser;
+  const canPerformWriteActions = !isHrdUser; // Admin and standard users can write
   
   if (loading || authLoading) {
     return <FullPageSpinner />;
@@ -665,7 +668,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             )}
            </div>
           
-          {selectedRows.length > 0 && !isHrdUser && (
+          {selectedRows.length > 0 && canPerformWriteActions && (
             <>
               <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
                 <Send className="mr-2 h-4 w-4" />
@@ -678,7 +681,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             </>
           )}
 
-          {!isHrdUser && (
+          {canPerformWriteActions && (
             <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName("Select an item..."); setPoPrice("")} }}>
                 <DialogTrigger asChild>
                 <Button>
@@ -776,7 +779,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
           <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
             {filteredPreOrders.map((po) => {
                const itemsToDisplay = openAccordion === po.poNumber && statusFilter !== "all" ? po.orders.filter((order) => order.status === statusFilter) : po.orders;
-               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-yellow-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
+               const statusColor = {'Pending': 'bg-yellow-500', 'Awaiting Approval': 'bg-orange-500', 'Approved': 'bg-green-500', 'Fulfilled': 'bg-blue-500', 'Rejected': 'bg-red-500', 'Cancelled': 'bg-red-500'}[po.status] || 'bg-gray-500';
 
               return (
                 <AccordionItem key={po.poNumber} value={po.poNumber} className="border-0">
@@ -817,33 +820,34 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      {isHrdUser && po.status === 'Awaiting Approval' && (
+                                      {canApprove && po.status === 'Awaiting Approval' && (
                                         <>
-                                          <DropdownMenuItem onSelect={() => handleDecision(po, "approved")} className="text-green-600"> <Check className="mr-2 h-4 w-4" />Approve </DropdownMenuItem>
+                                          <DropdownMenuItem onSelect={() => handleDecision(po, "approved")}> <Check className="mr-2 h-4 w-4" />Mark as Approved </DropdownMenuItem>
                                           <DropdownMenuItem onSelect={() => handleDecision(po, "rejected")} className="text-red-600"> <X className="mr-2 h-4 w-4" />Reject </DropdownMenuItem>
                                         </>
                                       )}
-                                      {!isHrdUser && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
                                       
                                       {/* Undo Logic */}
-                                      {!isHrdUser && po.status === 'Fulfilled' && (
+                                      {canPerformWriteActions && po.status === 'Fulfilled' && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Approved')}>
-                                          <Undo2 className="mr-2 h-4 w-4" /> Undo Fulfilled
+                                          <Undo2 className="mr-2 h-4 w-4" /> Undo Fulfill
                                         </DropdownMenuItem>
                                       )}
-                                      {isHrdUser && po.status === 'Approved' && (
+                                      {canApprove && po.status === 'Approved' && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> Undo Decision
                                         </DropdownMenuItem>
                                       )}
-                                      {!isHrdUser && (po.status === 'Rejected' || po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
+                                      {canPerformWriteActions && (po.status === 'Rejected' || po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
-                                          <Undo2 className="mr-2 h-4 w-4" /> Revert to Pending
+                                          <Undo2 className="mr-2 h-4 w-4" /> Undo
                                         </DropdownMenuItem>
                                       )}
 
+                                      {canPerformWriteActions && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+
                                       <DropdownMenuSeparator />
-                                      {!isHrdUser && po.status !== 'Fulfilled' && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>}
+                                      {canPerformWriteActions && po.status !== 'Fulfilled' && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                             </div>
@@ -873,12 +877,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      {!isHrdUser && order.status === 'Approved' && (
+                                      {canPerformWriteActions && order.status === 'Approved' && (
                                         <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
                                           <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled
                                         </DropdownMenuItem>
                                       )}
-                                      {!isHrdUser && po.status === 'Pending' && (
+                                      {canPerformWriteActions && po.status === 'Pending' && (
                                         <>
                                           <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
                                             <Pencil className="mr-2 h-4 w-4" /> Edit
@@ -888,7 +892,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                           </DropdownMenuItem>
                                         </>
                                       )}
-                                      {isHrdUser && po.status === 'Awaiting Approval' && (
+                                      {canApprove && po.status === 'Awaiting Approval' && (
                                         <>
                                           <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
                                             <Check className="mr-2 h-4 w-4" /> Approve Item
