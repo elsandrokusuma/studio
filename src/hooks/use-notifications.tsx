@@ -24,16 +24,46 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 let notificationId = 0;
 
+const NOTIFICATION_STORAGE_KEY = 'app-notifications';
+
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  // Load notifications from sessionStorage on initial mount
+  useEffect(() => {
+    try {
+      const storedNotifications = sessionStorage.getItem(NOTIFICATION_STORAGE_KEY);
+      if (storedNotifications) {
+        setNotifications(JSON.parse(storedNotifications));
+      }
+    } catch (error) {
+      console.error("Failed to parse notifications from sessionStorage", error);
+    }
+  }, []);
+  
+  // Save notifications to sessionStorage whenever they change
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifications));
+    } catch (error) {
+      console.error("Failed to save notifications to sessionStorage", error);
+    }
+  }, [notifications]);
 
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
     setNotifications(prev => [{ ...notification, id: `notif-${notificationId++}` }, ...prev]);
   }, []);
 
   const clearNotifications = useCallback(() => {
-    setNotifications([]);
-  }, []);
+    setNotifications(prev => prev.filter(n => n.id.startsWith('system-')));
+    // Also clear the storage from non-system notifications
+    try {
+        const systemNotifications = notifications.filter(n => n.id.startsWith('system-'));
+        sessionStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(systemNotifications));
+    } catch (error) {
+        console.error("Failed to clear notifications from sessionStorage", error);
+    }
+  }, [notifications]);
 
   useEffect(() => {
     if (!db) return;
@@ -89,7 +119,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     });
     unsubs.push(unsubscribeLowStock);
 
-    setupListener("pre-orders", "status", "Awaiting Approval", "poNumber", "stationery_approval", "Stationery Approvals", "/approval", Clock);
+    setupListener("pre-orders", "status", "Awaiting Approval", "poNumber", "stationery_approval", "Stationery Approvals", "/pre-orders", Clock);
     setupListener("sparepart-requests", "status", "Awaiting Approval", "requestNumber", "sparepart_approval", "Sparepart Approvals", "/approval-sparepart", Clock);
 
     return () => {
