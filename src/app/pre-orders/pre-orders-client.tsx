@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -490,9 +491,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       });
 
       const phoneNumber = "628563866500";
-      const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\\n');
+      const poList = posToApprove.map(po => `- ${po.poNumber}`).join('\n');
       const message = encodeURIComponent(
-        `Dengan hormat,\\n\\nMohon untuk ditinjau dan disetujui permintaan Pre-Order berikut:\\n\\n${poList}\\n\\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\\nhttps://stationeryinventory-gwk.vercel.app/pre-orders\\n\\nTerima kasih.`
+        `Dengan hormat,\n\nMohon untuk ditinjau dan disetujui permintaan Pre-Order berikut:\n\n${poList}\n\nAnda dapat meninjaunya langsung melalui tautan di bawah ini:\nhttps://stationeryinventory-gwk.vercel.app/pre-orders\n\nTerima kasih.`
       );
       
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
@@ -518,7 +519,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       .flatMap(po => po.orders);
   
     const itemsToExport = allItemsInSelectedPOs.filter(
-      item => item.status === 'Approved' || item.status === 'Fulfilled'
+      item => item.status === 'Approved' || item.status === 'Fulfilled' || item.status === 'Awaiting Approval'
     );
   
     if (itemsToExport.length === 0) {
@@ -709,10 +710,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   Request Approval
                 </Button>
               )}
-              <Button onClick={handleExportPdf} disabled={!canExport}>
-                <FileDown className="mr-2 h-4 w-4" />
-                Export
-              </Button>
+              {(canExport || isHrdUser) && (
+                <Button onClick={handleExportPdf}>
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              )}
             </>
           )}
 
@@ -855,7 +858,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      {(canApprove || isAdminUser) && po.status === 'Awaiting Approval' && (
+                                      {isAdminUser && po.status === 'Awaiting Approval' && (
                                         <DropdownMenuItem onSelect={() => handleMarkAsApproved(po)}>
                                           <Check className="mr-2 h-4 w-4" />Mark as Approved
                                         </DropdownMenuItem>
@@ -863,7 +866,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       
                                       {po.status === 'Fulfilled' && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders.filter(o => o.status === 'Fulfilled'), 'Approved')}>
-                                          <Undo2 className="mr-2 h-4 w-4" /> Undo Fulfill
+                                          <Undo2 className="mr-2 h-4 w-4" /> Undo
                                         </DropdownMenuItem>
                                       )}
                                       {(po.status === 'Approved' || po.status === 'Rejected') && (
@@ -902,44 +905,55 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[order.status] }> {order.status} </Badge> </TableCell>
                                 <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
                                 <TableCell className="text-right">
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button size="icon" variant="ghost">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Item Actions</span>
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      {order.status === 'Approved' && canPerformWriteActions && (
-                                        <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
-                                          <CheckCircle className="mr-2 h-4 w-4" />Mark as Fulfilled
-                                        </DropdownMenuItem>
-                                      )}
-                                      {order.status === 'Pending' && canPerformWriteActions && (
-                                        <>
-                                          <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                          </DropdownMenuItem>
-                                        </>
-                                      )}
-                                      {order.status === 'Awaiting Approval' && canApprove && (
-                                        <>
-                                          <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
-                                            <Check className="mr-2 h-4 w-4" /> Approve
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem className="text-red-600" onSelect={() => handleItemDecision(order, 'Rejected')}>
-                                            <X className="mr-2 h-4 w-4" /> Reject
-                                          </DropdownMenuItem>
-                                        </>
-                                      )}
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
+                                  {order.status !== 'Approved' && order.status !== 'Fulfilled' && (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button size="icon" variant="ghost">
+                                          <MoreHorizontal className="h-4 w-4" />
+                                          <span className="sr-only">Item Actions</span>
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        {order.status === 'Pending' && canPerformWriteActions && (
+                                          <>
+                                            <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
+                                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                            </DropdownMenuItem>
+                                          </>
+                                        )}
+                                        {order.status === 'Awaiting Approval' && canApprove && (
+                                          <>
+                                            <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
+                                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
+                                              <Check className="mr-2 h-4 w-4" /> Approve
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-red-600" onSelect={() => handleItemDecision(order, 'Rejected')}>
+                                              <X className="mr-2 h-4 w-4" /> Reject
+                                            </DropdownMenuItem>
+                                          </>
+                                        )}
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )}
+                                  {order.status === 'Approved' && canPerformWriteActions && (
+                                      <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                  <MoreHorizontal className="h-4 w-4" />
+                                              </Button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent align="end">
+                                              <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
+                                                  <CheckCircle className="mr-2 h-4 w-4" /> Mark as Fulfilled
+                                              </DropdownMenuItem>
+                                          </DropdownMenuContent>
+                                      </DropdownMenu>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             ))}
