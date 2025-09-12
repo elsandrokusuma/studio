@@ -7,6 +7,7 @@ type Theme = 'light' | 'dark';
 type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
 // Wallpaper can be a URL, a hex code, or 'default'
 type Wallpaper = string;
+type Language = 'id' | 'en';
 
 
 type ThemeContextType = {
@@ -20,6 +21,8 @@ type ThemeContextType = {
   setWallpaperOpacity: (opacity: number) => void;
   componentOpacity: number;
   setComponentOpacity: (opacity: number) => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
@@ -33,4 +36,4 @@ export function useTheme() {
 }
 
 export { ThemeContext };
-export type { Theme, Color, Wallpaper };
+export type { Theme, Color, Wallpaper, Language };

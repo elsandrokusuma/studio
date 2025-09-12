@@ -115,24 +115,130 @@ const languages = [
 
 type ActiveMenu = 'main' | 'appearance' | 'account' | 'language';
 
+const translations = {
+    en: {
+        backToSettings: 'Back to Settings',
+        account: 'Account',
+        accountDesc: 'Manage your account details and preferences.',
+        profile: 'Profile',
+        profileDesc: 'Basic information about your account.',
+        notSignedIn: 'Not signed in',
+        notSignedInDesc: 'Sign in to manage your account.',
+        signOut: 'Sign Out',
+        deleteAccount: 'Delete Account',
+        deleteAccountDesc: 'This will permanently delete your account and all your data. This action cannot be undone.',
+        deleteMyAccount: 'Delete My Account',
+        areYouSure: 'Are you sure?',
+        deleteWarning: 'This will permanently delete your account and all related data. You cannot undo this action.',
+        cancel: 'Cancel',
+        confirmDelete: 'Yes, Delete My Account',
+        language: 'Language',
+        languageDesc: 'Choose the display language for the application.',
+        backToAppearance: 'Back to Appearance',
+        appearance: 'Appearance',
+        appearanceDesc: 'Customize the look and feel of the application.',
+        darkMode: 'Dark Mode',
+        darkModeDesc: 'Enable or disable the dark theme.',
+        themeColor: 'Theme Color',
+        themeColorDesc: 'Select your preferred theme color.',
+        backgroundWallpaper: 'Background Wallpaper',
+        backgroundWallpaperDesc: 'Choose a default wallpaper or upload your own image.',
+        solidColor: 'Solid Color',
+        wallpaperGallery: 'Wallpaper Gallery',
+        uploadImage: 'Upload Image',
+        wallpaperDarkness: 'Wallpaper Darkness Level',
+        wallpaperDarknessDesc: 'Adjust how dark the overlay on the wallpaper is.',
+        componentTransparency: 'Component Transparency',
+        componentTransparencyDesc: 'Set the transparency for cards and headers.',
+        galleryDesc: 'Choose from a diverse collection of images.',
+        solidColorDesc: 'Choose a solid background color.',
+        settings: 'Settings',
+        settingsDesc: 'Manage your application preferences.',
+        manageAccount: 'Manage your account details.',
+        customizeAppearance: 'Customize theme, colors, and wallpaper.',
+        chooseLanguage: 'Choose your preferred language.',
+        accountDeleted: 'Account Deleted',
+        accountDeletedDesc: 'Your account has been successfully deleted.',
+        deleteFailed: 'Failed to Delete Account',
+        languageUpdated: 'Language Updated',
+        languageUpdatedDesc: (lang: string) => `Language has been set to ${lang}.`,
+        wallpaperUpdated: 'Wallpaper Updated',
+        wallpaperUpdatedDesc: 'Your background wallpaper has been changed.',
+        fileTooLarge: 'File Too Large',
+        fileTooLargeDesc: 'Image size cannot exceed 5MB.',
+    },
+    id: {
+        backToSettings: 'Kembali ke Pengaturan',
+        account: 'Akun',
+        accountDesc: 'Kelola detail dan preferensi akun Anda.',
+        profile: 'Profil',
+        profileDesc: 'Informasi dasar tentang akun Anda.',
+        notSignedIn: 'Belum masuk',
+        notSignedInDesc: 'Masuk untuk mengelola akun Anda.',
+        signOut: 'Keluar',
+        deleteAccount: 'Hapus Akun',
+        deleteAccountDesc: 'Tindakan ini akan menghapus akun dan semua data Anda secara permanen. Tindakan ini tidak dapat diurungkan.',
+        deleteMyAccount: 'Hapus Akun Saya',
+        areYouSure: 'Apakah Anda yakin?',
+        deleteWarning: 'Ini akan menghapus akun Anda secara permanen dan semua data terkait. Anda tidak dapat mengurungkan tindakan ini.',
+        cancel: 'Batal',
+        confirmDelete: 'Ya, Hapus Akun Saya',
+        language: 'Bahasa',
+        languageDesc: 'Pilih bahasa tampilan untuk aplikasi.',
+        backToAppearance: 'Kembali ke Tampilan',
+        appearance: 'Tampilan',
+        appearanceDesc: 'Sesuaikan tampilan dan nuansa aplikasi.',
+        darkMode: 'Mode Gelap',
+        darkModeDesc: 'Aktifkan atau nonaktifkan tema gelap.',
+        themeColor: 'Warna Tema',
+        themeColorDesc: 'Pilih warna tema pilihan Anda.',
+        backgroundWallpaper: 'Wallpaper Latar Belakang',
+        backgroundWallpaperDesc: 'Pilih wallpaper default atau unggah gambar Anda sendiri.',
+        solidColor: 'Warna Solid',
+        wallpaperGallery: 'Galeri Wallpaper',
+        uploadImage: 'Unggah Gambar',
+        wallpaperDarkness: 'Tingkat Kegelapan Wallpaper',
+        wallpaperDarknessDesc: 'Atur seberapa gelap overlay pada wallpaper.',
+        componentTransparency: 'Transparansi Komponen',
+        componentTransparencyDesc: 'Atur transparansi untuk card dan header.',
+        galleryDesc: 'Pilih dari koleksi gambar yang beragam.',
+        solidColorDesc: 'Pilih warna latar belakang solid.',
+        settings: 'Pengaturan',
+        settingsDesc: 'Kelola preferensi aplikasi Anda.',
+        manageAccount: 'Kelola detail akun Anda.',
+        customizeAppearance: 'Sesuaikan tema, warna, dan wallpaper.',
+        chooseLanguage: 'Pilih bahasa pilihan Anda.',
+        accountDeleted: 'Akun Dihapus',
+        accountDeletedDesc: 'Akun Anda telah berhasil dihapus.',
+        deleteFailed: 'Gagal Menghapus Akun',
+        languageUpdated: 'Bahasa Diperbarui',
+        languageUpdatedDesc: (lang: string) => `Bahasa telah diatur ke ${lang}.`,
+        wallpaperUpdated: 'Wallpaper Diperbarui',
+        wallpaperUpdatedDesc: 'Wallpaper latar belakang Anda telah diubah.',
+        fileTooLarge: 'File Terlalu Besar',
+        fileTooLargeDesc: 'Ukuran gambar tidak boleh melebihi 5MB.',
+    }
+};
 
 function AccountSettings({ onBack }: { onBack: () => void }) {
     const { user, loading, signOut, deleteAccount } = useAuth();
     const { toast } = useToast();
     const { addNotification } = useNotifications();
+    const { language } = useTheme();
+    const t = language === 'id' ? translations.id : translations.en;
 
     const handleDelete = async () => {
         try {
             await deleteAccount();
             addNotification({
-                title: "Akun Dihapus",
-                description: "Akun Anda telah berhasil dihapus.",
+                title: t.accountDeleted,
+                description: t.accountDeletedDesc,
                 icon: Trash2,
             });
         } catch (error: any) {
             toast({
                 variant: "destructive",
-                title: "Gagal Menghapus Akun",
+                title: t.deleteFailed,
                 description: error.message,
             });
         }
@@ -142,17 +248,17 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-8">
              <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali ke Pengaturan
+                {t.backToSettings}
             </Button>
             <header>
-                <h1 className="text-3xl font-bold tracking-tight">Account</h1>
-                <p className="text-muted-foreground">Kelola detail dan preferensi akun Anda.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t.account}</h1>
+                <p className="text-muted-foreground">{t.accountDesc}</p>
             </header>
             
             <Card>
                 <CardHeader>
-                    <CardTitle>Profil</CardTitle>
-                    <CardDescription>Informasi dasar tentang akun Anda.</CardDescription>
+                    <CardTitle>{t.profile}</CardTitle>
+                    <CardDescription>{t.profileDesc}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                      <div className="flex items-center justify-between">
@@ -184,40 +290,38 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                                         </AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <p className="font-semibold text-lg">Not signed in</p>
-                                        <p className="text-sm">Sign in to manage your account.</p>
+                                        <p className="font-semibold text-lg">{t.notSignedIn}</p>
+                                        <p className="text-sm">{t.notSignedInDesc}</p>
                                     </div>
                                 </div>
                             )}
                         </div>
-                        {user && <Button variant="outline" onClick={signOut}>Sign Out</Button>}
+                        {user && <Button variant="outline" onClick={signOut}>{t.signOut}</Button>}
                     </div>
                 </CardContent>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Hapus Akun</CardTitle>
-                    <CardDescription>Tindakan ini akan menghapus akun dan semua data Anda secara permanen. Tindakan ini tidak dapat diurungkan.</CardDescription>
+                    <CardTitle>{t.deleteAccount}</CardTitle>
+                    <CardDescription>{t.deleteAccountDesc}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                            <Button variant="destructive" disabled={!user}>
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Hapus Akun Saya
+                                {t.deleteMyAccount}
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Ini akan menghapus akun Anda secara permanen dan semua data terkait. Anda tidak dapat mengurungkan tindakan ini.
-                            </AlertDialogDescription>
+                            <AlertDialogTitle>{t.areYouSure}</AlertDialogTitle>
+                            <AlertDialogDescription>{t.deleteWarning}</AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete}>Ya, Hapus Akun Saya</AlertDialogAction>
+                            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDelete}>{t.confirmDelete}</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
@@ -228,15 +332,16 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
 }
 
 function LanguageSettings({ onBack }: { onBack: () => void }) {
-    const [selectedLanguage, setSelectedLanguage] = React.useState('id'); // Default to Indonesia
+    const { language, setLanguage } = useTheme();
     const { addNotification } = useNotifications();
+    const t = language === 'id' ? translations.id : translations.en;
 
     const handleLanguageSelect = (code: string) => {
-        setSelectedLanguage(code);
-        const language = languages.find(l => l.code === code);
+        setLanguage(code as 'id' | 'en');
+        const selectedLang = languages.find(l => l.code === code);
         addNotification({
-            title: "Bahasa Diperbarui",
-            description: `Bahasa telah diatur ke ${language?.name}.`, // Note: Full functionality requires i18n library
+            title: t.languageUpdated,
+            description: t.languageUpdatedDesc(selectedLang?.name || ''),
             icon: Languages,
         });
     };
@@ -245,11 +350,11 @@ function LanguageSettings({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-8">
             <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali ke Pengaturan
+                {t.backToSettings}
             </Button>
             <header>
-                <h1 className="text-3xl font-bold tracking-tight">Bahasa</h1>
-                <p className="text-muted-foreground">Pilih bahasa tampilan untuk aplikasi.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t.language}</h1>
+                <p className="text-muted-foreground">{t.languageDesc}</p>
             </header>
             
             <Card>
@@ -261,11 +366,11 @@ function LanguageSettings({ onBack }: { onBack: () => void }) {
                                 onClick={() => handleLanguageSelect(lang.code)}
                                 className={cn(
                                     "flex items-center justify-between w-full p-3 rounded-lg text-left transition-colors",
-                                    selectedLanguage === lang.code ? "bg-accent text-accent-foreground" : "hover:bg-accent"
+                                    language === lang.code ? "bg-accent text-accent-foreground" : "hover:bg-accent"
                                 )}
                             >
                                 <span>{lang.name}</span>
-                                {selectedLanguage === lang.code && <Check className="h-5 w-5 text-primary" />}
+                                {language === lang.code && <Check className="h-5 w-5 text-primary" />}
                             </button>
                         ))}
                     </div>
@@ -282,8 +387,10 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         color, setColor, 
         wallpaper, setWallpaper,
         wallpaperOpacity, setWallpaperOpacity,
-        componentOpacity, setComponentOpacity
+        componentOpacity, setComponentOpacity,
+        language
     } = useTheme();
+    const t = language === 'id' ? translations.id : translations.en;
     const { toast } = useToast();
     const { addNotification } = useNotifications();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -302,8 +409,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         if (file.size > 5 * 1024 * 1024) {
             toast({
                 variant: 'destructive',
-                title: 'File Terlalu Besar',
-                description: 'Ukuran gambar tidak boleh melebihi 5MB.',
+                title: t.fileTooLarge,
+                description: t.fileTooLargeDesc,
             });
             return;
         }
@@ -313,8 +420,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
             const result = e.target?.result as string;
             setWallpaper(result);
             addNotification({
-                title: 'Wallpaper Diperbarui',
-                description: 'Wallpaper latar belakang Anda telah diubah.',
+                title: t.wallpaperUpdated,
+                description: t.wallpaperUpdatedDesc,
                 icon: ImageIcon,
             });
         };
@@ -355,11 +462,11 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-8 no-scrollbar">
             <Button variant="ghost" onClick={() => setActiveSubMenu('main')} className="self-start text-muted-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali ke Tampilan
+                {t.backToAppearance}
             </Button>
             <header>
-                <h1 className="text-3xl font-bold tracking-tight">Galeri Wallpaper</h1>
-                <p className="text-muted-foreground">Pilih dari koleksi gambar yang beragam.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t.wallpaperGallery}</h1>
+                <p className="text-muted-foreground">{t.galleryDesc}</p>
             </header>
             <div className="no-scrollbar">
                 <Card>
@@ -403,11 +510,11 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         <div className="flex flex-col gap-8 no-scrollbar">
             <Button variant="ghost" onClick={() => setActiveSubMenu('main')} className="self-start text-muted-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali ke Tampilan
+                {t.backToAppearance}
             </Button>
             <header>
-                <h1 className="text-3xl font-bold tracking-tight">Warna Solid</h1>
-                <p className="text-muted-foreground">Pilih warna latar belakang solid.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t.solidColor}</h1>
+                <p className="text-muted-foreground">{t.solidColorDesc}</p>
             </header>
             <div className="no-scrollbar">
                 <Card>
@@ -458,18 +565,18 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                  <div className="flex flex-col gap-8">
                     <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Kembali ke Pengaturan
+                        {t.backToSettings}
                     </Button>
                     <header>
-                        <h1 className="text-3xl font-bold tracking-tight">Appearance</h1>
-                        <p className="text-muted-foreground">Sesuaikan tampilan dan nuansa aplikasi.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">{t.appearance}</h1>
+                        <p className="text-muted-foreground">{t.appearanceDesc}</p>
                     </header>
                     <Card>
                         <CardContent className="p-6 space-y-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <Label htmlFor="dark-mode">Dark Mode</Label>
-                                    <p className="text-sm text-muted-foreground">Aktifkan atau nonaktifkan tema gelap.</p>
+                                    <Label htmlFor="dark-mode">{t.darkMode}</Label>
+                                    <p className="text-sm text-muted-foreground">{t.darkModeDesc}</p>
                                 </div>
                                 <Switch
                                     id="dark-mode"
@@ -480,8 +587,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
 
                             <div className="space-y-2">
                                 <div>
-                                    <Label>Warna Tema</Label>
-                                    <p className="text-sm text-muted-foreground">Pilih warna tema pilihan Anda.</p>
+                                    <Label>{t.themeColor}</Label>
+                                    <p className="text-sm text-muted-foreground">{t.themeColorDesc}</p>
                                 </div>
                                 <div className="flex gap-3 pt-2">
                                     {colors.map((c) => (
@@ -500,8 +607,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
 
                              <div className="space-y-2">
                                 <div>
-                                    <Label>Wallpaper Latar Belakang</Label>
-                                    <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
+                                    <Label>{t.backgroundWallpaper}</Label>
+                                    <p className="text-sm text-muted-foreground">{t.backgroundWallpaperDesc}</p>
                                 </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
                                     <div
@@ -514,7 +621,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                             <Droplets className="h-6 w-6 text-muted-foreground" />
                                         </div>
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity">
-                                            <p className="text-white font-semibold">Warna Solid</p>
+                                            <p className="text-white font-semibold">{t.solidColor}</p>
                                         </div>
                                     </div>
                                     <div
@@ -525,7 +632,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                     >
                                         <Image src="https://picsum.photos/seed/gallery/600/400" alt="Wallpaper Gallery" fill unoptimized className="object-cover" data-ai-hint="abstract texture" />
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                            <p className="text-white font-semibold">Galeri Wallpaper</p>
+                                            <p className="text-white font-semibold">{t.wallpaperGallery}</p>
                                         </div>
                                     </div>
                                     <button
@@ -533,7 +640,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                         className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         <Upload className="h-6 w-6 mb-1" />
-                                        <span className="text-xs font-medium">Unggah Gambar</span>
+                                        <span className="text-xs font-medium">{t.uploadImage}</span>
                                         <input
                                             type="file"
                                             ref={fileInputRef}
@@ -548,8 +655,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
 
                             <div className="space-y-4">
                                 <div>
-                                    <Label>Tingkat Kegelapan Wallpaper</Label>
-                                    <p className="text-sm text-muted-foreground">Atur seberapa gelap overlay pada wallpaper.</p>
+                                    <Label>{t.wallpaperDarkness}</Label>
+                                    <p className="text-sm text-muted-foreground">{t.wallpaperDarknessDesc}</p>
                                 </div>
                                 <Slider
                                     value={[wallpaperOpacity]}
@@ -563,8 +670,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                             
                             <div className="space-y-4">
                                 <div>
-                                    <Label>Transparansi Komponen</Label>
-                                    <p className="text-sm text-muted-foreground">Atur transparansi untuk card dan header.</p>
+                                    <Label>{t.componentTransparency}</Label>
+                                    <p className="text-sm text-muted-foreground">{t.componentTransparencyDesc}</p>
                                 </div>
                                 <Slider
                                     value={[componentOpacity]}
@@ -596,16 +703,18 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
 
 function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void }) {
     const router = useRouter();
+    const { language } = useTheme();
+    const t = language === 'id' ? translations.id : translations.en;
     
     return (
         <div className="flex flex-col gap-8">
              <Button variant="ghost" onClick={() => router.back()} className="self-start text-muted-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali
+                {t.language === 'id' ? 'Kembali' : 'Back'}
             </Button>
             <header>
-                <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-                <p className="text-muted-foreground">Kelola preferensi aplikasi Anda.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t.settings}</h1>
+                <p className="text-muted-foreground">{t.settingsDesc}</p>
             </header>
             <Card>
                 <CardContent className="p-4 space-y-2">
@@ -618,8 +727,8 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
                                 <User className="h-5 w-5 text-primary" />
                             </div>
                             <div className="text-left">
-                                <p className="font-semibold">Account</p>
-                                <p className="text-sm text-muted-foreground">Kelola detail akun Anda.</p>
+                                <p className="font-semibold">{t.account}</p>
+                                <p className="text-sm text-muted-foreground">{t.manageAccount}</p>
                             </div>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -633,8 +742,8 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
                                 <Palette className="h-5 w-5 text-primary" />
                             </div>
                             <div className="text-left">
-                                <p className="font-semibold">Appearance</p>
-                                <p className="text-sm text-muted-foreground">Sesuaikan tema, warna, dan wallpaper.</p>
+                                <p className="font-semibold">{t.appearance}</p>
+                                <p className="text-sm text-muted-foreground">{t.customizeAppearance}</p>
                             </div>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -648,8 +757,8 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
                                 <Languages className="h-5 w-5 text-primary" />
                             </div>
                             <div className="text-left">
-                                <p className="font-semibold">Bahasa</p>
-                                <p className="text-sm text-muted-foreground">Pilih bahasa pilihan Anda.</p>
+                                <p className="font-semibold">{t.language}</p>
+                                <p className="text-sm text-muted-foreground">{t.chooseLanguage}</p>
                             </div>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />

@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
-import { ThemeContext, type Theme, type Color, type Wallpaper } from '@/hooks/use-theme';
+import { ThemeContext, type Theme, type Color, type Wallpaper, type Language } from '@/hooks/use-theme';
 
 function AppWallpaper() {
     const { wallpaper, wallpaperOpacity } = React.useContext(ThemeContext)!;
@@ -68,18 +68,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [wallpaper, setWallpaperState] = React.useState<Wallpaper>('default');
   const [wallpaperOpacity, setWallpaperOpacityState] = React.useState(0.5);
   const [componentOpacity, setComponentOpacityState] = React.useState(1);
-  
+  const [language, setLanguageState] = React.useState<Language>('id');
+
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
     const savedTheme = Cookies.get('theme') as Theme | undefined;
     const savedColor = Cookies.get('color') as Color | undefined;
+    const savedLanguage = Cookies.get('language') as Language | undefined;
     const savedWallpaper = localStorage.getItem('wallpaper') as Wallpaper | undefined;
     const savedWallpaperOpacity = localStorage.getItem('wallpaperOpacity');
     const savedComponentOpacity = localStorage.getItem('componentOpacity');
 
     if (savedTheme) setThemeState(savedTheme);
     if (savedColor) setColorState(savedColor);
+    if (savedLanguage) setLanguageState(savedLanguage);
     if (savedWallpaper) setWallpaperState(savedWallpaper);
     if (savedWallpaperOpacity) setWallpaperOpacityState(parseFloat(savedWallpaperOpacity));
     if (savedComponentOpacity) setComponentOpacityState(parseFloat(savedComponentOpacity));
@@ -92,8 +95,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.className = cn(theme, `theme-${color}`);
       document.documentElement.style.setProperty('--wallpaper-overlay-opacity', wallpaperOpacity.toString());
       document.documentElement.style.setProperty('--component-opacity', componentOpacity.toString());
+      document.documentElement.lang = language;
     }
-  }, [isMounted, theme, color, wallpaperOpacity, componentOpacity]);
+  }, [isMounted, theme, color, wallpaperOpacity, componentOpacity, language]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -103,6 +107,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setColor = (newColor: Color) => {
     setColorState(newColor);
     Cookies.set('color', newColor, { expires: 365 });
+  };
+  
+  const setLanguage = (newLanguage: Language) => {
+    setLanguageState(newLanguage);
+    Cookies.set('language', newLanguage, { expires: 365 });
   };
   
   const setWallpaper = (newWallpaper: Wallpaper) => {
@@ -125,7 +134,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       color, setColor, 
       wallpaper, setWallpaper,
       wallpaperOpacity, setWallpaperOpacity,
-      componentOpacity, setComponentOpacity
+      componentOpacity, setComponentOpacity,
+      language, setLanguage
   };
 
   if (!isMounted) {
