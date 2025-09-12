@@ -325,7 +325,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                 data-ai-hint={wallpaperCategories[category as Category][0].hint}
                             />
                             <div className="absolute inset-0 bg-black/30 flex items-end p-2">
-                                <p className="text-white text-xs font-medium">{category === 'Tech' ? 'Teknologi' : category}</p>
+                                <p className="text-white text-xs font-medium">{category === 'Tech' ? 'Tech' : category}</p>
                             </div>
                         </div>
                     ))}
