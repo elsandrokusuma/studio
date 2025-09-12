@@ -41,11 +41,11 @@ const colors: { name: Color, bgColor: string }[] = [
 
 const wallpaperCategories = {
     Nature: [
-        { name: 'Forest', value: 'https://picsum.photos/seed/forest/1920/1080', hint: 'nature forest' },
+        { name: 'Waterfall', value: 'https://picsum.photos/seed/waterfall/1920/1080', hint: 'nature waterfall' },
         { name: 'Mountains', value: 'https://picsum.photos/seed/mountains/1920/1080', hint: 'nature mountains' },
         { name: 'Lake', value: 'https://picsum.photos/seed/lake/1920/1080', hint: 'nature lake' },
+        { name: 'Forest', value: 'https://picsum.photos/seed/forest/1920/1080', hint: 'nature forest' },
         { name: 'Aurora', value: 'https://picsum.photos/seed/aurora/1920/1080', hint: 'nature sky' },
-        { name: 'Waterfall', value: 'https://picsum.photos/seed/waterfall/1920/1080', hint: 'nature waterfall' },
         { name: 'Jungle', value: 'https://picsum.photos/seed/jungle/1920/1080', hint: 'nature jungle' },
         { name: 'River', value: 'https://picsum.photos/seed/river/1920/1080', hint: 'nature river' },
         { name: 'Island', value: 'https://picsum.photos/seed/island/1920/1080', hint: 'nature island' },
@@ -65,16 +65,16 @@ const wallpaperCategories = {
         { name: 'Nightlife', value: 'https://picsum.photos/seed/nightlife/1920/1080', hint: 'city nightlife' },
     ],
     Tech: [
-        { name: 'Circuit', value: 'https://picsum.photos/seed/circuit/1920/1080', hint: 'technology circuit' },
-        { name: 'Code', value: 'https://picsum.photos/seed/coding/1920/1080', hint: 'technology code' },
-        { name: 'Server', value: 'https://picsum.photos/seed/server/1920/1080', hint: 'technology server' },
-        { name: 'Network', value: 'https://picsum.photos/seed/network/1920/1080', hint: 'technology network' },
-        { name: 'Binary', value: 'https://picsum.photos/seed/binary/1920/1080', hint: 'technology binary' },
-        { name: 'Hardware', value: 'https://picsum.photos/seed/hardware/1920/1080', hint: 'technology hardware' },
-        { name: 'Processor', value: 'https://picsum.photos/seed/processor/1920/1080', hint: 'technology processor' },
-        { name: 'Abstract', value: 'https://picsum.photos/seed/connect/1920/1080', hint: 'technology abstract' },
-        { name: 'Hexagon', value: 'https://picsum.photos/seed/hexagon/1920/1080', hint: 'technology abstract' },
-        { name: 'Futuristic', value: 'https://picsum.photos/seed/future/1920/1080', hint: 'technology futuristic' },
+        { name: 'Laptop Code', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'technology code' },
+        { name: 'Galaxy', value: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa', hint: 'technology network' },
+        { name: 'LED Panel', value: 'https://images.unsplash.com/photo-1597741066271-593d6b055813', hint: 'technology abstract' },
+        { name: 'Retro Tech', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'technology abstract' },
+        { name: 'Monitor Code', value: 'https://images.unsplash.com/photo-1624996752380-8ec242e0f85d', hint: 'technology code' },
+        { name: 'Circuit Board', value: 'https://images.unsplash.com/photo-1581092334651-ddf7d54d9242', hint: 'technology circuit' },
+        { name: 'Stripes', value: 'https://images.unsplash.com/photo-1580894732444-8ec5321f7378', hint: 'technology abstract' },
+        { name: 'Blue Light', value: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769', hint: 'technology abstract' },
+        { name: 'Circuit Closeup', value: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b', hint: 'technology circuit' },
+        { name: 'Control Panel', value: 'https://images.unsplash.com/photo-1619120238346-978e0773b424', hint: 'technology server' },
     ],
 };
 
