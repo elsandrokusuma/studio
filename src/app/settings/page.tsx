@@ -65,16 +65,16 @@ const wallpaperCategories = {
         { name: 'Nightlife', value: 'https://picsum.photos/seed/nightlife/1920/1080', hint: 'city nightlife' },
     ],
     Tech: [
-        { name: 'Laptop Code', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'technology code' },
+        { name: 'Laptop Code', value: 'https://images.unsplash.com/photo-1593344484962-796b93173263', hint: 'technology circuit' },
         { name: 'Galaxy', value: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa', hint: 'technology network' },
         { name: 'Digital Wallpaper', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'technology abstract' },
-        { name: 'Blue Light', value: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769', hint: 'technology abstract' },
+        { name: 'Control Panel', value: 'https://images.unsplash.com/photo-1534035431473-b39d36382162', hint: 'technology abstract' },
         { name: 'Monitor Code', value: 'https://images.unsplash.com/photo-1624996752380-8ec242e0f85d', hint: 'technology code' },
         { name: 'Circuit Board', value: 'https://images.unsplash.com/photo-1581092334651-ddf7d54d9242', hint: 'technology circuit' },
         { name: 'Stripes', value: 'https://images.unsplash.com/photo-1580894732444-8ec5321f7378', hint: 'technology abstract' },
         { name: 'Retro Tech', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'technology abstract' },
         { name: 'Circuit Closeup', value: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b', hint: 'technology circuit' },
-        { name: 'Laptop Code', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'technology code' },
+        { name: 'Control Panel', value: 'https://images.unsplash.com/photo-1619120238346-978e0773b424', hint: 'technology server' },
     ],
 };
 
@@ -102,7 +102,7 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                 description: error.message,
             });
         }
-    }
+    };
 
     return (
         <div className="flex flex-col gap-8">
@@ -190,7 +190,7 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                 </CardContent>
             </Card>
         </div>
-    )
+    );
 }
 
 
