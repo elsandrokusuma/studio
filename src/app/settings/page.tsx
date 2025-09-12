@@ -66,14 +66,14 @@ const wallpaperCategories = {
     ],
     Tech: [
         { name: 'Circuit', value: 'https://picsum.photos/seed/circuit/1920/1080', hint: 'technology circuit' },
-        { name: 'Code', value: 'https://picsum.photos/seed/code/1920/1080', hint: 'technology code' },
+        { name: 'Code', value: 'https://picsum.photos/seed/coding/1920/1080', hint: 'technology code' },
         { name: 'Server', value: 'https://picsum.photos/seed/server/1920/1080', hint: 'technology server' },
         { name: 'Network', value: 'https://picsum.photos/seed/network/1920/1080', hint: 'technology network' },
         { name: 'Binary', value: 'https://picsum.photos/seed/binary/1920/1080', hint: 'technology binary' },
         { name: 'Hardware', value: 'https://picsum.photos/seed/hardware/1920/1080', hint: 'technology hardware' },
         { name: 'Processor', value: 'https://picsum.photos/seed/processor/1920/1080', hint: 'technology processor' },
         { name: 'Abstract', value: 'https://picsum.photos/seed/connect/1920/1080', hint: 'technology abstract' },
-        { name: 'Data', value: 'https://picsum.photos/seed/datascience/1920/1080', hint: 'technology data' },
+        { name: 'Hexagon', value: 'https://picsum.photos/seed/hexagon/1920/1080', hint: 'technology abstract' },
         { name: 'Futuristic', value: 'https://picsum.photos/seed/future/1920/1080', hint: 'technology futuristic' },
     ],
 };
