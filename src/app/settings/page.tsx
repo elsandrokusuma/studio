@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon, Droplets, Contrast } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon, Droplets, Contrast, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -580,6 +580,21 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </button>
+                     <button 
+                        onClick={() => { /* TODO: Implement language settings */ }}
+                        className="flex items-center justify-between w-full p-4 rounded-lg hover:bg-accent transition-colors"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="p-2 bg-primary/10 rounded-md">
+                                <Languages className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="text-left">
+                                <p className="font-semibold">Bahasa</p>
+                                <p className="text-sm text-muted-foreground">Pilih bahasa pilihan Anda.</p>
+                            </div>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </button>
                 </CardContent>
             </Card>
         </div>
@@ -619,3 +634,5 @@ export default function SettingsPage() {
         </div>
     );
 }
+
+    
