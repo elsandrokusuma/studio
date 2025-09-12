@@ -50,18 +50,11 @@ const wallpaperCategories = {
         value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
         hint: 'city architecture',
     })),
-    Tech: [
-        { name: 'Tech 1', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'circuit board' },
-        { name: 'Tech 2', value: 'https://images.unsplash.com/photo-1526374965328-5f61d25c0e56', hint: 'binary code' },
-        { name: 'Tech 3', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'code editor' },
-        { name: 'Tech 4', value: 'https://images.unsplash.com/photo-1614741118884-62ac62b22303', hint: 'abstract network' },
-        { name: 'Tech 5', value: 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b', hint: 'data science' },
-        { name: 'Tech 6', value: 'https://images.unsplash.com/photo-1587831990711-23d72e90422b', hint: 'developer setup' },
-        { name: 'Tech 7', value: 'https://images.unsplash.com/photo-1593720213428-28a5b9e94613', hint: 'web development' },
-        { name: 'Tech 8', value: 'https://images.unsplash.com/photo-1518770660439-4636190af475', hint: 'microchip' },
-        { name: 'Tech 9', value: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b', hint: 'laptop tech' },
-        { name: 'Tech 10', value: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c', hint: 'team collaboration' },
-    ],
+    Tech: Array.from({ length: 10 }, (_, i) => ({
+        name: `Tech ${i + 1}`,
+        value: `https://picsum.photos/seed/tech_${i + 1}/1920/1080`,
+        hint: 'technology abstract',
+    })),
 };
 
 type Category = keyof typeof wallpaperCategories;
@@ -500,7 +493,3 @@ export default function SettingsPage() {
         </div>
     );
 }
-
-    
-
-    
