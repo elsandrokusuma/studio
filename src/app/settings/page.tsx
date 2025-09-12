@@ -52,7 +52,7 @@ const wallpaperCategories = {
     })),
     Tech: [
         { name: 'Tech 1', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'code editor' },
-        { name: 'Tech 2', value: 'https://picsum.photos/seed/circuit/1920/1080', hint: 'circuit board' },
+        { name: 'Tech 2', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'circuit board' },
         { name: 'Tech 3', value: 'https://picsum.photos/seed/server/1920/1080', hint: 'server room' },
         { name: 'Tech 4', value: 'https://picsum.photos/seed/developer/1920/1080', hint: 'developer setup' },
         { name: 'Tech 5', value: 'https://picsum.photos/seed/network/1920/1080', hint: 'network' },
@@ -60,7 +60,7 @@ const wallpaperCategories = {
         { name: 'Tech 7', value: 'https://picsum.photos/seed/data/1920/1080', hint: 'data stream' },
         { name: 'Tech 8', value: 'https://picsum.photos/seed/processor/1920/1080', hint: 'microchip' },
         { name: 'Tech 9', value: 'https://picsum.photos/seed/digital/1920/1080', hint: 'digital art' },
-        { name: 'Tech 10', value: 'https://picsum.photos/seed/abstract/1920/1080', hint: 'abstract tech' },
+        { name: 'Tech 10', value: 'https://images.unsplash.com/photo-1526374965328-5f61d25c0e56', hint: 'binary code' },
     ],
 };
 
@@ -500,3 +500,5 @@ export default function SettingsPage() {
         </div>
     );
 }
+
+    
