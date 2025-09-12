@@ -255,8 +255,8 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
             </header>
             <Card>
                 <CardContent className="p-4 sm:p-6">
-                    <ScrollArea className="h-[calc(100vh-22rem)] no-scrollbar pr-4 -mr-4">
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                    <ScrollArea type="never" className="h-[calc(100vh-22rem)] pr-4 -mr-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                             <div
                                 key="default"
                                 className={cn(
