@@ -100,6 +100,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
+import { useTheme } from "@/hooks/use-theme";
 
 
 const seedData = [
@@ -220,6 +221,157 @@ const seedData = [
   { name: "WD-40 (191 mL)", quantity: 0, photoUrl: "", unit: "Can", price: 55000 },
 ];
 
+const translations = {
+    en: {
+        title: "Inventory",
+        description: "Manage your products and their stock levels.",
+        searchPlaceholder: "Search by item name...",
+        actions: "Actions",
+        importFromCsv: "Import from CSV",
+        exportToCsv: "Export to CSV",
+        seedDatabase: "Seed Database",
+        addItem: "Add Item",
+        addNewItem: "Add New Inventory Item",
+        addNewItemDesc: "Fill in the details below to add a new product.",
+        name: "Name",
+        price: "Price",
+        unit: "Unit",
+        quantity: "Quantity",
+        photoUrl: "Photo",
+        pasteGdrive: "Or paste https://drive.google.com/...",
+        takePhoto: "Take Photo",
+        saveItem: "Save Item",
+        photo: "Photo",
+        status: "Status",
+        inStock: "In Stock",
+        lowStock: "Low Stock",
+        outOfStock: "Out of Stock",
+        createPreOrder: "Create Pre-Order",
+        edit: "Edit",
+        stockIn: "Stock In",
+        stockOut: "Stock Out",
+        deleteItem: "Delete Item",
+        itemPhoto: "Item Photo",
+        itemPhotoDesc: "A larger view of the inventory item's photo.",
+        editItemTitle: (name: string) => `Edit Item: ${name}`,
+        editItemDesc: "Update the details for this item. Changes to quantity will be logged as a transaction.",
+        saveChanges: "Save Changes",
+        recordStockIn: "Record Stock In",
+        recordStockInDesc: "Add new stock received for this item.",
+        item: "Item",
+        selectItem: "Select an item...",
+        from: "From",
+        supplierName: "e.g., Supplier Name",
+        addStock: "Add Stock",
+        recordStockOut: "Record Stock Out",
+        recordStockOutDesc: "Record stock that has been sold or used.",
+        to: "To",
+        customerDept: "e.g., Customer, Department",
+        removeStock: "Remove Stock",
+        areYouSure: "Are you sure?",
+        deleteWarning: (name: string) => `This action cannot be undone. This will permanently delete the item ${name} from your inventory.`,
+        cancel: "Cancel",
+        delete: "Delete",
+        areYouSureSeed: "Are you absolutely sure?",
+        seedWarning: "This action cannot be undone. This will permanently delete all current items in your inventory and replace them with the new data set.",
+        confirmSeed: "Yes, replace my data",
+        cameraTitle: "Take a Photo",
+        cameraDesc: "Point your camera at the item and click 'Capture'.",
+        capture: "Capture",
+        retake: "Retake",
+        savePhoto: "Save Photo",
+        switchCamera: "Switch Camera",
+        importTitle: "Import from CSV",
+        importDesc: "Upload a CSV file to add items to the inventory in bulk. The file must have columns: `name`, `price`, `unit`, `quantity`, and optionally `photoUrl`.",
+        csvFile: "CSV File",
+        importData: "Import Data",
+        importing: "Importing...",
+        unitRequired: "Unit is required",
+        unitRequiredDesc: "Please select a unit for the item.",
+        fieldRequired: "Field Required",
+        fieldRequiredDesc: "This field cannot be empty.",
+        negativeStock: "Stock cannot be negative.",
+        accessDenied: "Access Denied",
+        accessDeniedDesc: "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
+        firebaseNotConfigured: "Firebase Not Configured",
+        firebaseNotConfiguredDesc: "Please configure your Firebase credentials in the environment variables to use this application.",
+    },
+    id: {
+        title: "Inventaris",
+        description: "Kelola produk dan tingkat stok Anda.",
+        searchPlaceholder: "Cari berdasarkan nama barang...",
+        actions: "Aksi",
+        importFromCsv: "Impor dari CSV",
+        exportToCsv: "Ekspor ke CSV",
+        seedDatabase: "Isi Database",
+        addItem: "Tambah Barang",
+        addNewItem: "Tambah Barang Inventaris Baru",
+        addNewItemDesc: "Isi detail di bawah untuk menambahkan produk baru.",
+        name: "Nama",
+        price: "Harga",
+        unit: "Unit",
+        quantity: "Jumlah",
+        photoUrl: "Foto",
+        pasteGdrive: "Atau tempel https://drive.google.com/...",
+        takePhoto: "Ambil Foto",
+        saveItem: "Simpan Barang",
+        photo: "Foto",
+        status: "Status",
+        inStock: "Stok Tersedia",
+        lowStock: "Stok Rendah",
+        outOfStock: "Stok Habis",
+        createPreOrder: "Buat Pra-Pesan",
+        edit: "Ubah",
+        stockIn: "Stok Masuk",
+        stockOut: "Stok Keluar",
+        deleteItem: "Hapus Barang",
+        itemPhoto: "Foto Barang",
+        itemPhotoDesc: "Tampilan lebih besar dari foto barang inventaris.",
+        editItemTitle: (name: string) => `Ubah Barang: ${name}`,
+        editItemDesc: "Perbarui detail untuk barang ini. Perubahan jumlah akan dicatat sebagai transaksi.",
+        saveChanges: "Simpan Perubahan",
+        recordStockIn: "Catat Stok Masuk",
+        recordStockInDesc: "Tambahkan stok baru yang diterima untuk suatu barang.",
+        item: "Barang",
+        selectItem: "Pilih barang...",
+        from: "Dari",
+        supplierName: "contoh: Nama Pemasok",
+        addStock: "Tambah Stok",
+        recordStockOut: "Catat Stok Keluar",
+        recordStockOutDesc: "Catat stok yang telah terjual atau digunakan.",
+        to: "Ke",
+        customerDept: "contoh: Pelanggan, Departemen",
+        removeStock: "Keluarkan Stok",
+        areYouSure: "Apakah Anda yakin?",
+        deleteWarning: (name: string) => `Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen barang ${name} dari inventaris Anda.`,
+        cancel: "Batal",
+        delete: "Hapus",
+        areYouSureSeed: "Apakah Anda benar-benar yakin?",
+        seedWarning: "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen semua barang saat ini di inventaris Anda dan menggantinya dengan kumpulan data baru.",
+        confirmSeed: "Ya, ganti data saya",
+        cameraTitle: "Ambil Foto",
+        cameraDesc: "Arahkan kamera Anda ke barang dan klik 'Ambil'.",
+        capture: "Ambil",
+        retake: "Ulangi",
+        savePhoto: "Simpan Foto",
+        switchCamera: "Ganti Kamera",
+        importTitle: "Impor dari CSV",
+        importDesc: "Unggah file CSV untuk menambahkan barang ke inventaris secara massal. File harus memiliki kolom: `name`, `price`, `unit`, `quantity`, dan opsional `photoUrl`.",
+        csvFile: "File CSV",
+        importData: "Impor Data",
+        importing: "Mengimpor...",
+        unitRequired: "Unit diperlukan",
+        unitRequiredDesc: "Silakan pilih unit untuk barang tersebut.",
+        fieldRequired: "Kolom Diperlukan",
+        fieldRequiredDesc: "Kolom ini tidak boleh kosong.",
+        negativeStock: "Stok tidak boleh negatif.",
+        accessDenied: "Akses Ditolak",
+        accessDeniedDesc: "Anda tidak memiliki izin untuk melihat halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.",
+        firebaseNotConfigured: "Firebase Tidak Dikonfigurasi",
+        firebaseNotConfiguredDesc: "Harap konfigurasikan kredensial Firebase Anda di variabel lingkungan untuk menggunakan aplikasi ini.",
+    }
+};
+
 
 export default function InventoryPage() {
   const [items, setItems] = React.useState<InventoryItem[]>([]);
@@ -241,6 +393,9 @@ export default function InventoryPage() {
   const [layout, setLayout] = React.useState<'list' | 'grid'>('list');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { user, loading: authLoading } = useAuth();
+  const { language } = useTheme();
+
+  const t = language === 'id' ? translations.id : translations.en;
 
 
   // States for camera functionality
@@ -265,7 +420,7 @@ export default function InventoryPage() {
   const [comboOpen, setComboOpen] = React.useState(false)
   const [comboOutOpen, setComboOutOpen] = React.useState(false)
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
-  const [selectedItemName, setSelectedItemName] = React.useState<string>("Select an item...");
+  const [selectedItemName, setSelectedItemName] = React.useState<string>(t.selectItem);
 
 
   React.useEffect(() => {
@@ -304,6 +459,10 @@ export default function InventoryPage() {
     }
   }, [isEditItemOpen, selectedItem]);
   
+   React.useEffect(() => {
+    setSelectedItemName(t.selectItem);
+  }, [t.selectItem]);
+  
 
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -320,8 +479,8 @@ export default function InventoryPage() {
     if (!newItemData.unit) {
         toast({
             variant: "destructive",
-            title: "Unit is required",
-            description: "Please select a unit for the item.",
+            title: t.unitRequired,
+            description: t.unitRequiredDesc,
         });
         return;
     }
@@ -367,7 +526,7 @@ export default function InventoryPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Quantity cannot be negative.",
+        description: t.negativeStock,
       });
       return;
     }
@@ -415,8 +574,8 @@ export default function InventoryPage() {
         if (type === 'out' && !person.trim()) {
           toast({
             variant: "destructive",
-            title: "Field Required",
-            description: "The 'To' field cannot be empty.",
+            title: t.fieldRequired,
+            description: t.fieldRequiredDesc,
           });
           return;
         }
@@ -428,7 +587,7 @@ export default function InventoryPage() {
           toast({
             variant: "destructive",
             title: "Error",
-            description: "Stock cannot be negative.",
+            description: t.negativeStock,
           });
           return;
         }
@@ -446,7 +605,7 @@ export default function InventoryPage() {
         else setStockOutOpen(false);
         
         setSelectedItemId(null);
-        setSelectedItemName("Select an item...");
+        setSelectedItemName(t.selectItem);
       } catch (error) {
         console.error("Error updating stock:", error);
         toast({ variant: "destructive", title: "Failed to update stock" });
@@ -732,9 +891,9 @@ export default function InventoryPage() {
         <div className="p-4 bg-destructive/10 rounded-full mb-4">
             <Ban className="h-12 w-12 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <h1 className="text-2xl font-bold">{t.accessDenied}</h1>
         <p className="text-muted-foreground max-w-sm">
-            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+            {t.accessDeniedDesc}
         </p>
       </div>
     );
@@ -744,9 +903,9 @@ export default function InventoryPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <Alert variant="destructive" className="max-w-md">
-          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertTitle>{t.firebaseNotConfigured}</AlertTitle>
           <AlertDescription>
-            Please configure your Firebase credentials in the environment variables to use this application.
+            {t.firebaseNotConfiguredDesc}
           </AlertDescription>
         </Alert>
       </div>
@@ -757,9 +916,9 @@ export default function InventoryPage() {
     <div className="flex flex-col gap-8">
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
           <p className="text-muted-foreground">
-            Manage your products and their stock levels.
+            {t.description}
           </p>
         </div>
         <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
@@ -767,7 +926,7 @@ export default function InventoryPage() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search by item name..."
+              placeholder={t.searchPlaceholder}
               className="pl-8 w-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -785,23 +944,23 @@ export default function InventoryPage() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full md:w-auto">
-                    Actions
+                    {t.actions}
                     <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                 <DropdownMenuItem onSelect={() => setImportOpen(true)}>
                     <Upload className="mr-2 h-4 w-4" />
-                    Import from CSV
+                    {t.importFromCsv}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={handleExportCsv}>
                     <Download className="mr-2 h-4 w-4" />
-                    Export to CSV
+                    {t.exportToCsv}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => setSeedConfirmOpen(true)} className="text-red-600 focus:text-red-700">
                     <Database className="mr-2 h-4 w-4" />
-                    Seed Database
+                    {t.seedDatabase}
                 </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -810,14 +969,13 @@ export default function InventoryPage() {
           <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Import from CSV</DialogTitle>
+                <DialogTitle>{t.importTitle}</DialogTitle>
                 <DialogDescription>
-                  Upload a CSV file to add items to the inventory in bulk.
-                  The file must have columns: `name`, `price`, `unit`, `quantity`, and optionally `photoUrl`.
+                  {t.importDesc}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                  <Label htmlFor="csv-file">CSV File</Label>
+                  <Label htmlFor="csv-file">{t.csvFile}</Label>
                   <Input 
                     id="csv-file" 
                     type="file" 
@@ -827,7 +985,7 @@ export default function InventoryPage() {
               </div>
               <DialogFooter>
                 <Button onClick={handleImportCsv} disabled={!csvFile || isImporting}>
-                  {isImporting ? 'Importing...' : 'Import Data'}
+                  {isImporting ? t.importing : t.importData}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -837,27 +995,27 @@ export default function InventoryPage() {
                 <DialogTrigger asChild>
                 <Button className="w-full md:w-auto">
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Item
+                    {t.addItem}
                 </Button>
                 </DialogTrigger>
                 <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add New Inventory Item</DialogTitle>
+                    <DialogTitle>{t.addNewItem}</DialogTitle>
                     <DialogDescription>
-                    Fill in the details below to add a new product.
+                    {t.addNewItemDesc}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleAddItem} className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">Name</Label>
+                    <Label htmlFor="name" className="text-right">{t.name}</Label>
                     <Input id="name" name="name" className="col-span-3" required />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right">Price</Label>
+                    <Label htmlFor="price" className="text-right">{t.price}</Label>
                     <Input id="price" name="price" type="number" className="col-span-3" required />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="unit" className="text-right">Unit</Label>
+                    <Label htmlFor="unit" className="text-right">{t.unit}</Label>
                     <Select name="unit" required onValueChange={setSelectedUnit}>
                         <SelectTrigger className="col-span-3">
                         <SelectValue placeholder="Select a unit" />
@@ -877,29 +1035,29 @@ export default function InventoryPage() {
                     </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="quantity" className="text-right">Quantity</Label>
+                    <Label htmlFor="quantity" className="text-right">{t.quantity}</Label>
                     <Input id="quantity" name="quantity" type="number" className="col-span-3" required />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="photoUrl" className="text-right">Photo</Label>
+                    <Label htmlFor="photoUrl" className="text-right">{t.photoUrl}</Label>
                     <div className="col-span-3 flex items-center gap-2">
                         <Input 
                             id="photoUrl" 
                             name="photoUrl" 
                             type="text" 
-                            placeholder="Or paste https://drive.google.com/..." 
+                            placeholder={t.pasteGdrive} 
                             className="flex-grow"
                             value={photoUrl}
                             onChange={(e) => setPhotoUrl(e.target.value)}
                         />
                         <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
                             <Camera className="h-4 w-4" />
-                            <span className="sr-only">Take Photo</span>
+                            <span className="sr-only">{t.takePhoto}</span>
                         </Button>
                     </div>
                     </div>
                     <DialogFooter>
-                    <Button type="submit">Save Item</Button>
+                    <Button type="submit">{t.saveItem}</Button>
                     </DialogFooter>
                 </form>
                 </DialogContent>
@@ -915,14 +1073,14 @@ export default function InventoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[80px] hidden sm:table-cell">Photo</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="hidden md:table-cell">Unit</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="text-right">Quantity</TableHead>
+                    <TableHead className="w-[80px] hidden sm:table-cell">{t.photo}</TableHead>
+                    <TableHead>{t.name}</TableHead>
+                    <TableHead>{t.price}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t.unit}</TableHead>
+                    <TableHead className="text-center">{t.status}</TableHead>
+                    <TableHead className="text-right">{t.quantity}</TableHead>
                     <TableHead>
-                      <span className="sr-only">Actions</span>
+                      <span className="sr-only">{t.actions}</span>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -965,7 +1123,7 @@ export default function InventoryPage() {
                             'bg-red-100 text-red-800'
                           }
                         >
-                          {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
+                          {item.quantity > 5 ? t.inStock : item.quantity > 0 ? t.lowStock : t.outOfStock}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
@@ -979,9 +1137,9 @@ export default function InventoryPage() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
                                 <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
-                                <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                                <ShoppingCart className="mr-2 h-4 w-4" /> {t.createPreOrder}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                 onSelect={() => {
@@ -989,7 +1147,7 @@ export default function InventoryPage() {
                                     setEditItemOpen(true);
                                 }}
                                 >
-                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                <Pencil className="mr-2 h-4 w-4" /> {t.edit}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                 onSelect={() => {
@@ -998,7 +1156,7 @@ export default function InventoryPage() {
                                     setStockInOpen(true);
                                 }}
                                 >
-                                <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                                <ArrowDownCircle className="mr-2 h-4 w-4" /> {t.stockIn}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                 onSelect={() => {
@@ -1007,7 +1165,7 @@ export default function InventoryPage() {
                                     setStockOutOpen(true);
                                 }}
                                 >
-                                <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                                <ArrowUpCircle className="mr-2 h-4 w-4" /> {t.stockOut}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -1017,7 +1175,7 @@ export default function InventoryPage() {
                                     setDeleteOpen(true);
                                 }}
                                 >
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                                <Trash2 className="mr-2 h-4 w-4" /> {t.deleteItem}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                             </DropdownMenu>
@@ -1068,22 +1226,22 @@ export default function InventoryPage() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
                                 <DropdownMenuItem onSelect={() => handleCreatePreOrder(item)}>
-                                <ShoppingCart className="mr-2 h-4 w-4" /> Create Pre-Order
+                                <ShoppingCart className="mr-2 h-4 w-4" /> {t.createPreOrder}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onSelect={() => { setSelectedItem(item); setEditItemOpen(true); }}>
-                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                <Pencil className="mr-2 h-4 w-4" /> {t.edit}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockInOpen(true); }}>
-                                <ArrowDownCircle className="mr-2 h-4 w-4" /> Stock In
+                                <ArrowDownCircle className="mr-2 h-4 w-4" /> {t.stockIn}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onSelect={() => { setSelectedItemId(item.id); setSelectedItemName(item.name); setStockOutOpen(true); }}>
-                                <ArrowUpCircle className="mr-2 h-4 w-4" /> Stock Out
+                                <ArrowUpCircle className="mr-2 h-4 w-4" /> {t.stockOut}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedItem(item); setDeleteOpen(true); }}>
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete Item
+                                <Trash2 className="mr-2 h-4 w-4" /> {t.deleteItem}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                             </DropdownMenu>
@@ -1104,7 +1262,7 @@ export default function InventoryPage() {
                         'bg-red-100 text-red-800'
                       }
                     >
-                      {item.quantity > 5 ? "In Stock" : item.quantity > 0 ? "Low Stock" : "Out of Stock"}
+                      {item.quantity > 5 ? t.inStock : item.quantity > 0 ? t.lowStock : t.outOfStock}
                     </Badge>
                      <div className="text-right">
                         <p className="font-bold text-lg">{item.quantity}</p>
@@ -1121,9 +1279,9 @@ export default function InventoryPage() {
       <Dialog open={isPhotoOpen} onOpenChange={setPhotoOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Item Photo</DialogTitle>
+            <DialogTitle>{t.itemPhoto}</DialogTitle>
             <DialogDescription>
-              A larger view of the inventory item's photo.
+             {t.itemPhotoDesc}
             </DialogDescription>
           </DialogHeader>
           {photoToShow && (
@@ -1143,22 +1301,22 @@ export default function InventoryPage() {
       <Dialog open={isEditItemOpen} onOpenChange={setEditItemOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Item: {selectedItem?.name}</DialogTitle>
+            <DialogTitle>{t.editItemTitle(selectedItem?.name || '')}</DialogTitle>
             <DialogDescription>
-             Update the details for this item. Changes to quantity will be logged as a transaction.
+             {t.editItemDesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEditItem} className="grid gap-4 py-4">
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">Name</Label>
+              <Label htmlFor="name" className="text-right">{t.name}</Label>
               <Input id="name" name="name" className="col-span-3" defaultValue={selectedItem?.name} required />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="price" className="text-right">Price</Label>
+              <Label htmlFor="price" className="text-right">{t.price}</Label>
               <Input id="price" name="price" type="number" className="col-span-3" defaultValue={selectedItem?.price} required />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="unit" className="text-right">Unit</Label>
+              <Label htmlFor="unit" className="text-right">{t.unit}</Label>
               <Select name="unit" defaultValue={selectedItem?.unit} onValueChange={setSelectedUnit}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a unit" />
@@ -1178,26 +1336,26 @@ export default function InventoryPage() {
               </Select>
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="photoUrl" className="text-right">Photo</Label>
+              <Label htmlFor="photoUrl" className="text-right">{t.photoUrl}</Label>
               <div className="col-span-3 flex items-center gap-2">
                 <Input 
                   id="photoUrl" 
                   name="photoUrl" 
                   type="text" 
-                  placeholder="Or paste https://drive.google.com/..." 
+                  placeholder={t.pasteGdrive}
                   className="flex-grow" 
                   value={photoUrl}
                   onChange={(e) => setPhotoUrl(e.target.value)}
                 />
                  <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
                     <Camera className="h-4 w-4" />
-                    <span className="sr-only">Take Photo</span>
+                    <span className="sr-only">{t.takePhoto}</span>
                   </Button>
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="quantity" className="text-right">
-                Quantity
+                {t.quantity}
               </Label>
               <Input
                 id="quantity"
@@ -1210,7 +1368,7 @@ export default function InventoryPage() {
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{t.saveChanges}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1218,17 +1376,17 @@ export default function InventoryPage() {
 
 
       {/* Stock In Dialog */}
-      <Dialog open={isStockInOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setStockInOpen(isOpen); }}>
+      <Dialog open={isStockInOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName(t.selectItem); } setStockInOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Record Stock In</DialogTitle>
+            <DialogTitle>{t.recordStockIn}</DialogTitle>
             <DialogDescription>
-              Add new stock received for this item.
+              {t.recordStockInDesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleStockUpdate("in")} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="item" className="text-right">Item</Label>
+              <Label htmlFor="item" className="text-right">{t.item}</Label>
               <div className="col-span-3">
                 <Popover open={comboOpen} onOpenChange={setComboOpen}>
                     <PopoverTrigger asChild>
@@ -1275,17 +1433,17 @@ export default function InventoryPage() {
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="quantity" className="text-right">Quantity</Label>
+              <Label htmlFor="quantity" className="text-right">{t.quantity}</Label>
               <Input id="quantity" name="quantity" type="number" className="col-span-3" required min="1" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="person" className="text-right">From</Label>
-              <Input id="person" name="person" placeholder="e.g., Supplier Name" className="col-span-3" />
+              <Label htmlFor="person" className="text-right">{t.from}</Label>
+              <Input id="person" name="person" placeholder={t.supplierName} className="col-span-3" />
             </div>
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Add Stock
+                {t.addStock}
               </Button>
             </DialogFooter>
           </form>
@@ -1293,17 +1451,17 @@ export default function InventoryPage() {
       </Dialog>
 
       {/* Stock Out Dialog */}
-      <Dialog open={isStockOutOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName("Select an item..."); } setStockOutOpen(isOpen); }}>
+      <Dialog open={isStockOutOpen} onOpenChange={(isOpen) => { if(!isOpen) { setSelectedItemId(null); setSelectedItemName(t.selectItem); } setStockOutOpen(isOpen); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Record Stock Out</DialogTitle>
+            <DialogTitle>{t.recordStockOut}</DialogTitle>
             <DialogDescription>
-              Record stock that has been sold or used.
+              {t.recordStockOutDesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleStockUpdate("out")} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="item" className="text-right">Item</Label>
+                <Label htmlFor="item" className="text-right">{t.item}</Label>
                 <div className="col-span-3">
                     <Popover open={comboOutOpen} onOpenChange={setComboOutOpen}>
                         <PopoverTrigger asChild>
@@ -1350,17 +1508,17 @@ export default function InventoryPage() {
                 </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="quantity" className="text-right">Quantity</Label>
+              <Label htmlFor="quantity" className="text-right">{t.quantity}</Label>
               <Input id="quantity" name="quantity" type="number" className="col-span-3" required min="1" max={selectedItemForStockOut?.quantity} />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="person" className="text-right">To</Label>
-              <Input id="person" name="person" placeholder="e.g., Customer, Department" className="col-span-3" required />
+              <Label htmlFor="person" className="text-right">{t.to}</Label>
+              <Input id="person" name="person" placeholder={t.customerDept} className="col-span-3" required />
             </div>
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Remove Stock
+                {t.removeStock}
               </Button>
             </DialogFooter>
           </form>
@@ -1371,17 +1529,15 @@ export default function InventoryPage() {
        <AlertDialog open={isDeleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t.areYouSure}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the item
-              <span className="font-semibold"> {selectedItem?.name} </span>
-              from your inventory.
+              {t.deleteWarning(selectedItem?.name || '')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setSelectedItem(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setSelectedItem(null)}>{t.cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteItem}>
-              Delete
+              {t.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1391,15 +1547,15 @@ export default function InventoryPage() {
        <AlertDialog open={isSeedConfirmOpen} onOpenChange={setSeedConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t.areYouSureSeed}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete all current items in your inventory and replace them with the new data set.
+              {t.seedWarning}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={handleSeedDatabase}>
-              Yes, replace my data
+              {t.confirmSeed}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1409,9 +1565,9 @@ export default function InventoryPage() {
       <Dialog open={isCameraOpen} onOpenChange={(isOpen) => { setCameraOpen(isOpen); setCapturedImage(null); }}>
           <DialogContent className="max-w-2xl">
               <DialogHeader>
-                  <DialogTitle>Take a Photo</DialogTitle>
+                  <DialogTitle>{t.cameraTitle}</DialogTitle>
                   <DialogDescription>
-                      Point your camera at the item and click "Capture".
+                      {t.cameraDesc}
                   </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4">
@@ -1432,16 +1588,16 @@ export default function InventoryPage() {
               <DialogFooter>
                   {capturedImage ? (
                       <>
-                          <Button variant="outline" onClick={() => setCapturedImage(null)}>Retake</Button>
-                          <Button onClick={handleSavePhoto}>Save Photo</Button>
+                          <Button variant="outline" onClick={() => setCapturedImage(null)}>{t.retake}</Button>
+                          <Button onClick={handleSavePhoto}>{t.savePhoto}</Button>
                       </>
                   ) : (
                     <div className="flex justify-center items-center w-full relative">
-                        <Button onClick={handleCapture} disabled={!hasCameraPermission}>Capture</Button>
+                        <Button onClick={handleCapture} disabled={!hasCameraPermission}>{t.capture}</Button>
                         {videoDevices.length > 1 && (
                           <Button variant="outline" size="icon" onClick={handleSwitchCamera} disabled={!hasCameraPermission} className="absolute right-0">
                             <SwitchCamera className="h-4 w-4" />
-                            <span className="sr-only">Switch Camera</span>
+                            <span className="sr-only">{t.switchCamera}</span>
                           </Button>
                         )}
                     </div>
