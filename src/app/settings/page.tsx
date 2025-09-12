@@ -166,6 +166,16 @@ const translations = {
         wallpaperUpdatedDesc: 'Your background wallpaper has been changed.',
         fileTooLarge: 'File Too Large',
         fileTooLargeDesc: 'Image size cannot exceed 5MB.',
+        languages: {
+            'English': 'English',
+            'Indonesia': 'Indonesia',
+            'Español': 'Español',
+            'Français': 'Français',
+            'Deutsch': 'Deutsch',
+            '日本語': '日本語',
+            '한국어': '한국어',
+            '简体中文': '简体中文',
+        },
     },
     id: {
         backToSettings: 'Kembali ke Pengaturan',
@@ -217,6 +227,16 @@ const translations = {
         wallpaperUpdatedDesc: 'Wallpaper latar belakang Anda telah diubah.',
         fileTooLarge: 'File Terlalu Besar',
         fileTooLargeDesc: 'Ukuran gambar tidak boleh melebihi 5MB.',
+        languages: {
+            'English': 'Inggris',
+            'Indonesia': 'Indonesia',
+            'Español': 'Spanyol',
+            'Français': 'Prancis',
+            'Deutsch': 'Jerman',
+            '日本語': 'Jepang',
+            '한국어': 'Korea',
+            '简体中文': 'Mandarin (Sederhana)',
+        },
     }
 };
 
@@ -339,9 +359,10 @@ function LanguageSettings({ onBack }: { onBack: () => void }) {
     const handleLanguageSelect = (code: string) => {
         setLanguage(code as 'id' | 'en');
         const selectedLang = languages.find(l => l.code === code);
+        const translatedLangName = t.languages[selectedLang?.name as keyof typeof t.languages] || selectedLang?.name;
         addNotification({
             title: t.languageUpdated,
-            description: t.languageUpdatedDesc(selectedLang?.name || ''),
+            description: t.languageUpdatedDesc(translatedLangName || ''),
             icon: Languages,
         });
     };
@@ -369,7 +390,7 @@ function LanguageSettings({ onBack }: { onBack: () => void }) {
                                     language === lang.code ? "bg-accent text-accent-foreground" : "hover:bg-accent"
                                 )}
                             >
-                                <span>{lang.name}</span>
+                                <span>{t.languages[lang.name as keyof typeof t.languages]}</span>
                                 {language === lang.code && <Check className="h-5 w-5 text-primary" />}
                             </button>
                         ))}
