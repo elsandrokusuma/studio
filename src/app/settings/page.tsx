@@ -28,7 +28,6 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNotifications } from '@/hooks/use-notifications';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -39,11 +38,56 @@ const colors: { name: Color, bgColor: string }[] = [
     { name: 'violet', bgColor: 'bg-violet-500' },
 ];
 
-const galleryWallpapers = Array.from({ length: 40 }, (_, i) => ({
-    name: `Random ${i + 1}`,
-    value: `https://picsum.photos/seed/${i + 1}/600/400`,
-    hint: `abstract random`,
-}));
+const galleryWallpapers = [
+    // Abstract
+    { name: 'Abstract 1', value: 'https://picsum.photos/seed/101/600/400', hint: 'abstract art' },
+    { name: 'Abstract 2', value: 'https://picsum.photos/seed/102/600/400', hint: 'abstract colorful' },
+    { name: 'Abstract 3', value: 'https://picsum.photos/seed/103/600/400', hint: 'abstract geometric' },
+    { name: 'Abstract 4', value: 'https://picsum.photos/seed/104/600/400', hint: 'abstract light' },
+    { name: 'Abstract 5', value: 'https://picsum.photos/seed/105/600/400', hint: 'abstract dark' },
+    // Nature
+    { name: 'Nature 1', value: 'https://picsum.photos/seed/201/600/400', hint: 'nature forest' },
+    { name: 'Nature 2', value: 'https://picsum.photos/seed/202/600/400', hint: 'nature leaves' },
+    { name: 'Nature 3', value: 'https://picsum.photos/seed/203/600/400', hint: 'nature flower' },
+    { name: 'Nature 4', value: 'https://picsum.photos/seed/204/600/400', hint: 'nature field' },
+    { name: 'Nature 5', value: 'https://picsum.photos/seed/205/600/400', hint: 'nature tree' },
+    // Beach & Ocean
+    { name: 'Beach 1', value: 'https://picsum.photos/seed/301/600/400', hint: 'beach sand' },
+    { name: 'Beach 2', value: 'https://picsum.photos/seed/302/600/400', hint: 'beach sunset' },
+    { name: 'Ocean 1', value: 'https://picsum.photos/seed/303/600/400', hint: 'ocean waves' },
+    { name: 'Ocean 2', value: 'https://picsum.photos/seed/304/600/400', hint: 'ocean underwater' },
+    { name: 'Beach 3', value: 'https://picsum.photos/seed/305/600/400', hint: 'beach tropical' },
+    // Mountains
+    { name: 'Mountain 1', value: 'https://picsum.photos/seed/401/600/400', hint: 'mountains snow' },
+    { name: 'Mountain 2', value: 'https://picsum.photos/seed/402/600/400', hint: 'mountains valley' },
+    { name: 'Mountain 3', value: 'https://picsum.photos/seed/403/600/400', hint: 'mountains sunrise' },
+    { name: 'Mountain 4', value: 'https://picsum.photos/seed/404/600/400', hint: 'mountains lake' },
+    { name: 'Mountain 5', value: 'https://picsum.photos/seed/405/600/400', hint: 'mountains forest' },
+    // City Light Night
+    { name: 'City 1', value: 'https://picsum.photos/seed/501/600/400', hint: 'city night' },
+    { name: 'City 2', value: 'https://picsum.photos/seed/502/600/400', hint: 'city lights' },
+    { name: 'City 3', value: 'https://picsum.photos/seed/503/600/400', hint: 'city skyline' },
+    { name: 'City 4', value: 'https://picsum.photos/seed/504/600/400', hint: 'city traffic' },
+    { name: 'City 5', value: 'https://picsum.photos/seed/505/600/400', hint: 'city street' },
+    // Technology
+    { name: 'Technology 1', value: 'https://picsum.photos/seed/601/600/400', hint: 'technology circuit' },
+    { name: 'Technology 2', value: 'https://picsum.photos/seed/602/600/400', hint: 'technology code' },
+    { name: 'Technology 3', value: 'https://picsum.photos/seed/603/600/400', hint: 'technology futuristic' },
+    { name: 'Technology 4', value: 'https://picsum.photos/seed/604/600/400', hint: 'technology server' },
+    { name: 'Technology 5', value: 'https://picsum.photos/seed/605/600/400', hint: 'technology data' },
+    // Pattern
+    { name: 'Pattern 1', value: 'https://picsum.photos/seed/701/600/400', hint: 'pattern geometric' },
+    { name: 'Pattern 2', value: 'https://picsum.photos/seed/702/600/400', hint: 'pattern texture' },
+    { name: 'Pattern 3', value: 'https://picsum.photos/seed/703/600/400', hint: 'pattern lines' },
+    { name: 'Pattern 4', value: 'https://picsum.photos/seed/704/600/400', hint: 'pattern minimal' },
+    { name: 'Pattern 5', value: 'https://picsum.photos/seed/705/600/400', hint: 'pattern wood' },
+    // Bonus Mix
+    { name: 'Bonus 1', value: 'https://picsum.photos/seed/801/600/400', hint: 'animal wildlife' },
+    { name: 'Bonus 2', value: 'https://picsum.photos/seed/802/600/400', hint: 'car vintage' },
+    { name: 'Bonus 3', value: 'https://picsum.photos/seed/803/600/400', hint: 'space galaxy' },
+    { name: 'Bonus 4', value: 'https://picsum.photos/seed/804/600/400', hint: 'food delicious' },
+    { name: 'Bonus 5', value: 'https://picsum.photos/seed/805/600/400', hint: 'architecture modern' },
+];
 
 
 type ActiveMenu = 'main' | 'appearance' | 'account';
@@ -203,7 +247,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 icon: ImageIcon,
             });
         };
-        reader.readAsDataURL(file);
+        reader.readDataURL(file);
     };
 
     const renderWallpaperSelection = () => (
@@ -257,10 +301,10 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
     return (
         <div className="relative overflow-x-hidden no-scrollbar" style={{ minHeight: 'calc(100vh - 200px)' }}>
             <div className={cn(
-                "w-full transition-transform duration-300 ease-in-out",
+                "w-full transition-transform duration-300 ease-in-out no-scrollbar",
                 activeSubMenu !== 'main' && "-translate-x-full opacity-0 absolute"
             )}>
-                 <div className="flex flex-col gap-8 no-scrollbar">
+                 <div className="flex flex-col gap-8">
                     <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Kembali ke Pengaturan
