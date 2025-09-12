@@ -84,7 +84,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTheme } from "@/hooks/use-theme";
 
 
 type GroupedPO = {
@@ -96,6 +96,141 @@ type GroupedPO = {
   status: PreOrder['status'];
   orderDate: string;
   expectedDate: string;
+};
+
+const translations = {
+    en: {
+        title: "Pre-Order & Approval",
+        description: "Manage all stationery pre-orders and approvals in one place.",
+        allStatuses: "All Statuses",
+        filterByDate: "Filter by date",
+        addItemToPO: "Add Item to PO",
+        createNewPO: "Create New PO",
+        requestApproval: "Request Approval",
+        export: "Export",
+        selectAll: "Select all",
+        pending: "Pending",
+        awaitingApproval: "Awaiting Approval",
+        approved: "Approved",
+        rejected: "Rejected",
+        fulfilled: "Fulfilled",
+        cancelled: "Cancelled",
+        units: "units",
+        item: "Item",
+        unit: "Unit",
+        status: "Status",
+        qty: "Qty",
+        price: "Price",
+        total: "Total",
+        actions: "Actions",
+        markAsApproved: "Mark as Approved",
+        undo: "Undo",
+        undoDecision: "Undo Decision",
+        cancelOrder: "Cancel Order",
+        delete: "Delete",
+        edit: "Edit",
+        approve: "Approve",
+        reject: "Reject",
+        markAsFulfilled: "Mark as Fulfilled",
+        totalQuantity: "Total Quantity",
+        expectedDelivery: "Expected Delivery",
+        noPreOrdersTitle: "No pre-orders found",
+        noPreOrdersDesc: "Create your first pre-order to get started.",
+        areYouSure: "Are you sure?",
+        deleteWarning: (po: string) => `This action cannot be undone. This will permanently delete the pre-order ${po} and all its items.`,
+        cancelBtn: "Cancel",
+        deleteBtn: "Delete",
+        editItemTitle: (name: string) => `Edit Item: ${name}`,
+        editItemDesc: "Update the quantity, unit, or price for this item.",
+        saveChanges: "Save Changes",
+        deleteItemTitle: "Delete this item?",
+        deleteItemDesc: (name: string) => `This will permanently remove ${name} from this pre-order. This action cannot be undone.`,
+        deleteItemBtn: "Delete Item",
+        fulfillItemTitle: (name: string) => `Fulfill Item: ${name}`,
+        fulfillItemDesc: "Confirm the quantity of items received to add them to your inventory.",
+        quantityReceived: "Quantity Received",
+        confirmAndAdd: "Confirm & Add to Stock",
+        addItemTitle: (po: string) => `Add Item to ${po}`,
+        createNewPOTitle: "Create New Pre-Order",
+        addItemDesc: "Add another item to your pending pre-order.",
+        createNewPODesc: "Fill in the details for the first item of your new pre-order.",
+        poNumber: "PO Number",
+        expectedDate: "Expected Date",
+        addItemBtn: "Add Item",
+        accessDenied: "Access Denied",
+        accessDeniedDesc: "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
+        firebaseNotConfigured: "Firebase Not Configured",
+        firebaseNotConfiguredDesc: "Please configure your Firebase credentials to use this application.",
+        selectItem: "Select an item...",
+        searchItem: "Search item...",
+        noItemFound: "No item found.",
+    },
+    id: {
+        title: "Pra-Pesan & Persetujuan",
+        description: "Kelola semua pra-pesan dan persetujuan alat tulis di satu tempat.",
+        allStatuses: "Semua Status",
+        filterByDate: "Saring berdasarkan tanggal",
+        addItemToPO: "Tambah Item ke PO",
+        createNewPO: "Buat PO Baru",
+        requestApproval: "Minta Persetujuan",
+        export: "Ekspor",
+        selectAll: "Pilih semua",
+        pending: "Tertunda",
+        awaitingApproval: "Menunggu Persetujuan",
+        approved: "Disetujui",
+        rejected: "Ditolak",
+        fulfilled: "Terpenuhi",
+        cancelled: "Dibatalkan",
+        units: "unit",
+        item: "Barang",
+        unit: "Unit",
+        status: "Status",
+        qty: "Jml",
+        price: "Harga",
+        total: "Total",
+        actions: "Aksi",
+        markAsApproved: "Tandai Disetujui",
+        undo: "Batalkan",
+        undoDecision: "Batalkan Keputusan",
+        cancelOrder: "Batalkan Pesanan",
+        delete: "Hapus",
+        edit: "Ubah",
+        approve: "Setujui",
+        reject: "Tolak",
+        markAsFulfilled: "Tandai Terpenuhi",
+        totalQuantity: "Total Kuantitas",
+        expectedDelivery: "Perkiraan Pengiriman",
+        noPreOrdersTitle: "Tidak ada pra-pesan ditemukan",
+        noPreOrdersDesc: "Buat pra-pesan pertama Anda untuk memulai.",
+        areYouSure: "Apakah Anda yakin?",
+        deleteWarning: (po: string) => `Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen pra-pesan ${po} dan semua itemnya.`,
+        cancelBtn: "Batal",
+        deleteBtn: "Hapus",
+        editItemTitle: (name: string) => `Ubah Item: ${name}`,
+        editItemDesc: "Perbarui jumlah, unit, atau harga untuk item ini.",
+        saveChanges: "Simpan Perubahan",
+        deleteItemTitle: "Hapus item ini?",
+        deleteItemDesc: (name: string) => `Ini akan menghapus ${name} secara permanen dari pra-pesan ini. Tindakan ini tidak dapat dibatalkan.`,
+        deleteItemBtn: "Hapus Item",
+        fulfillItemTitle: (name: string) => `Penuhi Item: ${name}`,
+        fulfillItemDesc: "Konfirmasi jumlah barang yang diterima untuk ditambahkan ke inventaris Anda.",
+        quantityReceived: "Jumlah Diterima",
+        confirmAndAdd: "Konfirmasi & Tambah ke Stok",
+        addItemTitle: (po: string) => `Tambah Item ke ${po}`,
+        createNewPOTitle: "Buat Pra-Pesan Baru",
+        addItemDesc: "Tambahkan item lain ke pra-pesan Anda yang tertunda.",
+        createNewPODesc: "Isi detail untuk item pertama dari pra-pesan baru Anda.",
+        poNumber: "Nomor PO",
+        expectedDate: "Tanggal Perkiraan",
+        addItemBtn: "Tambah Item",
+        accessDenied: "Akses Ditolak",
+        accessDeniedDesc: "Anda tidak memiliki izin untuk melihat halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.",
+        firebaseNotConfigured: "Firebase Tidak Dikonfigurasi",
+        firebaseNotConfiguredDesc: "Harap konfigurasikan kredensial Firebase Anda untuk menggunakan aplikasi ini.",
+        selectItem: "Pilih item...",
+        searchItem: "Cari item...",
+        noItemFound: "Item tidak ditemukan.",
+    }
 };
 
 export function PreOrdersClient({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
@@ -117,6 +252,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [loading, setLoading] = React.useState(true);
   const [openAccordion, setOpenAccordion] = React.useState<string | undefined>();
   const { user, loading: authLoading } = useAuth();
+  const { language } = useTheme();
+  
+  const t = language === 'id' ? translations.id : translations.en;
 
   // States for editing/deleting individual items
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
@@ -135,7 +273,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   // State for combobox
   const [comboPoOpen, setComboPoOpen] = React.useState(false);
   const [selectedItemId, setSelectedItemId] = React.useState<string | undefined>();
-  const [selectedItemName, setSelectedItemName] = React.useState<string>("Select an item...");
+  const [selectedItemName, setSelectedItemName] = React.useState<string>(t.selectItem);
   
   React.useEffect(() => {
     if (!db) {
@@ -202,6 +340,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     }
   }, [preOrders]);
 
+  React.useEffect(() => {
+    setSelectedItemName(t.selectItem);
+  }, [t.selectItem]);
 
   const handleCreatePreOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -236,7 +377,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     setCreateOpen(false);
     setSelectedUnit(undefined);
     setSelectedItemId(undefined);
-    setSelectedItemName("Select an item...");
+    setSelectedItemName(t.selectItem);
     setPoPrice("");
     (e.target as HTMLFormElement).reset();
   };
@@ -561,13 +702,25 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       setPoPrice(item.price);
       setSelectedUnit(item.unit);
     } else {
-      setSelectedItemName("Select an item...")
+      setSelectedItemName(t.selectItem)
       setSelectedItemId(undefined);
       setPoPrice("");
       setSelectedUnit(undefined);
     }
     setComboPoOpen(false);
   };
+
+  const getStatusText = (status: PreOrder['status']) => {
+    const statusMap: Record<PreOrder['status'], string> = {
+      'Pending': t.pending,
+      'Awaiting Approval': t.awaitingApproval,
+      'Approved': t.approved,
+      'Rejected': t.rejected,
+      'Fulfilled': t.fulfilled,
+      'Cancelled': t.cancelled,
+    };
+    return statusMap[status] || status;
+  }
 
   const groupedPreOrders = React.useMemo(() => {
     const groups: { [key: string]: PreOrder[] } = {};
@@ -585,7 +738,6 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         if (orders.some(o => o.status === 'Awaiting Approval')) return 'Awaiting Approval';
         if (orders.some(o => o.status === 'Rejected')) return 'Rejected';
         if (orders.some(o => o.status === 'Pending')) return 'Pending';
-        // If all items are either Approved or Fulfilled, the overall status is Approved
         if (orders.every(o => ['Approved', 'Fulfilled'].includes(o.status))) return 'Approved';
         return 'Awaiting Approval';
       };
@@ -638,9 +790,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         <div className="p-4 bg-destructive/10 rounded-full mb-4">
             <Ban className="h-12 w-12 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <h1 className="text-2xl font-bold">{t.accessDenied}</h1>
         <p className="text-muted-foreground max-w-sm">
-            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+            {t.accessDeniedDesc}
         </p>
       </div>
     );
@@ -650,9 +802,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     return (
       <div className="flex items-center justify-center h-full">
         <Alert variant="destructive" className="max-w-md">
-          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertTitle>{t.firebaseNotConfigured}</AlertTitle>
           <AlertDescription>
-            Please configure your Firebase credentials to use this application.
+            {t.firebaseNotConfiguredDesc}
           </AlertDescription>
         </Alert>
       </div>
@@ -664,24 +816,24 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     <div className="flex flex-col gap-8">
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pre-Order &amp; Approval</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
           <p className="text-muted-foreground">
-            Manage all stationery pre-orders and approvals in one place.
+            {t.description}
           </p>
         </div>
         <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
            <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={t.allStatuses} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Awaiting Approval">Awaiting Approval</SelectItem>
-              <SelectItem value="Approved">Approved</SelectItem>
-              <SelectItem value="Rejected">Rejected</SelectItem>
-              <SelectItem value="Fulfilled">Fulfilled</SelectItem>
-              <SelectItem value="Cancelled">Cancelled</SelectItem>
+              <SelectItem value="all">{t.allStatuses}</SelectItem>
+              <SelectItem value="Pending">{t.pending}</SelectItem>
+              <SelectItem value="Awaiting Approval">{t.awaitingApproval}</SelectItem>
+              <SelectItem value="Approved">{t.approved}</SelectItem>
+              <SelectItem value="Rejected">{t.rejected}</SelectItem>
+              <SelectItem value="Fulfilled">{t.fulfilled}</SelectItem>
+              <SelectItem value="Cancelled">{t.cancelled}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -690,7 +842,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
               <PopoverTrigger asChild>
                 <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateFilter ? format(dateFilter, "PPP") : <span>Filter by date</span>}
+                  {dateFilter ? format(dateFilter, "PPP") : <span>{t.filterByDate}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -709,40 +861,40 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
               {canPerformWriteActions && (
                 <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
                   <Send className="mr-2 h-4 w-4" />
-                  Request Approval
+                  {t.requestApproval}
                 </Button>
               )}
               {(canExport || isHrdUser) && (
                 <Button onClick={handleExportPdf}>
                   <FileDown className="mr-2 h-4 w-4" />
-                  Export
+                  {t.export}
                 </Button>
               )}
             </>
           )}
 
           {canPerformWriteActions && (
-            <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName("Select an item..."); setPoPrice("")} }}>
+            <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
                 <DialogTrigger asChild>
                 <Button>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    {isCreatingNewPo ? 'Create New PO' : 'Add Item to PO'}
+                    {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
                 </Button>
                 </DialogTrigger>
                 <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>{isCreatingNewPo ? 'Create New Pre-Order' : `Add Item to ${activePoNumber}`}</DialogTitle>
+                    <DialogTitle>{isCreatingNewPo ? t.createNewPOTitle : t.addItemTitle(activePoNumber)}</DialogTitle>
                     <DialogDescription>
-                    {isCreatingNewPo ? 'Fill in the details for the first item of your new pre-order.' : 'Add another item to your pending pre-order.'}
+                    {isCreatingNewPo ? t.createNewPODesc : t.addItemDesc}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="poNumber" className="text-right">PO Number</Label>
+                    <Label htmlFor="poNumber" className="text-right">{t.poNumber}</Label>
                     <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="item" className="text-right">Item</Label>
+                    <Label htmlFor="item" className="text-right">{t.item}</Label>
                     <div className="col-span-3">
                         <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
                         <PopoverTrigger asChild>
@@ -753,9 +905,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                         </PopoverTrigger>
                         <PopoverContent className="w-[300px] p-0">
                             <Command>
-                            <CommandInput placeholder="Search item..." />
+                            <CommandInput placeholder={t.searchItem} />
                             <CommandList>
-                                <CommandEmpty>No item found.</CommandEmpty>
+                                <CommandEmpty>{t.noItemFound}</CommandEmpty>
                                 <CommandGroup>
                                 {inventoryItems.map((item) => (
                                     <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
@@ -771,11 +923,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     </div>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right">Price</Label>
+                    <Label htmlFor="price" className="text-right">{t.price}</Label>
                     <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="unit" className="text-right">Unit</Label>
+                    <Label htmlFor="unit" className="text-right">{t.unit}</Label>
                     <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
                         <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
                         <SelectContent>
@@ -793,15 +945,15 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="quantity" className="text-right">Quantity</Label>
+                    <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
                     <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="expectedDate" className="text-right">Expected Date</Label>
+                    <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
                     <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
                     </div>
                     <DialogFooter>
-                    <Button type="submit">Add Item</Button>
+                    <Button type="submit">{t.addItemBtn}</Button>
                     </DialogFooter>
                 </form>
                 </DialogContent>
@@ -813,7 +965,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       <div className="space-y-4">
         <div className="px-4 hidden sm:flex">
             <Checkbox checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} aria-label="Select all" disabled={selectableRowCount === 0} className="mr-4" />
-            <span className="text-sm text-muted-foreground">Select all</span>
+            <span className="text-sm text-muted-foreground">{t.selectAll}</span>
         </div>
         {filteredPreOrders.length > 0 ? (
           <Accordion type="single" collapsible value={openAccordion} onOpenChange={setOpenAccordion}>
@@ -834,9 +986,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 <h3 className="font-semibold text-base">{po.poNumber}</h3>
                                 <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
                                     <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[po.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[po.status] }>
-                                        {po.status}
+                                        {getStatusText(po.status)}
                                     </Badge>
-                                    <span>• {po.totalQuantity} units</span>
+                                    <span>• {po.totalQuantity} {t.units}</span>
                                 </div>
                             </div>
                           </div>
@@ -859,33 +1011,33 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                      <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
                                       {canApprove && po.status === 'Awaiting Approval' && (
                                         <DropdownMenuItem onSelect={() => handleMarkAsApproved(po)}>
-                                          <Check className="mr-2 h-4 w-4" />Mark as Approved
+                                          <Check className="mr-2 h-4 w-4" />{t.markAsApproved}
                                         </DropdownMenuItem>
                                       )}
                                       
                                       {po.status === 'Fulfilled' && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders.filter(o => o.status === 'Fulfilled'), 'Approved')}>
-                                          <Undo2 className="mr-2 h-4 w-4" /> Undo
+                                          <Undo2 className="mr-2 h-4 w-4" /> {t.undo}
                                         </DropdownMenuItem>
                                       )}
                                       {(po.status === 'Approved' || po.status === 'Rejected') && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
-                                          <Undo2 className="mr-2 h-4 w-4" /> Undo Decision
+                                          <Undo2 className="mr-2 h-4 w-4" /> {t.undoDecision}
                                         </DropdownMenuItem>
                                       )}
                                       {(po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
                                         <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
-                                          <Undo2 className="mr-2 h-4 w-4" /> Undo
+                                          <Undo2 className="mr-2 h-4 w-4" /> {t.undo}
                                         </DropdownMenuItem>
                                       )}
 
-                                      {canPerformWriteActions && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>Cancel Order</DropdownMenuItem>}
+                                      {canPerformWriteActions && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>{t.cancelOrder}</DropdownMenuItem>}
 
                                       <DropdownMenuSeparator />
-                                      {canPerformWriteActions && po.status !== 'Fulfilled' && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>}
+                                      {canPerformWriteActions && po.status !== 'Fulfilled' && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> {t.delete} </DropdownMenuItem>}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                             </div>
@@ -897,14 +1049,14 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Item</TableHead> <TableHead>Unit</TableHead> <TableHead>Status</TableHead> <TableHead className="text-right">Qty</TableHead> <TableHead className="text-right">Price</TableHead> <TableHead className="text-right">Total</TableHead> <TableHead><span className="sr-only">Actions</span></TableHead>
+                              <TableHead>{t.item}</TableHead> <TableHead>{t.unit}</TableHead> <TableHead>{t.status}</TableHead> <TableHead className="text-right">{t.qty}</TableHead> <TableHead className="text-right">{t.price}</TableHead> <TableHead className="text-right">{t.total}</TableHead> <TableHead><span className="sr-only">{t.actions}</span></TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {itemsToDisplay.map(order => (
                               <TableRow key={order.id}>
                                 <TableCell className="font-medium">{order.itemName}</TableCell> <TableCell>{order.unit}</TableCell>
-                                <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[order.status] }> {order.status} </Badge> </TableCell>
+                                <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[order.status] }> {getStatusText(order.status)} </Badge> </TableCell>
                                 <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
                                 <TableCell className="text-right">
                                   {order.status !== 'Fulfilled' && (
@@ -919,29 +1071,29 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                         {order.status === 'Pending' && canPerformWriteActions && (
                                           <>
                                             <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                                              <Pencil className="mr-2 h-4 w-4" /> {t.edit}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem className="text-red-500" onSelect={() => { setSelectedOrderItem(order); setDeleteItemOpen(true); }}>
-                                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                              <Trash2 className="mr-2 h-4 w-4" /> {t.delete}
                                             </DropdownMenuItem>
                                           </>
                                         )}
                                         {order.status === 'Awaiting Approval' && canApprove && (
                                           <>
                                             <DropdownMenuItem onSelect={() => { setSelectedOrderItem(order); setEditItemOpen(true); }}>
-                                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                                              <Pencil className="mr-2 h-4 w-4" /> {t.edit}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem className="text-green-600" onSelect={() => handleItemDecision(order, 'Approved')}>
-                                              <Check className="mr-2 h-4 w-4" /> Approve
+                                              <Check className="mr-2 h-4 w-4" /> {t.approve}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem className="text-red-600" onSelect={() => handleItemDecision(order, 'Rejected')}>
-                                              <X className="mr-2 h-4 w-4" /> Reject
+                                              <X className="mr-2 h-4 w-4" /> {t.reject}
                                             </DropdownMenuItem>
                                           </>
                                         )}
                                         {order.status === 'Approved' && canPerformWriteActions && (
                                             <DropdownMenuItem onSelect={() => handleOpenFulfillDialog(order)}>
-                                                <CheckCircle className="mr-2 h-4 w-4" /> Mark as Fulfilled
+                                                <CheckCircle className="mr-2 h-4 w-4" /> {t.markAsFulfilled}
                                             </DropdownMenuItem>
                                         )}
                                       </DropdownMenuContent>
@@ -954,8 +1106,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                         </Table>
                       </CardContent>
                       <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
-                           <div className="flex items-center gap-2"> <Box className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">Total Quantity</p> <p className="font-medium">{po.totalQuantity} units</p> </div> </div>
-                           <div className="flex items-center gap-2"> <CalendarDays className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">Expected Delivery</p> <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p> </div> </div>
+                           <div className="flex items-center gap-2"> <Box className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">{t.totalQuantity}</p> <p className="font-medium">{po.totalQuantity} {t.units}</p> </div> </div>
+                           <div className="flex items-center gap-2"> <CalendarDays className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">{t.expectedDelivery}</p> <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p> </div> </div>
                       </CardFooter>
                     </AccordionContent>
                    </Card>
@@ -965,8 +1117,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         ) : (
             <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-24">
               <div className="flex flex-col items-center gap-1 text-center">
-                <h3 className="text-2xl font-bold tracking-tight"> No pre-orders found </h3>
-                <p className="text-sm text-muted-foreground"> Create your first pre-order to get started. </p>
+                <h3 className="text-2xl font-bold tracking-tight"> {t.noPreOrdersTitle} </h3>
+                <p className="text-sm text-muted-foreground"> {t.noPreOrdersDesc} </p>
               </div>
             </div>
         )}
@@ -974,44 +1126,44 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
         <AlertDialog open={isDeleteOpen} onOpenChange={setDeleteOpen}>
           <AlertDialogContent>
-            <AlertDialogHeader> <AlertDialogTitle>Are you sure?</AlertDialogTitle> <AlertDialogDescription> This action cannot be undone. This will permanently delete the pre-order <span className="font-semibold"> {selectedPo?.poNumber}</span> and all its items. </AlertDialogDescription> </AlertDialogHeader>
-            <AlertDialogFooter> <AlertDialogCancel onClick={() => setSelectedPo(null)}>Cancel</AlertDialogCancel> <AlertDialogAction onClick={handleDeletePreOrder}> Delete </AlertDialogAction> </AlertDialogFooter>
+            <AlertDialogHeader> <AlertDialogTitle>{t.areYouSure}</AlertDialogTitle> <AlertDialogDescription> {t.deleteWarning(selectedPo?.poNumber || '')} </AlertDialogDescription> </AlertDialogHeader>
+            <AlertDialogFooter> <AlertDialogCancel onClick={() => setSelectedPo(null)}>{t.cancelBtn}</AlertDialogCancel> <AlertDialogAction onClick={handleDeletePreOrder}> {t.deleteBtn} </AlertDialogAction> </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
         <Dialog open={isEditItemOpen} onOpenChange={setEditItemOpen}>
           <DialogContent>
-            <DialogHeader> <DialogTitle>Edit Item: {selectedOrderItem?.itemName}</DialogTitle> <DialogDescription> Update the quantity, unit, or price for this item. </DialogDescription> </DialogHeader>
+            <DialogHeader> <DialogTitle>{t.editItemTitle(selectedOrderItem?.itemName || '')}</DialogTitle> <DialogDescription> {t.editItemDesc} </DialogDescription> </DialogHeader>
             <form onSubmit={handleEditOrderItem} className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="price" className="text-right">Price</Label> <Input id="price" name="price" type="number" min="0" className="col-span-3" defaultValue={selectedOrderItem?.price} required /> </div>
+              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="price" className="text-right">{t.price}</Label> <Input id="price" name="price" type="number" min="0" className="col-span-3" defaultValue={selectedOrderItem?.price} required /> </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="unit" className="text-right">Unit</Label>
+                <Label htmlFor="unit" className="text-right">{t.unit}</Label>
                 <Select name="unit" required onValueChange={setSelectedUnit} defaultValue={selectedOrderItem?.unit}>
                   <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
                   <SelectContent> <SelectItem value="Pcs">Pcs</SelectItem> <SelectItem value="Pack">Pack</SelectItem> <SelectItem value="Box">Box</SelectItem> <SelectItem value="Roll">Roll</SelectItem> <SelectItem value="Rim">Rim</SelectItem> <SelectItem value="Tube">Tube</SelectItem> <SelectItem value="Bottle">Bottle</SelectItem> <SelectItem value="Can">Can</SelectItem> <SelectItem value="Sheet">Sheet</SelectItem> <SelectItem value="Cartridge">Cartridge</SelectItem> </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="quantity" className="text-right">Quantity</Label> <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required /> </div>
-              <DialogFooter> <Button type="submit">Save Changes</Button> </DialogFooter>
+              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="quantity" className="text-right">{t.qty}</Label> <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required /> </div>
+              <DialogFooter> <Button type="submit">{t.saveChanges}</Button> </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
 
         <AlertDialog open={isDeleteItemOpen} onOpenChange={setDeleteItemOpen}>
           <AlertDialogContent>
-            <AlertDialogHeader> <AlertDialogTitle>Delete this item?</AlertDialogTitle> <AlertDialogDescription> This will permanently remove <span className="font-semibold">{selectedOrderItem?.itemName}</span> from this pre-order. This action cannot be undone. </AlertDialogDescription> </AlertDialogHeader>
-            <AlertDialogFooter> <AlertDialogCancel onClick={() => setSelectedOrderItem(null)}>Cancel</AlertDialogCancel> <AlertDialogAction onClick={handleDeleteOrderItem}> Delete Item </AlertDialogAction> </AlertDialogFooter>
+            <AlertDialogHeader> <AlertDialogTitle>{t.deleteItemTitle}</AlertDialogTitle> <AlertDialogDescription> {t.deleteItemDesc(selectedOrderItem?.itemName || '')} </AlertDialogDescription> </AlertDialogHeader>
+            <AlertDialogFooter> <AlertDialogCancel onClick={() => setSelectedOrderItem(null)}>{t.cancelBtn}</AlertDialogCancel> <AlertDialogAction onClick={handleDeleteOrderItem}> {t.deleteItemBtn} </AlertDialogAction> </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
         <Dialog open={isFulfillOpen} onOpenChange={setFulfillOpen}>
           <DialogContent>
-              <DialogHeader> <DialogTitle>Fulfill Item: {itemToFulfill?.itemName}</DialogTitle> <DialogDescription> Confirm the quantity of items received to add them to your inventory. </DialogDescription> </DialogHeader>
+              <DialogHeader> <DialogTitle>{t.fulfillItemTitle(itemToFulfill?.itemName || '')}</DialogTitle> <DialogDescription> {t.fulfillItemDesc} </DialogDescription> </DialogHeader>
               <form onSubmit={handleFulfillItem}>
                 <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="fulfill-quantity" className="text-right"> Quantity Received </Label> <Input id="fulfill-quantity" name="fulfill-quantity" type="number" min="1" className="col-span-3" value={fulfillQuantity} onChange={(e) => setFulfillQuantity(e.target.value)} required /> </div>
+                  <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="fulfill-quantity" className="text-right"> {t.quantityReceived} </Label> <Input id="fulfill-quantity" name="fulfill-quantity" type="number" min="1" className="col-span-3" value={fulfillQuantity} onChange={(e) => setFulfillQuantity(e.target.value)} required /> </div>
                 </div>
-                <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>Cancel</Button> <Button type="submit">Confirm &amp; Add to Stock</Button> </DialogFooter>
+                <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>{t.cancelBtn}</Button> <Button type="submit">{t.confirmAndAdd}</Button> </DialogFooter>
               </form>
           </DialogContent>
         </Dialog>
