@@ -1,3 +1,4 @@
+
 /* eslint-disable */
 
 @tailwind base;
@@ -148,6 +149,16 @@
     color: hsl(var(--foreground));
   }
   
+  /* Force dark text color on light backgrounds */
+  body.force-dark-text {
+    --foreground: 224 10% 21%;
+    --card-foreground: 224 10% 21%;
+    --popover-foreground: 224 10% 21%;
+    --secondary-foreground: 224 10% 21%;
+    --muted-foreground: 220 9% 46%;
+    --accent-foreground: 224 10% 21%;
+  }
+
   /* Apply opacity to cards */
   .card, .header {
     background-color: hsl(var(--card) / var(--component-opacity));
@@ -169,3 +180,5 @@
 [data-vercel-toolbar] {
   display: none !important;
 }
+
+    

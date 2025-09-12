@@ -273,6 +273,36 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
         reader.readDataURL(file);
     };
 
+    const getLuminance = (hex: string) => {
+      let r = 0, g = 0, b = 0;
+      if (hex.length === 4) {
+        r = parseInt(hex[1] + hex[1], 16);
+        g = parseInt(hex[2] + hex[2], 16);
+        b = parseInt(hex[3] + hex[3], 16);
+      } else if (hex.length === 7) {
+        r = parseInt(hex.substring(1, 3), 16);
+        g = parseInt(hex.substring(3, 5), 16);
+        b = parseInt(hex.substring(5, 7), 16);
+      }
+      return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    };
+
+    React.useEffect(() => {
+        if (wallpaper.startsWith('#')) {
+            const luminance = getLuminance(wallpaper);
+            if (luminance > 0.5) {
+                document.body.classList.add('force-dark-text');
+            } else {
+                document.body.classList.remove('force-dark-text');
+            }
+        } else {
+            document.body.classList.remove('force-dark-text');
+        }
+        return () => {
+            document.body.classList.remove('force-dark-text');
+        };
+    }, [wallpaper]);
+
     const renderWallpaperSelection = () => (
         <div className="flex flex-col gap-8 no-scrollbar">
             <Button variant="ghost" onClick={() => setActiveSubMenu('main')} className="self-start text-muted-foreground">
@@ -600,3 +630,5 @@ export default function SettingsPage() {
         </div>
     );
 }
+
+    
