@@ -40,46 +40,52 @@ const colors: { name: Color, bgColor: string }[] = [
 ];
 
 const wallpapers = [
+    // Nature
     { name: 'Waterfall', value: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716', hint: 'nature waterfall' },
     { name: 'Mountains', value: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606', hint: 'nature mountains' },
     { name: 'Forest', value: 'https://images.unsplash.com/photo-1448375240586-882707db888b', hint: 'nature forest' },
     { name: 'Lake', value: 'https://images.unsplash.com/photo-1476610182048-b716b8518a2a', hint: 'nature lake' },
     { name: 'Aurora', value: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7', hint: 'nature sky' },
+    { name: 'Autumn Path', value: 'https://images.unsplash.com/photo-1473117406439-369f98a6e846', hint: 'nature path' },
+    { name: 'Desert', value: 'https://images.unsplash.com/photo-1473580044384-7ba9967e16a0', hint: 'nature desert' },
+    { name: 'Beach', value: 'https://images.unsplash.com/photo-1507525428034-b723a996f329', hint: 'nature beach' },
+    // City
     { name: 'City Map', value: 'https://images.unsplash.com/photo-1599599810694-b5b37304c041', hint: 'city map' },
     { name: 'Tokyo Street', value: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989', hint: 'city night' },
     { name: 'Skyscraper', value: 'https://images.unsplash.com/photo-1523978591478-c752744f2327', hint: 'city architecture' },
     { name: 'Rooftops', value: 'https://images.unsplash.com/photo-1506752243769-53e71b12278a', hint: 'city urban' },
     { name: 'Hong Kong', value: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc', hint: 'city skyline' },
+    { name: 'Neon Sign', value: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97', hint: 'city neon' },
+    { name: 'Copenhagen', value: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc', hint: 'city skyline' },
+    { name: 'Bridge', value: 'https://images.unsplash.com/photo-1501446529957-6226bd447c46', hint: 'city bridge' },
+    // Technology
     { name: 'Laptop', value: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853', hint: 'technology computer' },
     { name: 'Coding', value: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c', hint: 'technology code' },
-    { name: 'Abstract Lines', value: 'https://images.unsplash.com/photo-1538370965246-fe2b0b973712', hint: 'technology abstract' },
     { name: 'Circuit', value: 'https://images.unsplash.com/photo-1550751827-413370f196a1', hint: 'technology circuit' },
     { name: 'Server Room', value: 'https://images.unsplash.com/photo-1521185490212-7813a45d1f5b', hint: 'technology network' },
+    { name: 'Keyboard', value: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3', hint: 'technology keyboard' },
+    { name: 'Motherboard', value: 'https://images.unsplash.com/photo-1518770660439-4636190af475', hint: 'technology circuit' },
+    { name: 'Wires', value: 'https://images.unsplash.com/photo-1580894732444-8ecded7948b4', hint: 'technology abstract' },
+    { name: 'Desk Setup', value: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87', hint: 'technology workspace' },
+    // Animal
     { name: 'Fox', value: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5', hint: 'animal fox' },
     { name: 'Lion', value: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d', hint: 'animal lion' },
     { name: 'Jellyfish', value: 'https://images.unsplash.com/photo-1536751033192-23fcc3a43a84', hint: 'animal jellyfish' },
     { name: 'Eagle', value: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45', hint: 'animal bird' },
     { name: 'Wolf', value: 'https://images.unsplash.com/photo-1547407139-3c921a66005c', hint: 'animal wolf' },
+    { name: 'Husky', value: 'https://images.unsplash.com/photo-1590762983193-a5f2a83852cb', hint: 'animal dog' },
+    // Abstract
     { name: 'Liquid Swirl', value: 'https://images.unsplash.com/photo-1558518393-95c24a66042b', hint: 'abstract colorful' },
     { name: 'Geometric', value: 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17', hint: 'abstract texture' },
     { name: 'Paint Splash', value: 'https://images.unsplash.com/photo-1483213091558-f075d351b842', hint: 'abstract paint' },
     { name: 'Cubes', value: 'https://images.unsplash.com/photo-1618214394489-13a409a808ba', hint: 'abstract 3d' },
     { name: 'Purple Waves', value: 'https://images.unsplash.com/photo-1534035431473-b39d36382162', hint: 'abstract waves' },
+    // Cars
     { name: 'Classic Car', value: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d', hint: 'car classic' },
     { name: 'Sports Car', value: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70', hint: 'car sports' },
     { name: 'Night Drive', value: 'https://images.unsplash.com/photo-1532581140502-5353113331c1', hint: 'car night' },
     { name: 'Vintage Porsche', value: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2', hint: 'car vintage' },
     { name: 'Drifting', value: 'https://images.unsplash.com/photo-1580481222384-885994537c44', hint: 'car race' },
-    { name: 'Galaxy', value: 'https://images.unsplash.com/photo-1446776811953-b23d5795b4e6', hint: 'space galaxy' },
-    { name: 'Library', value: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66', hint: 'interior books' },
-    { name: 'Coffee', value: 'https://images.unsplash.com/photo-1511920183353-8b2c42d5d7e4', hint: 'food coffee' },
-    { name: 'Vinyl Record', value: 'https://images.unsplash.com/photo-1502494495221-1b02b604e548', hint: 'music vintage' },
-    { name: 'Architecture', value: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625', hint: 'building modern' },
-    { name: 'Planet', value: 'https://images.unsplash.com/photo-1506443432602-ac2fcd6f54e0', hint: 'space planet' },
-    { name: 'Autumn Path', value: 'https://images.unsplash.com/photo-1473117406439-369f98a6e846', hint: 'nature path' },
-    { name: 'White Waves', value: 'https://images.unsplash.com/photo-1562619425-c307bb834a36', hint: 'abstract texture' },
-    { name: 'Neon Sign', value: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97', hint: 'city neon' },
-    { name: 'Keyboard', value: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3', hint: 'technology keyboard' },
 ];
 
 type ActiveMenu = 'main' | 'appearance' | 'account';
@@ -242,7 +248,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
     };
 
     const renderWallpaperSelection = () => (
-        <div className="space-y-2">
+        <div className="space-y-4">
             <div>
                 <Label>Wallpaper Latar Belakang</Label>
                 <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
@@ -356,9 +362,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
-                        {renderWallpaperSelection()}
-                    </div>
+                    {renderWallpaperSelection()}
 
                     <div className="space-y-4">
                         <div>
