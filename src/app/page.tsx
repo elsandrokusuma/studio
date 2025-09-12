@@ -103,6 +103,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { LoginForm } from "@/components/login-form";
 import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
+import { useTheme } from "@/hooks/use-theme";
 
 
 const chartConfig = {
@@ -116,39 +117,209 @@ const chartConfig = {
   },
 };
 
-const motivationalQuotes = [
-  "Setiap langkah kecil adalah kemajuan.",
-  "Fokus pada kemajuan, bukan kesempurnaan.",
-  "Hari ini adalah kesempatan baru untuk berkembang.",
-  "Kerja keras hari ini adalah kemenangan esok hari.",
-  "Jangan berhenti saat lelah, berhentilah saat selesai.",
-  "Mulai dari mana Anda berada. Gunakan apa yang Anda miliki.",
-  "Kesuksesan adalah jumlah dari usaha-usaha kecil.",
-  "Jadikan setiap hari mahakarya Anda.",
-  "Percayalah pada proses.",
-  "Satu-satunya batasan adalah pikiran Anda.",
-  "Terus bergerak maju, jangan melihat ke belakang.",
-  "Tindakan adalah kunci dasar untuk semua kesuksesan.",
-  "Semangatmu adalah apimu. Jaga agar tetap menyala.",
-  "Setiap pencapaian dimulai dengan keputusan untuk mencoba.",
-  "Jangan takut gagal, takutlah tidak mencoba.",
-  "Anda lebih kuat dari yang Anda kira.",
-  "Lakukan yang terbaik, dan lupakan sisanya.",
-  "Mimpi besar dimulai dengan satu langkah.",
-  "Jadilah versi terbaik dari dirimu hari ini.",
-  "Tantangan membuat hidup menarik.",
-  "Konsistensi lebih penting dari kesempurnaan.",
-  "Fokus pada tujuan, bukan rintangan.",
-  "Kesabaran adalah kunci kemenangan.",
-  "Setiap hari adalah halaman baru dalam ceritamu.",
-  "Jangan menunggu kesempatan, ciptakanlah.",
-  "Tetap positif, bekerja keras, dan wujudkan.",
-  "Belajar dari kemarin, hidup untuk hari ini.",
-  "Kekuatan tidak datang dari kemenangan, tapi dari perjuangan.",
-  "Keajaiban terjadi saat Anda tidak menyerah.",
-  "Lakukan sesuatu hari ini yang akan membuat dirimu di masa depan berterima kasih.",
-  "Jatuh tujuh kali, bangkit delapan kali."
-];
+const motivationalQuotes = {
+  en: [
+    "Every small step is progress.",
+    "Focus on progress, not perfection.",
+    "Today is a new opportunity to grow.",
+    "Hard work today is victory tomorrow.",
+    "Don't stop when you're tired, stop when you're done.",
+    "Start where you are. Use what you have.",
+    "Success is the sum of small efforts.",
+    "Make each day your masterpiece.",
+    "Trust the process.",
+    "The only limit is your mind.",
+    "Keep moving forward, don't look back.",
+    "Action is the foundational key to all success.",
+    "Your passion is your fire. Keep it burning.",
+    "Every accomplishment starts with the decision to try.",
+    "Don't be afraid to fail, be afraid not to try.",
+    "You are stronger than you think.",
+    "Do your best, and forget the rest.",
+    "Big dreams start with one step.",
+    "Be the best version of yourself today.",
+    "Challenges make life interesting.",
+    "Consistency is more important than perfection.",
+    "Focus on the goal, not the obstacles.",
+    "Patience is the key to victory.",
+    "Every day is a new page in your story.",
+    "Don't wait for opportunity, create it.",
+    "Stay positive, work hard, and make it happen.",
+    "Learn from yesterday, live for today.",
+    "Strength does not come from winning, but from struggle.",
+    "Miracles happen when you don't give up.",
+    "Do something today that your future self will thank you for.",
+    "Fall down seven times, get up eight."
+  ],
+  id: [
+    "Setiap langkah kecil adalah kemajuan.",
+    "Fokus pada kemajuan, bukan kesempurnaan.",
+    "Hari ini adalah kesempatan baru untuk berkembang.",
+    "Kerja keras hari ini adalah kemenangan esok hari.",
+    "Jangan berhenti saat lelah, berhentilah saat selesai.",
+    "Mulai dari mana Anda berada. Gunakan apa yang Anda miliki.",
+    "Kesuksesan adalah jumlah dari usaha-usaha kecil.",
+    "Jadikan setiap hari mahakarya Anda.",
+    "Percayalah pada proses.",
+    "Satu-satunya batasan adalah pikiran Anda.",
+    "Terus bergerak maju, jangan melihat ke belakang.",
+    "Tindakan adalah kunci dasar untuk semua kesuksesan.",
+    "Semangatmu adalah apimu. Jaga agar tetap menyala.",
+    "Setiap pencapaian dimulai dengan keputusan untuk mencoba.",
+    "Jangan takut gagal, takutlah tidak mencoba.",
+    "Anda lebih kuat dari yang Anda kira.",
+    "Lakukan yang terbaik, dan lupakan sisanya.",
+    "Mimpi besar dimulai dengan satu langkah.",
+    "Jadilah versi terbaik dari dirimu hari ini.",
+    "Tantangan membuat hidup menarik.",
+    "Konsistensi lebih penting dari kesempurnaan.",
+    "Fokus pada tujuan, bukan rintangan.",
+    "Kesabaran adalah kunci kemenangan.",
+    "Setiap hari adalah halaman baru dalam ceritamu.",
+    "Jangan menunggu kesempatan, ciptakanlah.",
+    "Tetap positif, bekerja keras, dan wujudkan.",
+    "Belajar dari kemarin, hidup untuk hari ini.",
+    "Kekuatan tidak datang dari kemenangan, tapi dari perjuangan.",
+    "Keajaiban terjadi saat Anda tidak menyerah.",
+    "Lakukan sesuatu hari ini yang akan membuat dirimu di masa depan berterima kasih.",
+    "Jatuh tujuh kali, bangkit delapan kali."
+  ]
+};
+
+const translations = {
+    en: {
+        goodMorning: "Good morning",
+        goodAfternoon: "Good afternoon",
+        goodEvening: "Good evening",
+        goodNight: "Good night",
+        totalItems: "Total Items",
+        stockValue: "Stock Value",
+        lowStock: "Low Stock",
+        outOfStock: "Out of Stock",
+        pendingApprovals: "Pending Approvals",
+        quickActions: "Quick Actions",
+        commonTasks: "Common tasks",
+        addItem: "Add Item",
+        addItemDesc: "New inventory item",
+        stockIn: "Stock In",
+        stockInDesc: "Receive items",
+        stockOut: "Stock Out",
+        stockOutDesc: "Issue items",
+        createPO: "Create PO",
+        createPODesc: "Purchase order",
+        stockMovement: "Stock Movement Trends",
+        last6Months: "Last 6 months activity",
+        last7Days: "Last 7 days activity",
+        daily: "Daily",
+        monthly: "Monthly",
+        allitems: "All Items",
+        recentTransactions: "Recent Transactions",
+        recentTransactionsDesc: "The latest stock movements in your inventory.",
+        item: "Item",
+        qty: "Qty",
+        type: "Type",
+        noTransactions: "No transactions recorded yet.",
+        transactionDetails: "Transaction Details",
+        transactionDetailsDesc: "Detailed information about the stock movement.",
+        date: "Date",
+        itemName: "Item Name",
+        quantity: "Quantity",
+        from: "From",
+        to: "To",
+        stockStatusTitle: (title: string) => `${title} Items`,
+        stockStatusDesc: (title: string) => `A list of all items that are currently ${title.toLowerCase()}.`,
+        addNewItem: "Add New Inventory Item",
+        addNewItemDesc: "Fill in the details below to add a new product.",
+        name: "Name",
+        price: "Price",
+        unit: "Unit",
+        photoUrl: "Photo URL",
+        saveItem: "Save Item",
+        recordStockIn: "Record Stock In",
+        recordStockInDesc: "Add new stock received for an item.",
+        addStock: "Add Stock",
+        recordStockOut: "Record Stock Out",
+        recordStockOutDesc: "Record stock that has been sold or used.",
+        removeStock: "Remove Stock",
+        createNewPO: "Create New Pre-Order",
+        createNewPODesc: "Fill in the details for the new pre-order.",
+        poNumber: "PO Number",
+        expectedDate: "Expected Date",
+        createPreOrder: "Create Pre-Order",
+        unitRequired: "Unit is required",
+        unitRequiredDesc: "Please select a unit for the item.",
+        itemRequired: "Please select an item.",
+        fieldRequired: "Field Required",
+        fieldRequiredDesc: "This field cannot be empty.",
+        negativeStock: "Stock cannot be negative.",
+    },
+    id: {
+        goodMorning: "Selamat pagi",
+        goodAfternoon: "Selamat siang",
+        goodEvening: "Selamat sore",
+        goodNight: "Selamat malam",
+        totalItems: "Total Barang",
+        stockValue: "Nilai Stok",
+        lowStock: "Stok Rendah",
+        outOfStock: "Stok Habis",
+        pendingApprovals: "Persetujuan Tertunda",
+        quickActions: "Aksi Cepat",
+        commonTasks: "Tugas umum",
+        addItem: "Tambah Barang",
+        addItemDesc: "Barang inventaris baru",
+        stockIn: "Stok Masuk",
+        stockInDesc: "Terima barang",
+        stockOut: "Stok Keluar",
+        stockOutDesc: "Keluarkan barang",
+        createPO: "Buat PO",
+        createPODesc: "Pesanan pembelian",
+        stockMovement: "Tren Pergerakan Stok",
+        last6Months: "Aktivitas 6 bulan terakhir",
+        last7Days: "Aktivitas 7 hari terakhir",
+        daily: "Harian",
+        monthly: "Bulanan",
+        allitems: "Semua Barang",
+        recentTransactions: "Transaksi Terkini",
+        recentTransactionsDesc: "Pergerakan stok terbaru di inventaris Anda.",
+        item: "Barang",
+        qty: "Jml",
+        type: "Tipe",
+        noTransactions: "Belum ada transaksi yang tercatat.",
+        transactionDetails: "Detail Transaksi",
+        transactionDetailsDesc: "Informasi rinci tentang pergerakan stok.",
+        date: "Tanggal",
+        itemName: "Nama Barang",
+        quantity: "Jumlah",
+        from: "Dari",
+        to: "Ke",
+        stockStatusTitle: (title: string) => `Barang Stok ${title}`,
+        stockStatusDesc: (title: string) => `Daftar semua barang yang saat ini ${title.toLowerCase()}.`,
+        addNewItem: "Tambah Barang Inventaris Baru",
+        addNewItemDesc: "Isi detail di bawah untuk menambahkan produk baru.",
+        name: "Nama",
+        price: "Harga",
+        unit: "Unit",
+        photoUrl: "URL Foto",
+        saveItem: "Simpan Barang",
+        recordStockIn: "Catat Stok Masuk",
+        recordStockInDesc: "Tambahkan stok baru yang diterima untuk suatu barang.",
+        addStock: "Tambah Stok",
+        recordStockOut: "Catat Stok Keluar",
+        recordStockOutDesc: "Catat stok yang telah terjual atau digunakan.",
+        removeStock: "Keluarkan Stok",
+        createNewPO: "Buat Pre-Order Baru",
+        createNewPODesc: "Isi detail untuk pre-order baru.",
+        poNumber: "Nomor PO",
+        expectedDate: "Tanggal Perkiraan",
+        createPreOrder: "Buat Pre-Order",
+        unitRequired: "Unit diperlukan",
+        unitRequiredDesc: "Silakan pilih unit untuk barang tersebut.",
+        itemRequired: "Silakan pilih barang.",
+        fieldRequired: "Kolom Diperlukan",
+        fieldRequiredDesc: "Kolom ini tidak boleh kosong.",
+        negativeStock: "Stok tidak boleh negatif.",
+    }
+};
 
 
 type GreetingInfo = {
@@ -178,6 +349,9 @@ export default function DashboardPage() {
   const { addNotification } = useNotifications();
   const { user, loading: authLoading } = useAuth();
   const [showLogin, setShowLogin] = React.useState(false);
+  const { language } = useTheme();
+
+  const t = language === 'id' ? translations.id : translations.en;
 
   // Dialog states
   const [isAddOpen, setAddOpen] = React.useState(false);
@@ -278,20 +452,20 @@ export default function DashboardPage() {
         const currentHour = wibTime.getHours();
 
         if (currentHour >= 1 && currentHour < 11) {
-            return { text: "Good morning", icon: Sun };
+            return { text: t.goodMorning, icon: Sun };
         } else if (currentHour >= 11 && currentHour < 15) {
-            return { text: "Good afternoon", icon: Sun };
+            return { text: t.goodAfternoon, icon: Sun };
         } else if (currentHour >= 15 && currentHour < 19) {
-            return { text: "Good evening", icon: Sunset };
+            return { text: t.goodEvening, icon: Sunset };
         } else {
-            return { text: "Good night", icon: Moon };
+            return { text: t.goodNight, icon: Moon };
         }
     };
     setGreetingInfo(getGreeting());
 
     // Set daily motivational quote
     const dayOfMonth = new Date().getDate();
-    setDailyQuote(motivationalQuotes[dayOfMonth - 1]);
+    setDailyQuote(motivationalQuotes[language][dayOfMonth - 1]);
 
     const fetchData = async () => {
         if (!db) {
@@ -349,7 +523,7 @@ export default function DashboardPage() {
     };
 
     fetchData();
-  }, [toast]);
+  }, [toast, t, language]);
 
   React.useEffect(() => {
     if (!authLoading) {
@@ -392,8 +566,8 @@ export default function DashboardPage() {
     if (!newItemData.unit) {
         toast({
             variant: "destructive",
-            title: "Unit is required",
-            description: "Please select a unit for the item.",
+            title: t.unitRequired,
+            description: t.unitRequiredDesc,
         });
         return;
     }
@@ -429,7 +603,7 @@ export default function DashboardPage() {
         const selectedItem = inventoryItems.find((i) => i.id === selectedItemId);
 
         if (!selectedItem) {
-          toast({ variant: "destructive", title: "Please select an item." });
+          toast({ variant: "destructive", title: t.itemRequired });
           return;
         }
 
@@ -440,8 +614,8 @@ export default function DashboardPage() {
         if (type === 'out' && !person.trim()) {
           toast({
             variant: "destructive",
-            title: "Field Required",
-            description: "The 'To' field cannot be empty.",
+            title: t.fieldRequired,
+            description: t.fieldRequiredDesc,
           });
           return;
         }
@@ -456,7 +630,7 @@ export default function DashboardPage() {
           toast({
             variant: "destructive",
             title: "Error",
-            description: "Stock cannot be negative.",
+            description: t.negativeStock,
           });
           return;
         }
@@ -496,7 +670,7 @@ export default function DashboardPage() {
     const selectedItem = inventoryItems.find((i) => i.id === selectedItemId);
 
     if (!selectedItem) {
-      toast({ variant: "destructive", title: "Please select an item." });
+      toast({ variant: "destructive", title: t.itemRequired });
       return;
     }
 
@@ -535,7 +709,7 @@ export default function DashboardPage() {
   };
 
   const handleShowLowStock = () => {
-    setStockStatusTitle("Low Stock Items");
+    setStockStatusTitle("Low Stock");
     setStockStatusItems(
       inventoryItems.filter((item) => item.quantity <= 5 && item.quantity > 0)
     );
@@ -543,7 +717,7 @@ export default function DashboardPage() {
   };
 
   const handleShowOutOfStock = () => {
-    setStockStatusTitle("Out of Stock Items");
+    setStockStatusTitle("Out of Stock");
     setStockStatusItems(inventoryItems.filter((item) => item.quantity === 0));
     setStockStatusOpen(true);
   };
@@ -657,7 +831,7 @@ export default function DashboardPage() {
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.totalItems}</CardTitle>
             <Package className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -671,7 +845,7 @@ export default function DashboardPage() {
             style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Stock Value</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.stockValue}</CardTitle>
             <DollarSign className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -686,7 +860,7 @@ export default function DashboardPage() {
            style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.lowStock}</CardTitle>
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -699,7 +873,7 @@ export default function DashboardPage() {
           style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.outOfStock}</CardTitle>
             <Ban className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -713,7 +887,7 @@ export default function DashboardPage() {
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Pending Approvals
+              {t.pendingApprovals}
             </CardTitle>
             <Clock className="h-4 w-4" />
           </CardHeader>
@@ -730,8 +904,8 @@ export default function DashboardPage() {
               <Zap className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common tasks</CardDescription>
+              <CardTitle>{t.quickActions}</CardTitle>
+              <CardDescription>{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="grid gap-3">
@@ -744,9 +918,9 @@ export default function DashboardPage() {
                 <Plus className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">Add Item</p>
+                <p className="font-semibold text-base">{t.addItem}</p>
                 <p className="font-normal text-sm text-left">
-                  New inventory item
+                  {t.addItemDesc}
                 </p>
               </div>
             </Button>
@@ -759,8 +933,8 @@ export default function DashboardPage() {
                 <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">Stock In</p>
-                <p className="font-normal text-sm text-left">Receive items</p>
+                <p className="font-semibold text-base">{t.stockIn}</p>
+                <p className="font-normal text-sm text-left">{t.stockInDesc}</p>
               </div>
             </Button>
             <Button
@@ -772,8 +946,8 @@ export default function DashboardPage() {
                 <TrendingDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">Stock Out</p>
-                <p className="font-normal text-sm text-left">Issue items</p>
+                <p className="font-semibold text-base">{t.stockOut}</p>
+                <p className="font-normal text-sm text-left">{t.stockOutDesc}</p>
               </div>
             </Button>
             <Button
@@ -785,8 +959,8 @@ export default function DashboardPage() {
                 <FileText className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">Create PO</p>
-                <p className="font-normal text-sm text-left">Purchase order</p>
+                <p className="font-semibold text-base">{t.createPO}</p>
+                <p className="font-normal text-sm text-left">{t.createPODesc}</p>
               </div>
             </Button>
           </CardContent>
@@ -799,9 +973,9 @@ export default function DashboardPage() {
                   <BarChart4 className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <CardTitle>Stock Movement Trends</CardTitle>
+                  <CardTitle>{t.stockMovement}</CardTitle>
                   <CardDescription>
-                    {timePeriod === 'monthly' ? 'Last 6 months activity' : 'Last 7 days activity'}
+                    {timePeriod === 'monthly' ? t.last6Months : t.last7Days}
                   </CardDescription>
                 </div>
               </div>
@@ -830,8 +1004,8 @@ export default function DashboardPage() {
                   className="w-full sm:w-auto"
                   onValueChange={(value: 'daily' | 'monthly') => value && setTimePeriod(value)}
                 >
-                  <ToggleGroupItem value="daily" aria-label="Daily view">Daily</ToggleGroupItem>
-                  <ToggleGroupItem value="monthly" aria-label="Monthly view">Monthly</ToggleGroupItem>
+                  <ToggleGroupItem value="daily" aria-label="Daily view">{t.daily}</ToggleGroupItem>
+                  <ToggleGroupItem value="monthly" aria-label="Monthly view">{t.monthly}</ToggleGroupItem>
                 </ToggleGroup>
                 <Select
                   value={selectedChartItem}
@@ -841,7 +1015,7 @@ export default function DashboardPage() {
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Items</SelectItem>
+                    <SelectItem value="all">{t.allitems}</SelectItem>
                     {inventoryItems.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
                         {item.name}
@@ -865,8 +1039,8 @@ export default function DashboardPage() {
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Legend />
-                    <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={[4, 4, 0, 0]} name="Stock In" />
-                    <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={[4, 4, 0, 0]} name="Stock Out" />
+                    <Bar dataKey="stockIn" fill="var(--color-stockIn)" radius={[4, 4, 0, 0]} name={t.stockIn} />
+                    <Bar dataKey="stockOut" fill="var(--color-stockOut)" radius={[4, 4, 0, 0]} name={t.stockOut} />
                   </BarChart>
                 )}
                 {chartType === 'line' && (
@@ -876,8 +1050,8 @@ export default function DashboardPage() {
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Legend />
-                    <Line type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" strokeWidth={2} dot={false} name="Stock In" />
-                    <Line type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" strokeWidth={2} dot={false} name="Stock Out" />
+                    <Line type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" strokeWidth={2} dot={false} name={t.stockIn} />
+                    <Line type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" strokeWidth={2} dot={false} name={t.stockOut} />
                   </LineChart>
                 )}
                 {chartType === 'area' && (
@@ -897,8 +1071,8 @@ export default function DashboardPage() {
                         <stop offset="95%" stopColor="var(--color-stockOut)" stopOpacity={0.1} />
                       </linearGradient>
                     </defs>
-                    <Area type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" fill="url(#fillStockIn)" stackId="1" name="Stock In" />
-                    <Area type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" fill="url(#fillStockOut)" stackId="1" name="Stock Out" />
+                    <Area type="monotone" dataKey="stockIn" stroke="var(--color-stockIn)" fill="url(#fillStockIn)" stackId="1" name={t.stockIn} />
+                    <Area type="monotone" dataKey="stockOut" stroke="var(--color-stockOut)" fill="url(#fillStockOut)" stackId="1" name={t.stockOut} />
                   </AreaChart>
                 )}
               </ChartContainer>
@@ -909,9 +1083,9 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Transactions</CardTitle>
+          <CardTitle>{t.recentTransactions}</CardTitle>
           <CardDescription>
-            The latest stock movements in your inventory.
+            {t.recentTransactionsDesc}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -920,10 +1094,10 @@ export default function DashboardPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
+                    <TableHead>{t.item}</TableHead>
+                    <TableHead className="text-right">{t.qty}</TableHead>
                     <TableHead className="text-right hidden sm:table-cell">
-                      Type
+                      {t.type}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -981,7 +1155,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="text-center text-sm text-muted-foreground py-8">
-              No transactions recorded yet.
+              {t.noTransactions}
             </div>
           )}
         </CardContent>
@@ -990,16 +1164,16 @@ export default function DashboardPage() {
       <Dialog open={isDetailsOpen} onOpenChange={setDetailsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Transaction Details</DialogTitle>
+            <DialogTitle>{t.transactionDetails}</DialogTitle>
             <DialogDescription>
-              Detailed information about the stock movement.
+              {t.transactionDetailsDesc}
             </DialogDescription>
           </DialogHeader>
           {selectedTransaction && (
             <div className="grid gap-4 py-4 text-sm">
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-semibold text-muted-foreground">
-                  Date
+                  {t.date}
                 </span>
                 <span className="col-span-2">
                   {new Date(selectedTransaction.date).toLocaleString()}
@@ -1007,7 +1181,7 @@ export default function DashboardPage() {
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-semibold text-muted-foreground">
-                  Item Name
+                  {t.itemName}
                 </span>
                 <span className="col-span-2">
                   {selectedTransaction.itemName}
@@ -1015,7 +1189,7 @@ export default function DashboardPage() {
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-semibold text-muted-foreground">
-                  Quantity
+                  {t.quantity}
                 </span>
                 <span className="col-span-2">
                   {selectedTransaction.quantity}
@@ -1023,7 +1197,7 @@ export default function DashboardPage() {
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-semibold text-muted-foreground">
-                  Type
+                  {t.type}
                 </span>
                 <span className="col-span-2">
                   <Badge
@@ -1054,8 +1228,8 @@ export default function DashboardPage() {
                   <span className="font-semibold text-muted-foreground">
                     {selectedTransaction.type === "in" ||
                     selectedTransaction.type === "add"
-                      ? "From"
-                      : "To"}
+                      ? t.from
+                      : t.to}
                   </span>
                   <span className="col-span-2">
                     {selectedTransaction.person}
@@ -1070,10 +1244,9 @@ export default function DashboardPage() {
       <Dialog open={isStockStatusOpen} onOpenChange={setStockStatusOpen}>
         <DialogContent className="h-[60vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{stockStatusTitle}</DialogTitle>
+            <DialogTitle>{t.stockStatusTitle(stockStatusTitle)}</DialogTitle>
             <DialogDescription>
-              A list of all items that are currently{" "}
-              {stockStatusTitle.toLowerCase().replace(" items", "")}.
+              {t.stockStatusDesc(stockStatusTitle)}
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 min-h-0">
@@ -1081,8 +1254,8 @@ export default function DashboardPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Item Name</TableHead>
-                    <TableHead className="text-right">Quantity</TableHead>
+                    <TableHead>{t.itemName}</TableHead>
+                    <TableHead className="text-right">{t.quantity}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1105,21 +1278,21 @@ export default function DashboardPage() {
       <Dialog open={isAddOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Inventory Item</DialogTitle>
+            <DialogTitle>{t.addNewItem}</DialogTitle>
             <DialogDescription>
-              Fill in the details below to add a new product.
+              {t.addNewItemDesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddItem} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
+                {t.name}
               </Label>
               <Input id="name" name="name" className="col-span-3" required />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="price" className="text-right">
-                Price
+                {t.price}
               </Label>
               <Input
                 id="price"
@@ -1132,7 +1305,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="unit" className="text-right">
-                Unit
+                {t.unit}
               </Label>
               <Select name="unit" required onValueChange={setSelectedUnit}>
                 <SelectTrigger className="col-span-3">
@@ -1154,7 +1327,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="quantity" className="text-right">
-                Quantity
+                {t.quantity}
               </Label>
               <Input
                 id="quantity"
@@ -1167,7 +1340,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="photoUrl" className="text-right">
-                Photo URL
+                {t.photoUrl}
               </Label>
               <Input
                 id="photoUrl"
@@ -1177,7 +1350,7 @@ export default function DashboardPage() {
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Save Item</Button>
+              <Button type="submit">{t.saveItem}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1195,15 +1368,15 @@ export default function DashboardPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Record Stock In</DialogTitle>
+            <DialogTitle>{t.recordStockIn}</DialogTitle>
             <DialogDescription>
-              Add new stock received for an item.
+              {t.recordStockInDesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleStockUpdate("in")} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="item" className="text-right">
-                Item
+                {t.item}
               </Label>
               <div className="col-span-3">
                 <Popover open={comboInOpen} onOpenChange={setComboInOpen}>
@@ -1254,7 +1427,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="quantity" className="text-right">
-                Quantity
+                {t.quantity}
               </Label>
               <Input
                 id="quantity"
@@ -1267,7 +1440,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="person" className="text-right">
-                From
+                {t.from}
               </Label>
               <Input
                 id="person"
@@ -1279,7 +1452,7 @@ export default function DashboardPage() {
             <DialogFooter>
                <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Add Stock
+                {t.addStock}
               </Button>
             </DialogFooter>
           </form>
@@ -1298,15 +1471,15 @@ export default function DashboardPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Record Stock Out</DialogTitle>
+            <DialogTitle>{t.recordStockOut}</DialogTitle>
             <DialogDescription>
-              Record stock that has been sold or used.
+              {t.recordStockOutDesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleStockUpdate("out")} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="item" className="text-right">
-                Item
+                {t.item}
               </Label>
               <div className="col-span-3">
                 <Popover open={comboOutOpen} onOpenChange={setComboOutOpen}>
@@ -1357,7 +1530,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="quantity" className="text-right">
-                Quantity
+                {t.quantity}
               </Label>
               <Input
                 id="quantity"
@@ -1371,7 +1544,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="person" className="text-right">
-                To
+                {t.to}
               </Label>
               <Input
                 id="person"
@@ -1384,7 +1557,7 @@ export default function DashboardPage() {
             <DialogFooter>
               <Button type="submit" disabled={!selectedItemId || isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Remove Stock
+                {t.removeStock}
               </Button>
             </DialogFooter>
           </form>
@@ -1404,16 +1577,15 @@ export default function DashboardPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Pre-Order</DialogTitle>
+            <DialogTitle>{t.createNewPO}</DialogTitle>
             <DialogDescription>
-              Fill in the details for the new pre-order. This will create a
-              single item PO.
+              {t.createNewPODesc}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="poNumber" className="text-right">
-                PO Number
+                {t.poNumber}
               </Label>
               <Input
                 id="poNumber"
@@ -1426,7 +1598,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="item" className="text-right">
-                Item
+                {t.item}
               </Label>
               <div className="col-span-3">
                 <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
@@ -1479,7 +1651,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="price" className="text-right">
-                Price
+                {t.price}
               </Label>
               <Input
                 id="price"
@@ -1494,7 +1666,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="unit" className="text-right">
-                Unit
+                {t.unit}
               </Label>
               <Select
                 name="unit"
@@ -1521,7 +1693,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="quantity" className="text-right">
-                Quantity
+                {t.quantity}
               </Label>
               <Input
                 id="quantity"
@@ -1534,7 +1706,7 @@ export default function DashboardPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="expectedDate" className="text-right">
-                Expected Date
+                {t.expectedDate}
               </Label>
               <Input
                 id="expectedDate"
@@ -1545,7 +1717,7 @@ export default function DashboardPage() {
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Create Pre-Order</Button>
+              <Button type="submit">{t.createPreOrder}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1553,3 +1725,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
