@@ -60,7 +60,7 @@ const wallpaperCategories = {
         { name: 'Architecture', value: 'https://picsum.photos/seed/architecture/1920/1080', hint: 'building urban' },
         { name: 'Skyscraper', value: 'https://picsum.photos/seed/skyscraper/1920/1080', hint: 'city skyscraper' },
         { name: 'Town', value: 'https://picsum.photos/seed/town/1920/1080', hint: 'city town' },
-        { name: 'Street', value: 'https://picsum.photos/seed/street/1920/1080', hint: 'city street' },
+        { name: 'Alley', value: 'https://picsum.photos/seed/alley/1920/1080', hint: 'city street' },
         { name: 'Buildings', value: 'https://picsum.photos/seed/buildings/1920/1080', hint: 'city buildings' },
         { name: 'Nightlife', value: 'https://picsum.photos/seed/nightlife/1920/1080', hint: 'city nightlife' },
     ],
