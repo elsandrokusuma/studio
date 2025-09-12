@@ -74,17 +74,6 @@ const galleryWallpapers = [
     { name: 'Pattern 2', value: 'https://picsum.photos/seed/702/600/400', hint: 'pattern texture' },
     { name: 'Pattern 3', value: 'https://picsum.photos/seed/703/600/400', hint: 'pattern lines' },
     { name: 'Pattern 4', value: 'https://picsum.photos/seed/704/600/400', hint: 'pattern wood' },
-    // Bonus Mix
-    { name: 'Animal 1', value: 'https://picsum.photos/seed/801/600/400', hint: 'animal wildlife' },
-    { name: 'Car 1', value: 'https://picsum.photos/seed/802/600/400', hint: 'car vintage' },
-    { name: 'Space 1', value: 'https://picsum.photos/seed/803/600/400', hint: 'space galaxy' },
-    { name: 'Food 1', value: 'https://picsum.photos/seed/804/600/400', hint: 'food delicious' },
-    { name: 'Architecture 1', value: 'https://picsum.photos/seed/805/600/400', hint: 'architecture modern' },
-    { name: 'Abstract 5', value: 'https://picsum.photos/seed/105/600/400', hint: 'abstract dark' },
-    { name: 'Nature 5', value: 'https://picsum.photos/seed/205/600/400', hint: 'nature field' },
-    { name: 'Beach 3', value: 'https://picsum.photos/seed/305/600/400', hint: 'beach tropical' },
-    { name: 'Mountain 5', value: 'https://picsum.photos/seed/405/600/400', hint: 'mountains forest' },
-    { name: 'City 5', value: 'https://picsum.photos/seed/505/600/400', hint: 'city traffic' },
 ];
 
 const solidColors = [
@@ -270,7 +259,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 icon: ImageIcon,
             });
         };
-        reader.readDataURL(file);
+        reader.readAsDataURL(file);
     };
 
     const getLuminance = (hex: string) => {
@@ -630,5 +619,3 @@ export default function SettingsPage() {
         </div>
     );
 }
-
-    
