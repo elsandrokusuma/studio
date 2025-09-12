@@ -41,11 +41,11 @@ const colors: { name: Color, bgColor: string }[] = [
 
 const wallpaperCategories = {
     Nature: [
-        { name: 'Meadow', value: 'https://picsum.photos/seed/meadow/1920/1080', hint: 'nature meadow' },
+        { name: 'Forest', value: 'https://picsum.photos/seed/forest/1920/1080', hint: 'nature forest' },
         { name: 'Mountains', value: 'https://picsum.photos/seed/mountains/1920/1080', hint: 'nature mountains' },
         { name: 'Lake', value: 'https://picsum.photos/seed/lake/1920/1080', hint: 'nature lake' },
-        { name: 'Beach', value: 'https://picsum.photos/seed/beach/1920/1080', hint: 'nature beach' },
-        { name: 'Desert', value: 'https://picsum.photos/seed/desert/1920/1080', hint: 'nature desert' },
+        { name: 'Aurora', value: 'https://picsum.photos/seed/aurora/1920/1080', hint: 'nature sky' },
+        { name: 'Stars', value: 'https://picsum.photos/seed/stars/1920/1080', hint: 'nature galaxy' },
         { name: 'Jungle', value: 'https://picsum.photos/seed/jungle/1920/1080', hint: 'nature jungle' },
         { name: 'River', value: 'https://picsum.photos/seed/river/1920/1080', hint: 'nature river' },
         { name: 'Waterfall', value: 'https://picsum.photos/seed/waterfall/1920/1080', hint: 'nature waterfall' },
