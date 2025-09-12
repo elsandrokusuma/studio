@@ -28,6 +28,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNotifications } from '@/hooks/use-notifications';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -215,44 +216,46 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 <h1 className="text-3xl font-bold tracking-tight">Galeri Wallpaper</h1>
                 <p className="text-muted-foreground">Pilih dari koleksi gambar acak dan abstrak.</p>
             </header>
-            <Card>
-                <CardContent className="p-4 sm:p-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {galleryWallpapers.map((wp) => (
-                            <div
-                                key={wp.value}
-                                className={cn(
-                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                                    wallpaper === wp.value && "ring-2 ring-primary"
-                                )}
-                                onClick={() => setWallpaper(wp.value)}
-                                tabIndex={0}
-                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
-                            >
-                                <Image
-                                    src={wp.value}
-                                    alt={wp.name}
-                                    fill
-                                    unoptimized
-                                    className="object-cover"
-                                    data-ai-hint={wp.hint}
-                                />
-                                <div className="absolute inset-0 bg-black/30" />
-                                {wallpaper === wp.value && (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Check className="h-6 w-6 text-white" />
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+             <ScrollArea className="h-[calc(100vh-280px)] w-full no-scrollbar">
+                <Card>
+                    <CardContent className="p-4 sm:p-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {galleryWallpapers.map((wp) => (
+                                <div
+                                    key={wp.value}
+                                    className={cn(
+                                        "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                        wallpaper === wp.value && "ring-2 ring-primary"
+                                    )}
+                                    onClick={() => setWallpaper(wp.value)}
+                                    tabIndex={0}
+                                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                                >
+                                    <Image
+                                        src={wp.value}
+                                        alt={wp.name}
+                                        fill
+                                        unoptimized
+                                        className="object-cover"
+                                        data-ai-hint={wp.hint}
+                                    />
+                                    <div className="absolute inset-0 bg-black/30" />
+                                    {wallpaper === wp.value && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Check className="h-6 w-6 text-white" />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+             </ScrollArea>
         </div>
     );
     
     return (
-        <div className="relative overflow-x-hidden" style={{ minHeight: 'calc(100vh - 200px)' }}>
+        <div className="relative overflow-x-hidden no-scrollbar" style={{ minHeight: 'calc(100vh - 200px)' }}>
             <div className={cn(
                 "w-full transition-transform duration-300 ease-in-out",
                 activeSubMenu !== 'main' && "-translate-x-full opacity-0 absolute"
