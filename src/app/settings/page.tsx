@@ -101,8 +101,19 @@ const solidColors = [
     { name: 'Rose', value: '#f43f5e', hint: 'bg-rose-500' },
 ];
 
+const languages = [
+    { name: 'English', code: 'en' },
+    { name: 'Indonesia', code: 'id' },
+    { name: 'Español', code: 'es' },
+    { name: 'Français', code: 'fr' },
+    { name: 'Deutsch', code: 'de' },
+    { name: '日本語', code: 'ja' },
+    { name: '한국어', code: 'ko' },
+    { name: '简体中文', code: 'zh-CN' },
+];
 
-type ActiveMenu = 'main' | 'appearance' | 'account';
+
+type ActiveMenu = 'main' | 'appearance' | 'account' | 'language';
 
 
 function AccountSettings({ onBack }: { onBack: () => void }) {
@@ -210,6 +221,54 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+function LanguageSettings({ onBack }: { onBack: () => void }) {
+    const [selectedLanguage, setSelectedLanguage] = React.useState('id'); // Default to Indonesia
+    const { addNotification } = useNotifications();
+
+    const handleLanguageSelect = (code: string) => {
+        setSelectedLanguage(code);
+        const language = languages.find(l => l.code === code);
+        addNotification({
+            title: "Bahasa Diperbarui",
+            description: `Bahasa telah diatur ke ${language?.name}.`, // Note: Full functionality requires i18n library
+            icon: Languages,
+        });
+    };
+
+    return (
+        <div className="flex flex-col gap-8">
+            <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali ke Pengaturan
+            </Button>
+            <header>
+                <h1 className="text-3xl font-bold tracking-tight">Bahasa</h1>
+                <p className="text-muted-foreground">Pilih bahasa tampilan untuk aplikasi.</p>
+            </header>
+            
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex flex-col gap-1">
+                        {languages.map(lang => (
+                            <button 
+                                key={lang.code}
+                                onClick={() => handleLanguageSelect(lang.code)}
+                                className={cn(
+                                    "flex items-center justify-between w-full p-3 rounded-lg text-left transition-colors",
+                                    selectedLanguage === lang.code ? "bg-accent text-accent-foreground" : "hover:bg-accent"
+                                )}
+                            >
+                                <span>{lang.name}</span>
+                                {selectedLanguage === lang.code && <Check className="h-5 w-5 text-primary" />}
+                            </button>
+                        ))}
+                    </div>
                 </CardContent>
             </Card>
         </div>
@@ -581,7 +640,7 @@ function MainSettings({ onMenuClick }: { onMenuClick: (menu: ActiveMenu) => void
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </button>
                      <button 
-                        onClick={() => { /* TODO: Implement language settings */ }}
+                        onClick={() => onMenuClick('language')}
                         className="flex items-center justify-between w-full p-4 rounded-lg hover:bg-accent transition-colors"
                     >
                         <div className="flex items-center gap-4">
@@ -631,8 +690,14 @@ export default function SettingsPage() {
             )}>
                 <AppearanceSettings onBack={() => setActiveMenu('main')} />
             </div>
+            <div className={cn(
+                "w-full transition-transform duration-300 ease-in-out absolute top-0",
+                activeMenu !== 'language' && "translate-x-full opacity-0"
+            )}>
+                <LanguageSettings onBack={() => setActiveMenu('main')} />
+            </div>
         </div>
     );
 }
-
+    
     
