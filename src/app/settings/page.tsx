@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon, Wallpaper as WallpaperIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -44,7 +44,7 @@ const wallpapers = [
     { name: 'Waterfall', value: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716', hint: 'nature waterfall' },
     { name: 'Mountains', value: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606', hint: 'nature mountains' },
     { name: 'Forest', value: 'https://images.unsplash.com/photo-1448375240586-882707db888b', hint: 'nature forest' },
-    { name: 'Lake', value: 'https://images.unsplash.com/photo-1476610182048-b716b8518a2a', hint: 'nature lake' },
+    { name: 'Lake', value: 'https://images.unsplash.com/photo-1501854140801-50d01698950b', hint: 'nature lake' },
     { name: 'Aurora', value: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7', hint: 'nature sky' },
     { name: 'Autumn Path', value: 'https://images.unsplash.com/photo-1473117406439-369f98a6e846', hint: 'nature path' },
     { name: 'Desert', value: 'https://images.unsplash.com/photo-1473580044384-7ba9967e16a0', hint: 'nature desert' },
@@ -214,6 +214,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
     const { toast } = useToast();
     const { addNotification } = useNotifications();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [showWallpaperGrid, setShowWallpaperGrid] = React.useState(false);
     
     const isDarkMode = theme === 'dark';
 
@@ -248,152 +249,186 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
     };
 
     const renderWallpaperSelection = () => (
-        <div className="space-y-4">
-            <div>
-                <Label>Wallpaper Latar Belakang</Label>
-                <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 pt-2">
-                <div
-                    key="default"
-                    className={cn(
-                        "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
-                        wallpaper === 'default' && "ring-2 ring-primary"
-                    )}
-                    onClick={() => setWallpaper('default')}
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
-                >
-                    <div className="absolute inset-0 flex items-end p-2">
-                        <p className="text-muted-foreground text-xs font-medium">Solid Color</p>
-                    </div>
-                    {wallpaper === 'default' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Check className="h-6 w-6 text-primary" />
-                        </div>
-                    )}
-                </div>
-                {wallpapers.map((wp) => (
-                    <div
-                        key={wp.name}
-                        className={cn(
-                            "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                            wallpaper === wp.value && "ring-2 ring-primary"
-                        )}
-                        onClick={() => setWallpaper(wp.value)}
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
-                    >
-                        <Image
-                            src={wp.value}
-                            alt={wp.name}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                            data-ai-hint={wp.hint}
-                        />
-                        <div className="absolute inset-0 bg-black/30" />
-                        {wallpaper === wp.value && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <Check className="h-6 w-6 text-white" />
+        <div className="flex flex-col gap-8">
+            <Button variant="ghost" onClick={() => setShowWallpaperGrid(false)} className="self-start text-muted-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali ke Tampilan
+            </Button>
+            <header>
+                <h1 className="text-3xl font-bold tracking-tight">Pilih Wallpaper</h1>
+                <p className="text-muted-foreground">Pilih dari koleksi kami atau unggah gambar Anda sendiri.</p>
+            </header>
+            <Card>
+                <CardContent className="p-4 sm:p-6 space-y-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                        <div
+                            key="default"
+                            className={cn(
+                                "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
+                                wallpaper === 'default' && "ring-2 ring-primary"
+                            )}
+                            onClick={() => setWallpaper('default')}
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
+                        >
+                            <div className="absolute inset-0 flex items-center justify-center p-2">
+                                <p className="text-muted-foreground text-xs text-center font-medium">Solid Color</p>
                             </div>
-                        )}
+                            {wallpaper === 'default' && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                    <Check className="h-6 w-6 text-white" />
+                                </div>
+                            )}
+                        </div>
+                        {wallpapers.map((wp) => (
+                            <div
+                                key={wp.value}
+                                className={cn(
+                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                    wallpaper === wp.value && "ring-2 ring-primary"
+                                )}
+                                onClick={() => setWallpaper(wp.value)}
+                                tabIndex={0}
+                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                            >
+                                <Image
+                                    src={wp.value}
+                                    alt={wp.name}
+                                    fill
+                                    unoptimized
+                                    className="object-cover"
+                                    data-ai-hint={wp.hint}
+                                />
+                                <div className="absolute inset-0 bg-black/30" />
+                                {wallpaper === wp.value && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Check className="h-6 w-6 text-white" />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        >
+                            <Upload className="h-6 w-6 mb-1" />
+                            <span className="text-xs font-medium">Unggah Gambar</span>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/png, image/jpeg, image/webp"
+                                onChange={handleFileUpload}
+                            />
+                        </button>
                     </div>
-                ))}
-                <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                    <Upload className="h-6 w-6 mb-1" />
-                    <span className="text-xs font-medium">Unggah Gambar</span>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/png, image/jpeg, image/webp"
-                        onChange={handleFileUpload}
-                    />
-                </button>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
     
     return (
-        <div className="flex flex-col gap-8">
-             <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Kembali ke Pengaturan
-            </Button>
-            <header>
-                <h1 className="text-3xl font-bold tracking-tight">Appearance</h1>
-                <p className="text-muted-foreground">Sesuaikan tampilan dan nuansa aplikasi.</p>
-            </header>
-            <Card>
-                <CardContent className="p-6 space-y-8">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <Label htmlFor="dark-mode">Dark Mode</Label>
-                            <p className="text-sm text-muted-foreground">Aktifkan atau nonaktifkan tema gelap.</p>
-                        </div>
-                        <Switch
-                            id="dark-mode"
-                            checked={isDarkMode}
-                            onCheckedChange={handleThemeChange}
-                        />
-                    </div>
+        <div className="relative overflow-x-hidden" style={{ minHeight: 'calc(100vh - 200px)' }}>
+            <div className={cn(
+                "w-full transition-transform duration-300 ease-in-out",
+                showWallpaperGrid && "-translate-x-full opacity-0 absolute"
+            )}>
+                 <div className="flex flex-col gap-8">
+                    <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Pengaturan
+                    </Button>
+                    <header>
+                        <h1 className="text-3xl font-bold tracking-tight">Appearance</h1>
+                        <p className="text-muted-foreground">Sesuaikan tampilan dan nuansa aplikasi.</p>
+                    </header>
+                    <Card>
+                        <CardContent className="p-6 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <Label htmlFor="dark-mode">Dark Mode</Label>
+                                    <p className="text-sm text-muted-foreground">Aktifkan atau nonaktifkan tema gelap.</p>
+                                </div>
+                                <Switch
+                                    id="dark-mode"
+                                    checked={isDarkMode}
+                                    onCheckedChange={handleThemeChange}
+                                />
+                            </div>
 
-                    <div className="space-y-2">
-                    <div>
-                            <Label>Warna Tema</Label>
-                            <p className="text-sm text-muted-foreground">Pilih warna tema pilihan Anda.</p>
-                        </div>
-                        <div className="flex gap-3 pt-2">
-                            {colors.map((c) => (
-                                <Button
-                                    key={c.name}
-                                    variant="outline"
-                                    size="icon"
-                                    className={cn('h-8 w-8 rounded-full', c.bgColor, color === c.name && 'ring-2 ring-offset-2 ring-primary')}
-                                    onClick={() => setColor(c.name)}
-                                >
-                                    {color === c.name && <Check className="h-4 w-4 text-white" />}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
+                            <div className="space-y-2">
+                                <div>
+                                    <Label>Warna Tema</Label>
+                                    <p className="text-sm text-muted-foreground">Pilih warna tema pilihan Anda.</p>
+                                </div>
+                                <div className="flex gap-3 pt-2">
+                                    {colors.map((c) => (
+                                        <Button
+                                            key={c.name}
+                                            variant="outline"
+                                            size="icon"
+                                            className={cn('h-8 w-8 rounded-full', c.bgColor, color === c.name && 'ring-2 ring-offset-2 ring-primary')}
+                                            onClick={() => setColor(c.name)}
+                                        >
+                                            {color === c.name && <Check className="h-4 w-4 text-white" />}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                             <button 
+                                onClick={() => setShowWallpaperGrid(true)}
+                                className="flex items-center justify-between w-full p-4 rounded-lg hover:bg-accent transition-colors -mx-4"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 bg-primary/10 rounded-md">
+                                        <WallpaperIcon className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-semibold">Wallpaper Latar Belakang</p>
+                                        <p className="text-sm text-muted-foreground">Pilih latar belakang aplikasi.</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                            </button>
 
-                    {renderWallpaperSelection()}
-
-                    <div className="space-y-4">
-                        <div>
-                            <Label>Tingkat Kegelapan Wallpaper</Label>
-                            <p className="text-sm text-muted-foreground">Atur seberapa gelap overlay pada wallpaper.</p>
-                        </div>
-                        <Slider
-                            value={[wallpaperOpacity]}
-                            onValueChange={(value) => setWallpaperOpacity(value[0])}
-                            min={0}
-                            max={1}
-                            step={0.1}
-                            disabled={wallpaper === 'default'}
-                        />
-                    </div>
-                    
-                    <div className="space-y-4">
-                        <div>
-                            <Label>Transparansi Komponen</Label>
-                            <p className="text-sm text-muted-foreground">Atur transparansi untuk card dan header.</p>
-                        </div>
-                        <Slider
-                            value={[componentOpacity]}
-                            onValueChange={(value) => setComponentOpacity(value[0])}
-                            min={0.5}
-                            max={1}
-                            step={0.05}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label>Tingkat Kegelapan Wallpaper</Label>
+                                    <p className="text-sm text-muted-foreground">Atur seberapa gelap overlay pada wallpaper.</p>
+                                </div>
+                                <Slider
+                                    value={[wallpaperOpacity]}
+                                    onValueChange={(value) => setWallpaperOpacity(value[0])}
+                                    min={0}
+                                    max={1}
+                                    step={0.1}
+                                    disabled={wallpaper === 'default'}
+                                />
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <Label>Transparansi Komponen</Label>
+                                    <p className="text-sm text-muted-foreground">Atur transparansi untuk card dan header.</p>
+                                </div>
+                                <Slider
+                                    value={[componentOpacity]}
+                                    onValueChange={(value) => setComponentOpacity(value[0])}
+                                    min={0.5}
+                                    max={1}
+                                    step={0.05}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+             <div className={cn(
+                "w-full transition-transform duration-300 ease-in-out absolute top-0",
+                !showWallpaperGrid && "translate-x-full opacity-0"
+            )}>
+                {renderWallpaperSelection()}
+            </div>
         </div>
     )
 }
@@ -468,14 +503,14 @@ export default function SettingsPage() {
                 <MainSettings onMenuClick={setActiveMenu} />
             </div>
              <div className={cn(
-                "w-full transition-transform duration-300 ease-in-out",
-                activeMenu !== 'account' && "translate-x-full opacity-0 absolute"
+                "w-full transition-transform duration-300 ease-in-out absolute top-0",
+                activeMenu !== 'account' && "translate-x-full opacity-0"
             )}>
                 <AccountSettings onBack={() => setActiveMenu('main')} />
             </div>
             <div className={cn(
-                "w-full transition-transform duration-300 ease-in-out",
-                activeMenu !== 'appearance' && "translate-x-full opacity-0 absolute"
+                "w-full transition-transform duration-300 ease-in-out absolute top-0",
+                activeMenu !== 'appearance' && "translate-x-full opacity-0"
             )}>
                 <AppearanceSettings onBack={() => setActiveMenu('main')} />
             </div>
