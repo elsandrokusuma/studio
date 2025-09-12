@@ -11,20 +11,36 @@ import { ThemeContext, type Theme, type Color, type Wallpaper } from '@/hooks/us
 function AppWallpaper() {
     const { wallpaper, wallpaperOpacity } = React.useContext(ThemeContext)!;
     const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+    const [solidColor, setSolidColor] = React.useState<string | null>(null);
 
     React.useEffect(() => {
         if (wallpaper === 'default') {
             setImageUrl(null);
+            setSolidColor(null);
             return;
         }
 
-        if (wallpaper) {
+        if (wallpaper.startsWith('#') || wallpaper.startsWith('rgb')) {
+            setSolidColor(wallpaper);
+            setImageUrl(null);
+        } else if (wallpaper) {
             setImageUrl(wallpaper);
+            setSolidColor(null);
         } else {
             setImageUrl(null);
+            setSolidColor(null);
         }
     }, [wallpaper]);
 
+    if (solidColor) {
+        return (
+            <div 
+                className="fixed inset-0 z-[-1]" 
+                style={{ backgroundColor: solidColor }} 
+            />
+        );
+    }
+    
     if (!imageUrl) {
         return null;
     }

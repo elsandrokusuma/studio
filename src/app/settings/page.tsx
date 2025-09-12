@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon, Droplets, Contrast } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -44,49 +44,72 @@ const galleryWallpapers = [
     { name: 'Abstract 2', value: 'https://picsum.photos/seed/102/600/400', hint: 'abstract colorful' },
     { name: 'Abstract 3', value: 'https://picsum.photos/seed/103/600/400', hint: 'abstract geometric' },
     { name: 'Abstract 4', value: 'https://picsum.photos/seed/104/600/400', hint: 'abstract light' },
-    { name: 'Abstract 5', value: 'https://picsum.photos/seed/105/600/400', hint: 'abstract dark' },
     // Nature
     { name: 'Nature 1', value: 'https://picsum.photos/seed/201/600/400', hint: 'nature forest' },
     { name: 'Nature 2', value: 'https://picsum.photos/seed/202/600/400', hint: 'nature leaves' },
     { name: 'Nature 3', value: 'https://picsum.photos/seed/203/600/400', hint: 'nature flower' },
-    { name: 'Nature 4', value: 'https://picsum.photos/seed/204/600/400', hint: 'nature field' },
-    { name: 'Nature 5', value: 'https://picsum.photos/seed/205/600/400', hint: 'nature tree' },
+    { name: 'Nature 4', value: 'https://picsum.photos/seed/204/600/400', hint: 'nature tree' },
     // Beach & Ocean
     { name: 'Beach 1', value: 'https://picsum.photos/seed/301/600/400', hint: 'beach sand' },
     { name: 'Beach 2', value: 'https://picsum.photos/seed/302/600/400', hint: 'beach sunset' },
     { name: 'Ocean 1', value: 'https://picsum.photos/seed/303/600/400', hint: 'ocean waves' },
     { name: 'Ocean 2', value: 'https://picsum.photos/seed/304/600/400', hint: 'ocean underwater' },
-    { name: 'Beach 3', value: 'https://picsum.photos/seed/305/600/400', hint: 'beach tropical' },
     // Mountains
     { name: 'Mountain 1', value: 'https://picsum.photos/seed/401/600/400', hint: 'mountains snow' },
     { name: 'Mountain 2', value: 'https://picsum.photos/seed/402/600/400', hint: 'mountains valley' },
     { name: 'Mountain 3', value: 'https://picsum.photos/seed/403/600/400', hint: 'mountains sunrise' },
     { name: 'Mountain 4', value: 'https://picsum.photos/seed/404/600/400', hint: 'mountains lake' },
-    { name: 'Mountain 5', value: 'https://picsum.photos/seed/405/600/400', hint: 'mountains forest' },
     // City Light Night
     { name: 'City 1', value: 'https://picsum.photos/seed/501/600/400', hint: 'city night' },
     { name: 'City 2', value: 'https://picsum.photos/seed/502/600/400', hint: 'city lights' },
     { name: 'City 3', value: 'https://picsum.photos/seed/503/600/400', hint: 'city skyline' },
-    { name: 'City 4', value: 'https://picsum.photos/seed/504/600/400', hint: 'city traffic' },
-    { name: 'City 5', value: 'https://picsum.photos/seed/505/600/400', hint: 'city street' },
+    { name: 'City 4', value: 'https://picsum.photos/seed/504/600/400', hint: 'city street' },
     // Technology
     { name: 'Technology 1', value: 'https://picsum.photos/seed/601/600/400', hint: 'technology circuit' },
     { name: 'Technology 2', value: 'https://picsum.photos/seed/602/600/400', hint: 'technology code' },
     { name: 'Technology 3', value: 'https://picsum.photos/seed/603/600/400', hint: 'technology futuristic' },
     { name: 'Technology 4', value: 'https://picsum.photos/seed/604/600/400', hint: 'technology server' },
-    { name: 'Technology 5', value: 'https://picsum.photos/seed/605/600/400', hint: 'technology data' },
     // Pattern
     { name: 'Pattern 1', value: 'https://picsum.photos/seed/701/600/400', hint: 'pattern geometric' },
     { name: 'Pattern 2', value: 'https://picsum.photos/seed/702/600/400', hint: 'pattern texture' },
     { name: 'Pattern 3', value: 'https://picsum.photos/seed/703/600/400', hint: 'pattern lines' },
-    { name: 'Pattern 4', value: 'https://picsum.photos/seed/704/600/400', hint: 'pattern minimal' },
-    { name: 'Pattern 5', value: 'https://picsum.photos/seed/705/600/400', hint: 'pattern wood' },
+    { name: 'Pattern 4', value: 'https://picsum.photos/seed/704/600/400', hint: 'pattern wood' },
     // Bonus Mix
-    { name: 'Bonus 1', value: 'https://picsum.photos/seed/801/600/400', hint: 'animal wildlife' },
-    { name: 'Bonus 2', value: 'https://picsum.photos/seed/802/600/400', hint: 'car vintage' },
-    { name: 'Bonus 3', value: 'https://picsum.photos/seed/803/600/400', hint: 'space galaxy' },
-    { name: 'Bonus 4', value: 'https://picsum.photos/seed/804/600/400', hint: 'food delicious' },
-    { name: 'Bonus 5', value: 'https://picsum.photos/seed/805/600/400', hint: 'architecture modern' },
+    { name: 'Animal 1', value: 'https://picsum.photos/seed/801/600/400', hint: 'animal wildlife' },
+    { name: 'Car 1', value: 'https://picsum.photos/seed/802/600/400', hint: 'car vintage' },
+    { name: 'Space 1', value: 'https://picsum.photos/seed/803/600/400', hint: 'space galaxy' },
+    { name: 'Food 1', value: 'https://picsum.photos/seed/804/600/400', hint: 'food delicious' },
+    { name: 'Architecture 1', value: 'https://picsum.photos/seed/805/600/400', hint: 'architecture modern' },
+    { name: 'Abstract 5', value: 'https://picsum.photos/seed/105/600/400', hint: 'abstract dark' },
+    { name: 'Nature 5', value: 'https://picsum.photos/seed/205/600/400', hint: 'nature field' },
+    { name: 'Beach 3', value: 'https://picsum.photos/seed/305/600/400', hint: 'beach tropical' },
+    { name: 'Mountain 5', value: 'https://picsum.photos/seed/405/600/400', hint: 'mountains forest' },
+    { name: 'City 5', value: 'https://picsum.photos/seed/505/600/400', hint: 'city traffic' },
+];
+
+const solidColors = [
+    { name: 'Default', value: 'default', hint: 'Default theme color' },
+    { name: 'Black', value: '#000000', hint: 'bg-black' },
+    { name: 'White', value: '#ffffff', hint: 'bg-white' },
+    { name: 'Slate', value: '#64748b', hint: 'bg-slate-500' },
+    { name: 'Gray', value: '#6b7280', hint: 'bg-gray-500' },
+    { name: 'Red', value: '#ef4444', hint: 'bg-red-500' },
+    { name: 'Orange', value: '#f97316', hint: 'bg-orange-500' },
+    { name: 'Amber', value: '#f59e0b', hint: 'bg-amber-500' },
+    { name: 'Yellow', value: '#eab308', hint: 'bg-yellow-500' },
+    { name: 'Lime', value: '#84cc16', hint: 'bg-lime-500' },
+    { name: 'Green', value: '#22c55e', hint: 'bg-green-500' },
+    { name: 'Emerald', value: '#10b981', hint: 'bg-emerald-500' },
+    { name: 'Teal', value: '#14b8a6', hint: 'bg-teal-500' },
+    { name: 'Cyan', value: '#06b6d4', hint: 'bg-cyan-500' },
+    { name: 'Sky', value: '#0ea5e9', hint: 'bg-sky-500' },
+    { name: 'Blue', value: '#3b82f6', hint: 'bg-blue-500' },
+    { name: 'Indigo', value: '#6366f1', hint: 'bg-indigo-500' },
+    { name: 'Violet', value: '#8b5cf6', hint: 'bg-violet-500' },
+    { name: 'Purple', value: '#a855f7', hint: 'bg-purple-500' },
+    { name: 'Fuchsia', value: '#d946ef', hint: 'bg-fuchsia-500' },
+    { name: 'Pink', value: '#ec4899', hint: 'bg-pink-500' },
+    { name: 'Rose', value: '#f43f5e', hint: 'bg-rose-500' },
 ];
 
 
@@ -216,7 +239,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
     const { toast } = useToast();
     const { addNotification } = useNotifications();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const [activeSubMenu, setActiveSubMenu] = React.useState<'main' | 'gallery'>('main');
+    const [activeSubMenu, setActiveSubMenu] = React.useState<'main' | 'gallery' | 'solidColor'>('main');
     
     const isDarkMode = theme === 'dark';
 
@@ -258,9 +281,9 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
             </Button>
             <header>
                 <h1 className="text-3xl font-bold tracking-tight">Galeri Wallpaper</h1>
-                <p className="text-muted-foreground">Pilih dari koleksi gambar acak dan abstrak.</p>
+                <p className="text-muted-foreground">Pilih dari koleksi gambar yang beragam.</p>
             </header>
-             <div className="h-[calc(100vh-280px)] w-full no-scrollbar">
+            <div className="no-scrollbar">
                 <Card>
                     <CardContent className="p-4 sm:p-6">
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -295,6 +318,56 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                     </CardContent>
                 </Card>
              </div>
+        </div>
+    );
+    
+    const renderSolidColorSelection = () => (
+        <div className="flex flex-col gap-8 no-scrollbar">
+            <Button variant="ghost" onClick={() => setActiveSubMenu('main')} className="self-start text-muted-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali ke Tampilan
+            </Button>
+            <header>
+                <h1 className="text-3xl font-bold tracking-tight">Warna Solid</h1>
+                <p className="text-muted-foreground">Pilih warna latar belakang solid.</p>
+            </header>
+            <div className="no-scrollbar">
+                <Card>
+                    <CardContent className="p-4 sm:p-6">
+                        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
+                            {solidColors.map((c) => (
+                                <div
+                                    key={c.name}
+                                    className="flex flex-col items-center gap-2 cursor-pointer"
+                                    onClick={() => setWallpaper(c.value)}
+                                    tabIndex={0}
+                                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper(c.value)}
+                                >
+                                    <div className={cn(
+                                        "relative aspect-square w-full rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                        wallpaper === c.value && "ring-2 ring-primary"
+                                    )}>
+                                        {c.value === 'default' ? (
+                                            <div className="w-full h-full rounded-md bg-muted flex items-center justify-center">
+                                                 <Contrast className="h-6 w-6 text-muted-foreground" />
+                                            </div>
+                                        ) : (
+                                            <div className={cn("w-full h-full rounded-md", c.hint)} style={{ backgroundColor: c.value.startsWith('#') ? c.value : undefined }} />
+                                        )}
+                                        
+                                        {wallpaper === c.value && (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-md">
+                                                <Check className="h-6 w-6 text-white" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-center text-muted-foreground">{c.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
     
@@ -353,21 +426,18 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                     <p className="text-sm text-muted-foreground">Pilih wallpaper default atau unggah gambar Anda sendiri.</p>
                                 </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
-                                     <div
-                                        className={cn(
-                                            "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted flex items-center justify-center p-2 text-center font-medium",
-                                            wallpaper === 'default' && "ring-2 ring-primary"
-                                        )}
-                                        onClick={() => setWallpaper('default')}
+                                    <div
+                                        className="relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                                        onClick={() => setActiveSubMenu('solidColor')}
                                         tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
+                                        onKeyDown={(e) => e.key === 'Enter' && setActiveSubMenu('solidColor')}
                                     >
-                                        Solid Color
-                                        {wallpaper === 'default' && (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                                <Check className="h-6 w-6 text-white" />
-                                            </div>
-                                        )}
+                                        <div className="absolute inset-0 bg-muted flex items-center justify-center p-2 text-center font-medium">
+                                            <Droplets className="h-6 w-6 text-muted-foreground" />
+                                        </div>
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity">
+                                            <p className="text-white font-semibold">Warna Solid</p>
+                                        </div>
                                     </div>
                                     <div
                                         className="relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
@@ -409,7 +479,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                     min={0}
                                     max={1}
                                     step={0.1}
-                                    disabled={wallpaper === 'default'}
+                                    disabled={wallpaper === 'default' || wallpaper.startsWith('#')}
                                 />
                             </div>
                             
@@ -435,6 +505,12 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 activeSubMenu !== 'gallery' && "translate-x-full opacity-0"
             )}>
                 {renderWallpaperSelection()}
+            </div>
+             <div className={cn(
+                "w-full transition-transform duration-300 ease-in-out absolute top-0",
+                activeSubMenu !== 'solidColor' && "translate-x-full opacity-0"
+            )}>
+                {renderSolidColorSelection()}
             </div>
         </div>
     )

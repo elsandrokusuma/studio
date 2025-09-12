@@ -5,6 +5,7 @@ import * as React from 'react';
 
 type Theme = 'light' | 'dark';
 type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
+// Wallpaper can be a URL, a hex code, or 'default'
 type Wallpaper = string;
 
 
