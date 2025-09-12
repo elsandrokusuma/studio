@@ -207,7 +207,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
     };
 
     const renderWallpaperSelection = () => (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 no-scrollbar">
             <Button variant="ghost" onClick={() => setActiveSubMenu('main')} className="self-start text-muted-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Kembali ke Tampilan
@@ -216,7 +216,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 <h1 className="text-3xl font-bold tracking-tight">Galeri Wallpaper</h1>
                 <p className="text-muted-foreground">Pilih dari koleksi gambar acak dan abstrak.</p>
             </header>
-             <ScrollArea className="h-[calc(100vh-280px)] w-full no-scrollbar">
+             <div className="h-[calc(100vh-280px)] w-full no-scrollbar">
                 <Card>
                     <CardContent className="p-4 sm:p-6">
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -250,7 +250,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                         </div>
                     </CardContent>
                 </Card>
-             </ScrollArea>
+             </div>
         </div>
     );
     
@@ -260,7 +260,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 "w-full transition-transform duration-300 ease-in-out",
                 activeSubMenu !== 'main' && "-translate-x-full opacity-0 absolute"
             )}>
-                 <div className="flex flex-col gap-8">
+                 <div className="flex flex-col gap-8 no-scrollbar">
                     <Button variant="ghost" onClick={onBack} className="self-start text-muted-foreground">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Kembali ke Pengaturan
@@ -325,6 +325,17 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                             </div>
                                         )}
                                     </div>
+                                    <div
+                                        className="relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                                        onClick={() => setActiveSubMenu('gallery')}
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && setActiveSubMenu('gallery')}
+                                    >
+                                        <Image src="https://picsum.photos/seed/gallery/600/400" alt="Wallpaper Gallery" fill unoptimized className="object-cover" data-ai-hint="abstract texture" />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                                            <p className="text-white font-semibold">Galeri Wallpaper</p>
+                                        </div>
+                                    </div>
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
                                         className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -339,17 +350,6 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                             onChange={handleFileUpload}
                                         />
                                     </button>
-                                    <div
-                                        className="relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
-                                        onClick={() => setActiveSubMenu('gallery')}
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && setActiveSubMenu('gallery')}
-                                    >
-                                        <Image src="https://picsum.photos/seed/gallery/600/400" alt="Wallpaper Gallery" fill unoptimized className="object-cover" data-ai-hint="abstract texture" />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                                            <p className="text-white font-semibold">Galeri Wallpaper</p>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
