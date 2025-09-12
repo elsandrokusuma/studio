@@ -67,7 +67,7 @@ const wallpaperCategories = {
     Tech: [
         { name: 'Laptop Code', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'technology code' },
         { name: 'Galaxy', value: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa', hint: 'technology network' },
-        { name: 'LED Panel', value: 'https://images.unsplash.com/photo-1597741066271-593d6b055813', hint: 'technology abstract' },
+        { name: 'Control Panel', value: 'https://images.unsplash.com/photo-1619120238346-978e0773b424', hint: 'technology server' },
         { name: 'Retro Tech', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'technology abstract' },
         { name: 'Monitor Code', value: 'https://images.unsplash.com/photo-1624996752380-8ec242e0f85d', hint: 'technology code' },
         { name: 'Circuit Board', value: 'https://images.unsplash.com/photo-1581092334651-ddf7d54d9242', hint: 'technology circuit' },
