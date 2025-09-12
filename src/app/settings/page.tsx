@@ -220,37 +220,35 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
             </header>
             <Card>
                 <CardContent className="p-4 sm:p-6">
-                     <ScrollArea className="h-[calc(100vh-22rem)] no-scrollbar">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                            {galleryWallpapers.map((wp) => (
-                                <div
-                                    key={wp.value}
-                                    className={cn(
-                                        "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                                        wallpaper === wp.value && "ring-2 ring-primary"
-                                    )}
-                                    onClick={() => setWallpaper(wp.value)}
-                                    tabIndex={0}
-                                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
-                                >
-                                    <Image
-                                        src={wp.value}
-                                        alt={wp.name}
-                                        fill
-                                        unoptimized
-                                        className="object-cover"
-                                        data-ai-hint={wp.hint}
-                                    />
-                                    <div className="absolute inset-0 bg-black/30" />
-                                    {wallpaper === wp.value && (
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <Check className="h-6 w-6 text-white" />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </ScrollArea>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {galleryWallpapers.map((wp) => (
+                            <div
+                                key={wp.value}
+                                className={cn(
+                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                    wallpaper === wp.value && "ring-2 ring-primary"
+                                )}
+                                onClick={() => setWallpaper(wp.value)}
+                                tabIndex={0}
+                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                            >
+                                <Image
+                                    src={wp.value}
+                                    alt={wp.name}
+                                    fill
+                                    unoptimized
+                                    className="object-cover"
+                                    data-ai-hint={wp.hint}
+                                />
+                                <div className="absolute inset-0 bg-black/30" />
+                                {wallpaper === wp.value && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Check className="h-6 w-6 text-white" />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </CardContent>
             </Card>
         </div>
