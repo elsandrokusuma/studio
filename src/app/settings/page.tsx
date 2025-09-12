@@ -45,16 +45,30 @@ const wallpaperCategories = {
         value: `https://picsum.photos/seed/nature_${i + 1}/1920/1080`,
         hint: 'nature',
     })),
-    City: Array.from({ length: 10 }, (_, i) => ({
-        name: `City ${i + 1}`,
-        value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
-        hint: 'city architecture',
-    })),
-    Tech: Array.from({ length: 10 }, (_, i) => ({
-        name: `Tech ${i + 1}`,
-        value: `https://picsum.photos/seed/tech_${i + 1}/1920/1080`,
-        hint: 'technology abstract',
-    })),
+    City: [
+        { name: 'City 1', value: 'https://picsum.photos/seed/cityscape/1920/1080', hint: 'city architecture' },
+        { name: 'City 2', value: 'https://picsum.photos/seed/urban/1920/1080', hint: 'city street' },
+        { name: 'City 3', value: 'https://picsum.photos/seed/metropolis/1920/1080', hint: 'city skyline' },
+        { name: 'City 4', value: 'https://picsum.photos/seed/downtown/1920/1080', hint: 'city night' },
+        { name: 'City 5', value: 'https://picsum.photos/seed/skyscraper/1920/1080', hint: 'architecture building' },
+        { name: 'City 6', value: 'https://picsum.photos/seed/citylights/1920/1080', hint: 'city lights' },
+        { name: 'City 7', value: 'https://picsum.photos/seed/architecture/1920/1080', hint: 'building urban' },
+        { name: 'City 8', value: 'https://picsum.photos/seed/cityview/1920/1080', hint: 'city view' },
+        { name: 'City 9', value: 'https://picsum.photos/seed/bigcity/1920/1080', hint: 'cityscape metropolis' },
+        { name: 'City 10', value: 'https://picsum.photos/seed/town/1920/1080', hint: 'city town' },
+    ],
+    Tech: [
+        { name: 'Tech 1', value: 'https://picsum.photos/seed/circuit/1920/1080', hint: 'technology circuit' },
+        { name: 'Tech 2', value: 'https://picsum.photos/seed/code/1920/1080', hint: 'technology code' },
+        { name: 'Tech 3', value: 'https://picsum.photos/seed/server/1920/1080', hint: 'technology server' },
+        { name: 'Tech 4', value: 'https://picsum.photos/seed/network/1920/1080', hint: 'technology network' },
+        { name: 'Tech 5', value: 'https://picsum.photos/seed/binary/1920/1080', hint: 'technology binary' },
+        { name: 'Tech 6', value: 'https://picsum.photos/seed/hardware/1920/1080', hint: 'technology hardware' },
+        { name: 'Tech 7', value: 'https://picsum.photos/seed/processor/1920/1080', hint: 'technology processor' },
+        { name: 'Tech 8', value: 'https://picsum.photos/seed/connect/1920/1080', hint: 'technology abstract' },
+        { name: 'Tech 9', value: 'https://picsum.photos/seed/datascience/1920/1080', hint: 'technology data' },
+        { name: 'Tech 10', value: 'https://picsum.photos/seed/future/1920/1080', hint: 'technology futuristic' },
+    ],
 };
 
 type Category = keyof typeof wallpaperCategories;
