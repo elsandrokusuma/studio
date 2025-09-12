@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon, Wallpaper as WallpaperIcon } from 'lucide-react';
+import { ArrowLeft, Check, Upload, Palette, ChevronRight, User, Trash2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -27,9 +27,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
 import { useNotifications } from '@/hooks/use-notifications';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -40,7 +38,6 @@ const colors: { name: Color, bgColor: string }[] = [
     { name: 'violet', bgColor: 'bg-violet-500' },
 ];
 
-// Generate 40 unique images from picsum.photos
 const galleryWallpapers = Array.from({ length: 40 }, (_, i) => ({
     name: `Random ${i + 1}`,
     value: `https://picsum.photos/seed/${i + 1}/600/400`,
