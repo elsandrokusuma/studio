@@ -50,18 +50,11 @@ const wallpaperCategories = {
         value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
         hint: 'city architecture',
     })),
-    Tech: [
-        { name: 'Circuit Board 1', value: 'https://images.unsplash.com/photo-1593344484962-796b9201a3f4?w=1920&h=1080&fit=crop&q=80', hint: 'circuit board' },
-        { name: 'Code on Screen', value: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1920&h=1080&fit=crop&q=80', hint: 'programming code' },
-        { name: 'Server Room', value: 'https://images.unsplash.com/photo-1580894908361-967195033215?w=1920&h=1080&fit=crop&q=80', hint: 'server room' },
-        { name: 'Abstract Tech Lines', value: 'https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?w=1920&h=1080&fit=crop&q=80', hint: 'abstract technology' },
-        { name: 'Glowing Circuit', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a?w=1920&h=1080&fit=crop&q=80', hint: 'glowing circuit' },
-        { name: 'Hardware Components', value: 'https://images.unsplash.com/photo-1614036935212-f04ba8a62318?w=1920&h=1080&fit=crop&q=80', hint: 'computer hardware' },
-        { name: 'Network Cables', value: 'https://images.unsplash.com/photo-1587831990711-23d7e9a24269?w=1920&h=1080&fit=crop&q=80', hint: 'network cables' },
-        { name: 'Futuristic City', value: 'https://images.unsplash.com/photo-1519692424382-3e2abe25ae29?w=1920&h=1080&fit=crop&q=80', hint: 'futuristic city' },
-        { name: 'Quantum Computer', value: 'https://images.unsplash.com/photo-1635070049405-5926a7b54338?w=1920&h=1080&fit=crop&q=80', hint: 'quantum computer' },
-        { name: 'Abstract Data', value: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&h=1080&fit=crop&q=80', hint: 'data visualization' },
-    ],
+    Tech: Array.from({ length: 10 }, (_, i) => ({
+        name: `Tech ${i + 1}`,
+        value: `https://picsum.photos/seed/tech_${i + 1}/1920/1080`,
+        hint: 'technology abstract',
+    })),
 };
 
 type Category = keyof typeof wallpaperCategories;
