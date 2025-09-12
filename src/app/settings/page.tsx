@@ -50,11 +50,18 @@ const wallpaperCategories = {
         value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
         hint: 'city architecture',
     })),
-    Tech: Array.from({ length: 10 }, (_, i) => ({
-        name: `Tech ${i + 1}`,
-        value: `https://picsum.photos/seed/tech_${i + 1}/1920/1080`,
-        hint: 'technology abstract',
-    })),
+    Tech: [
+        { name: 'Circuit Board 1', value: 'https://images.unsplash.com/photo-1593349480503-685d3a5a457c?q=80&w=1920', hint: 'circuit board' },
+        { name: 'Code on Screen', value: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1920', hint: 'programming code' },
+        { name: 'Server Room', value: 'https://images.unsplash.com/photo-1522139155322-1a48c04a7815?q=80&w=1920', hint: 'server room' },
+        { name: 'Abstract Tech Lines', value: 'https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?q=80&w=1920', hint: 'abstract technology' },
+        { name: 'Glowing Circuit', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a?q=80&w=1920', hint: 'glowing circuit' },
+        { name: 'Hardware Components', value: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1920', hint: 'computer hardware' },
+        { name: 'Network Cables', value: 'https://images.unsplash.com/photo-1584992212211-7c27ac75375d?q=80&w=1920', hint: 'network cables' },
+        { name: 'Futuristic City', value: 'https://images.unsplash.com/photo-1519618764838-55447b716f94?q=80&w=1920', hint: 'futuristic city' },
+        { name: 'Quantum Computer', value: 'https://images.unsplash.com/photo-1618255034173-39c40333fc88?q=80&w=1920', hint: 'quantum computer' },
+        { name: 'Abstract Data', value: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1920', hint: 'data visualization' },
+    ],
 };
 
 type Category = keyof typeof wallpaperCategories;
