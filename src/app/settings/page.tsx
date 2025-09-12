@@ -29,6 +29,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { useNotifications } from '@/hooks/use-notifications';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 const colors: { name: Color, bgColor: string }[] = [
@@ -40,7 +41,6 @@ const colors: { name: Color, bgColor: string }[] = [
 ];
 
 const wallpapers = [
-    // Nature
     { name: 'Waterfall', value: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716', hint: 'nature waterfall' },
     { name: 'Mountains', value: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606', hint: 'nature mountains' },
     { name: 'Forest', value: 'https://images.unsplash.com/photo-1448375240586-882707db888b', hint: 'nature forest' },
@@ -49,7 +49,6 @@ const wallpapers = [
     { name: 'Autumn Path', value: 'https://images.unsplash.com/photo-1473117406439-369f98a6e846', hint: 'nature path' },
     { name: 'Desert', value: 'https://images.unsplash.com/photo-1473580044384-7ba9967e16a0', hint: 'nature desert' },
     { name: 'Beach', value: 'https://images.unsplash.com/photo-1507525428034-b723a996f329', hint: 'nature beach' },
-    // City
     { name: 'City Map', value: 'https://images.unsplash.com/photo-1599599810694-b5b37304c041', hint: 'city map' },
     { name: 'Tokyo Street', value: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989', hint: 'city night' },
     { name: 'Skyscraper', value: 'https://images.unsplash.com/photo-1523978591478-c752744f2327', hint: 'city architecture' },
@@ -58,7 +57,6 @@ const wallpapers = [
     { name: 'Neon Sign', value: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97', hint: 'city neon' },
     { name: 'Copenhagen', value: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc', hint: 'city skyline' },
     { name: 'Bridge', value: 'https://images.unsplash.com/photo-1501446529957-6226bd447c46', hint: 'city bridge' },
-    // Technology
     { name: 'Laptop', value: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853', hint: 'technology computer' },
     { name: 'Coding', value: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c', hint: 'technology code' },
     { name: 'Circuit', value: 'https://images.unsplash.com/photo-1550751827-413370f196a1', hint: 'technology circuit' },
@@ -67,20 +65,17 @@ const wallpapers = [
     { name: 'Motherboard', value: 'https://images.unsplash.com/photo-1518770660439-4636190af475', hint: 'technology circuit' },
     { name: 'Wires', value: 'https://images.unsplash.com/photo-1580894732444-8ecded7948b4', hint: 'technology abstract' },
     { name: 'Desk Setup', value: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87', hint: 'technology workspace' },
-    // Animal
     { name: 'Fox', value: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5', hint: 'animal fox' },
     { name: 'Lion', value: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d', hint: 'animal lion' },
     { name: 'Jellyfish', value: 'https://images.unsplash.com/photo-1536751033192-23fcc3a43a84', hint: 'animal jellyfish' },
     { name: 'Eagle', value: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45', hint: 'animal bird' },
     { name: 'Wolf', value: 'https://images.unsplash.com/photo-1547407139-3c921a66005c', hint: 'animal wolf' },
     { name: 'Husky', value: 'https://images.unsplash.com/photo-1590762983193-a5f2a83852cb', hint: 'animal dog' },
-    // Abstract
     { name: 'Liquid Swirl', value: 'https://images.unsplash.com/photo-1558518393-95c24a66042b', hint: 'abstract colorful' },
     { name: 'Geometric', value: 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17', hint: 'abstract texture' },
     { name: 'Paint Splash', value: 'https://images.unsplash.com/photo-1483213091558-f075d351b842', hint: 'abstract paint' },
     { name: 'Cubes', value: 'https://images.unsplash.com/photo-1618214394489-13a409a808ba', hint: 'abstract 3d' },
     { name: 'Purple Waves', value: 'https://images.unsplash.com/photo-1534035431473-b39d36382162', hint: 'abstract waves' },
-    // Cars
     { name: 'Classic Car', value: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d', hint: 'car classic' },
     { name: 'Sports Car', value: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70', hint: 'car sports' },
     { name: 'Night Drive', value: 'https://images.unsplash.com/photo-1532581140502-5353113331c1', hint: 'car night' },
@@ -259,69 +254,71 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                 <p className="text-muted-foreground">Pilih dari koleksi kami atau unggah gambar Anda sendiri.</p>
             </header>
             <Card>
-                <CardContent className="p-4 sm:p-6 space-y-4">
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                        <div
-                            key="default"
-                            className={cn(
-                                "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
-                                wallpaper === 'default' && "ring-2 ring-primary"
-                            )}
-                            onClick={() => setWallpaper('default')}
-                            tabIndex={0}
-                            onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
-                        >
-                            <div className="absolute inset-0 flex items-center justify-center p-2">
-                                <p className="text-muted-foreground text-xs text-center font-medium">Solid Color</p>
-                            </div>
-                            {wallpaper === 'default' && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                    <Check className="h-6 w-6 text-white" />
-                                </div>
-                            )}
-                        </div>
-                        {wallpapers.map((wp) => (
+                <CardContent className="p-4 sm:p-6">
+                    <ScrollArea className="h-[calc(100vh-22rem)] no-scrollbar pr-4 -mr-4">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                             <div
-                                key={wp.value}
+                                key="default"
                                 className={cn(
-                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-                                    wallpaper === wp.value && "ring-2 ring-primary"
+                                    "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-muted",
+                                    wallpaper === 'default' && "ring-2 ring-primary"
                                 )}
-                                onClick={() => setWallpaper(wp.value)}
+                                onClick={() => setWallpaper('default')}
                                 tabIndex={0}
-                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && setWallpaper('default')}
                             >
-                                <Image
-                                    src={wp.value}
-                                    alt={wp.name}
-                                    fill
-                                    unoptimized
-                                    className="object-cover"
-                                    data-ai-hint={wp.hint}
-                                />
-                                <div className="absolute inset-0 bg-black/30" />
-                                {wallpaper === wp.value && (
-                                    <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="absolute inset-0 flex items-center justify-center p-2">
+                                    <p className="text-muted-foreground text-xs text-center font-medium">Solid Color</p>
+                                </div>
+                                {wallpaper === 'default' && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                                         <Check className="h-6 w-6 text-white" />
                                     </div>
                                 )}
                             </div>
-                        ))}
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <Upload className="h-6 w-6 mb-1" />
-                            <span className="text-xs font-medium">Unggah Gambar</span>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/png, image/jpeg, image/webp"
-                                onChange={handleFileUpload}
-                            />
-                        </button>
-                    </div>
+                             <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="relative aspect-video rounded-md border-2 border-dashed border-muted bg-popover flex flex-col items-center justify-center text-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                                <Upload className="h-6 w-6 mb-1" />
+                                <span className="text-xs font-medium">Unggah Gambar</span>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={handleFileUpload}
+                                />
+                            </button>
+                            {wallpapers.map((wp) => (
+                                <div
+                                    key={wp.value}
+                                    className={cn(
+                                        "relative aspect-video rounded-md overflow-hidden cursor-pointer ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                                        wallpaper === wp.value && "ring-2 ring-primary"
+                                    )}
+                                    onClick={() => setWallpaper(wp.value)}
+                                    tabIndex={0}
+                                    onKeyDown={(e) => e.key === 'Enter' && setWallpaper(wp.value)}
+                                >
+                                    <Image
+                                        src={wp.value}
+                                        alt={wp.name}
+                                        fill
+                                        unoptimized
+                                        className="object-cover"
+                                        data-ai-hint={wp.hint}
+                                    />
+                                    <div className="absolute inset-0 bg-black/30" />
+                                    {wallpaper === wp.value && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Check className="h-6 w-6 text-white" />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollArea>
                 </CardContent>
             </Card>
         </div>
