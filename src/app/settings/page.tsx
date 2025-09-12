@@ -50,15 +50,18 @@ const wallpaperCategories = {
         value: `https://picsum.photos/seed/cityscape_${i + 1}/1920/1080`,
         hint: 'city architecture',
     })),
-    Tech: Array.from({ length: 10 }, (_, i) => {
-        const seeds = ['circuit', 'code', 'server', 'abstract', 'network', 'futuristic', 'data', 'processor', 'digital', 'developer'];
-        const hints = ['circuit board', 'code', 'server room', 'abstract tech', 'network', 'futuristic city', 'data stream', 'microchip', 'digital art', 'developer setup'];
-        return {
-            name: `Tech ${i + 1}`,
-            value: `https://picsum.photos/seed/${seeds[i]}/1920/1080`,
-            hint: hints[i],
-        }
-    }),
+    Tech: [
+        { name: 'Tech 1', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'code editor' },
+        { name: 'Tech 2', value: 'https://picsum.photos/seed/circuit/1920/1080', hint: 'circuit board' },
+        { name: 'Tech 3', value: 'https://picsum.photos/seed/server/1920/1080', hint: 'server room' },
+        { name: 'Tech 4', value: 'https://picsum.photos/seed/developer/1920/1080', hint: 'developer setup' },
+        { name: 'Tech 5', value: 'https://picsum.photos/seed/network/1920/1080', hint: 'network' },
+        { name: 'Tech 6', value: 'https://picsum.photos/seed/futuristic/1920/1080', hint: 'futuristic city' },
+        { name: 'Tech 7', value: 'https://picsum.photos/seed/data/1920/1080', hint: 'data stream' },
+        { name: 'Tech 8', value: 'https://picsum.photos/seed/processor/1920/1080', hint: 'microchip' },
+        { name: 'Tech 9', value: 'https://picsum.photos/seed/digital/1920/1080', hint: 'digital art' },
+        { name: 'Tech 10', value: 'https://picsum.photos/seed/abstract/1920/1080', hint: 'abstract tech' },
+    ],
 };
 
 type Category = keyof typeof wallpaperCategories;
@@ -497,5 +500,3 @@ export default function SettingsPage() {
         </div>
     );
 }
-
-    
