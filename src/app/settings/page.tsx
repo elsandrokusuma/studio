@@ -40,11 +40,18 @@ const colors: { name: Color, bgColor: string }[] = [
 ];
 
 const wallpaperCategories = {
-    Nature: Array.from({ length: 10 }, (_, i) => ({
-        name: `Nature ${i + 1}`,
-        value: `https://picsum.photos/seed/nature_${i + 1}/1920/1080`,
-        hint: 'nature',
-    })),
+    Nature: [
+        { name: 'Forest', value: 'https://picsum.photos/seed/forest/1920/1080', hint: 'nature forest' },
+        { name: 'Mountains', value: 'https://picsum.photos/seed/mountains/1920/1080', hint: 'nature mountains' },
+        { name: 'Lake', value: 'https://picsum.photos/seed/lake/1920/1080', hint: 'nature lake' },
+        { name: 'Beach', value: 'https://picsum.photos/seed/beach/1920/1080', hint: 'nature beach' },
+        { name: 'Desert', value: 'https://picsum.photos/seed/desert/1920/1080', hint: 'nature desert' },
+        { name: 'Jungle', value: 'https://picsum.photos/seed/jungle/1920/1080', hint: 'nature jungle' },
+        { name: 'River', value: 'https://picsum.photos/seed/river/1920/1080', hint: 'nature river' },
+        { name: 'Waterfall', value: 'https://picsum.photos/seed/waterfall/1920/1080', hint: 'nature waterfall' },
+        { name: 'Island', value: 'https://picsum.photos/seed/island/1920/1080', hint: 'nature island' },
+        { name: 'Valley', value: 'https://picsum.photos/seed/valley/1920/1080', hint: 'nature valley' },
+    ],
     City: [
         { name: 'City 1', value: 'https://picsum.photos/seed/cityscape/1920/1080', hint: 'city architecture' },
         { name: 'City 2', value: 'https://picsum.photos/seed/urban/1920/1080', hint: 'city street' },
@@ -318,7 +325,7 @@ function AppearanceSettings({ onBack }: { onBack: () => void }) {
                                 data-ai-hint={wallpaperCategories[category as Category][0].hint}
                             />
                             <div className="absolute inset-0 bg-black/30 flex items-end p-2">
-                                <p className="text-white text-xs font-medium">{category === 'Tech' ? 'Tech' : category}</p>
+                                <p className="text-white text-xs font-medium">{category === 'Tech' ? 'Teknologi' : category}</p>
                             </div>
                         </div>
                     ))}
