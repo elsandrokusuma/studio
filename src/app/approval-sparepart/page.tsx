@@ -107,6 +107,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
+import { useTheme } from "@/hooks/use-theme";
 
 
 type GroupedRequest = {
@@ -127,6 +128,124 @@ type POItem = {
   quantity: number | string;
 };
 
+const translations = {
+    en: {
+        title: "Sparepart Approval",
+        description: (count: number, items: number) => `${count} PO groups • ${items} line items`,
+        requestApproval: "Request Approval",
+        export: "Export",
+        exportCsv: "Export as CSV",
+        exportPdf: "Export as PDF",
+        createRequest: "Create Request",
+        createRequestTitle: "Create Sparepart Request",
+        createRequestDesc: "Fill in the details to create a new sparepart request. You can also import items from a CSV file.",
+        requesterName: "Requester Name",
+        location: "Location",
+        jakarta: "Jakarta",
+        surabaya: "Surabaya",
+        items: "Items",
+        importFromFile: "Import from File",
+        itemNamePlaceholder: "Item Name",
+        companyPlaceholder: "Company",
+        qtyPlaceholder: "Qty",
+        addItem: "Add Item",
+        cancel: "Cancel",
+        totalPOs: "Total POs",
+        lineItems: "Line Items",
+        pending: "Pending",
+        searchPlaceholder: "Search PO or item...",
+        allStatus: "All Status",
+        allTime: "All Time",
+        pickDate: "Pick date",
+        selectAll: "Select All",
+        clearFilters: "Clear Filters",
+        noApprovalsTitle: "No pending approvals found",
+        noApprovalsDesc: "There are currently no sparepart requests matching your filters.",
+        units: "units",
+        requesterLabel: "Req",
+        actions: "Actions",
+        markAsApproved: "Mark as Approved",
+        undoDecision: "Undo Decision",
+        delete: "Delete",
+        itemName: "Item Name",
+        company: "Company",
+        qtyRequest: "Qty Request",
+        revisedQty: "Revised Qty",
+        status: "Status",
+        edit: "Edit",
+        approve: "Approve",
+        reject: "Reject",
+        editQtyTitle: (name: string) => `Edit Quantity: ${name}`,
+        editQtyDesc: "Revise the quantity for this item. The original request will be preserved.",
+        revisedQtyLabel: "Revised Quantity",
+        saveChanges: "Save Changes",
+        areYouSure: "Are you sure?",
+        deleteWarning: (po: string) => `This action cannot be undone. This will permanently delete the request ${po} and all its items.`,
+        accessDenied: "Access Denied",
+        accessDeniedDesc: "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
+        firebaseNotConfigured: "Firebase Not Configured",
+        firebaseNotConfiguredDesc: "Please configure your Firebase credentials in the environment variables to use this application.",
+    },
+    id: {
+        title: "Persetujuan Sparepart",
+        description: (count: number, items: number) => `${count} grup PO • ${items} baris item`,
+        requestApproval: "Minta Persetujuan",
+        export: "Ekspor",
+        exportCsv: "Ekspor sebagai CSV",
+        exportPdf: "Ekspor sebagai PDF",
+        createRequest: "Buat Permintaan",
+        createRequestTitle: "Buat Permintaan Sparepart",
+        createRequestDesc: "Isi detail untuk membuat permintaan sparepart baru. Anda juga dapat mengimpor item dari file CSV.",
+        requesterName: "Nama Pemohon",
+        location: "Lokasi",
+        jakarta: "Jakarta",
+        surabaya: "Surabaya",
+        items: "Item",
+        importFromFile: "Impor dari File",
+        itemNamePlaceholder: "Nama Item",
+        companyPlaceholder: "Perusahaan",
+        qtyPlaceholder: "Jml",
+        addItem: "Tambah Item",
+        cancel: "Batal",
+        totalPOs: "Total PO",
+        lineItems: "Total Item",
+        pending: "Tertunda",
+        searchPlaceholder: "Cari PO atau item...",
+        allStatus: "Semua Status",
+        allTime: "Semua Waktu",
+        pickDate: "Pilih tanggal",
+        selectAll: "Pilih Semua",
+        clearFilters: "Hapus Filter",
+        noApprovalsTitle: "Tidak ada persetujuan yang ditemukan",
+        noApprovalsDesc: "Saat ini tidak ada permintaan sparepart yang cocok dengan filter Anda.",
+        units: "unit",
+        requesterLabel: "Pemohon",
+        actions: "Aksi",
+        markAsApproved: "Tandai Disetujui",
+        undoDecision: "Batalkan Keputusan",
+        delete: "Hapus",
+        itemName: "Nama Item",
+        company: "Perusahaan",
+        qtyRequest: "Jml Diminta",
+        revisedQty: "Jml Direvisi",
+        status: "Status",
+        edit: "Ubah",
+        approve: "Setujui",
+        reject: "Tolak",
+        editQtyTitle: (name: string) => `Ubah Jumlah: ${name}`,
+        editQtyDesc: "Revisi jumlah untuk item ini. Permintaan asli akan tetap tersimpan.",
+        revisedQtyLabel: "Jumlah Revisi",
+        saveChanges: "Simpan Perubahan",
+        areYouSure: "Apakah Anda yakin?",
+        deleteWarning: (po: string) => `Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen permintaan ${po} dan semua itemnya.`,
+        accessDenied: "Akses Ditolak",
+        accessDeniedDesc: "Anda tidak memiliki izin untuk melihat halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.",
+        firebaseNotConfigured: "Firebase Tidak Dikonfigurasi",
+        firebaseNotConfiguredDesc: "Harap konfigurasikan kredensial Firebase Anda di variabel lingkungan untuk menggunakan aplikasi ini.",
+    }
+};
+
+
 export default function ApprovalSparepartPage() {
   const [allRequests, setAllRequests] = React.useState<SparepartRequest[]>([]);
   const [isCreatePoOpen, setCreatePoOpen] = React.useState(false);
@@ -135,6 +254,9 @@ export default function ApprovalSparepartPage() {
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { language } = useTheme();
+
+  const t = language === 'id' ? translations.id : translations.en;
 
   // State for Create PO Dialog
   const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
@@ -633,9 +755,9 @@ export default function ApprovalSparepartPage() {
         <div className="p-4 bg-destructive/10 rounded-full mb-4">
             <Ban className="h-12 w-12 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <h1 className="text-2xl font-bold">{t.accessDenied}</h1>
         <p className="text-muted-foreground max-w-sm">
-            You do not have permission to view this page. Please contact an administrator if you believe this is an error.
+            {t.accessDeniedDesc}
         </p>
       </div>
     );
@@ -645,9 +767,9 @@ export default function ApprovalSparepartPage() {
     return (
       <div className="flex items-center justify-center h-full">
         <Alert variant="destructive" className="max-w-md">
-          <AlertTitle>Firebase Not Configured</AlertTitle>
+          <AlertTitle>{t.firebaseNotConfigured}</AlertTitle>
           <AlertDescription>
-            Please configure your Firebase credentials in the environment variables to use this application.
+            {t.firebaseNotConfiguredDesc}
           </AlertDescription>
         </Alert>
       </div>
@@ -659,10 +781,10 @@ export default function ApprovalSparepartPage() {
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Approval Sparepart
+            {t.title}
           </h1>
           <p className="text-muted-foreground text-sm">
-            {totalRequestsCount} PO groups • {totalLineItems} line items
+            {t.description(totalRequestsCount, totalLineItems)}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -670,18 +792,18 @@ export default function ApprovalSparepartPage() {
                 <>
                 <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
                     <Send className="mr-2 h-4 w-4" />
-                    Request Approval
+                    {t.requestApproval}
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                     <Button variant="outline">
                         <FileDown className="mr-2 h-4 w-4" />
-                        Export
+                        {t.export}
                     </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                    <DropdownMenuItem onSelect={handleExportCsv}>Export as CSV</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleExportPdf}>Export as PDF</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleExportCsv}>{t.exportCsv}</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleExportPdf}>{t.exportPdf}</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
                 </>
@@ -690,40 +812,40 @@ export default function ApprovalSparepartPage() {
                 <DialogTrigger asChild>
                   <Button>
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Create Request
+                    {t.createRequest}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl">
                   <DialogHeader>
-                    <DialogTitle>Create Sparepart Request</DialogTitle>
+                    <DialogTitle>{t.createRequestTitle}</DialogTitle>
                     <DialogDescription>
-                      Fill in the details to create a new sparepart request. You can also import items from a CSV file.
+                      {t.createRequestDesc}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleCreateRequest}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 py-4">
                         <div className="space-y-4">
                             <div>
-                                <Label htmlFor="requesterName">Requester Name</Label>
+                                <Label htmlFor="requesterName">{t.requesterName}</Label>
                                 <Input id="requesterName" placeholder="e.g. John Doe" value={requesterName} onChange={(e) => setRequesterName(e.target.value)} />
                             </div>
                             <div>
-                                <Label>Location</Label>
+                                <Label>{t.location}</Label>
                                  <RadioGroup defaultValue="Jakarta" className="flex items-center gap-4 pt-2" value={location} onValueChange={setLocation}>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="Jakarta" id="jakarta" />
-                                        <Label htmlFor="jakarta">Jakarta</Label>
+                                        <Label htmlFor="jakarta">{t.jakarta}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="Surabaya" id="surabaya" />
-                                        <Label htmlFor="surabaya">Surabaya</Label>
+                                        <Label htmlFor="surabaya">{t.surabaya}</Label>
                                     </div>
                                 </RadioGroup>
                             </div>
                         </div>
                         <div className="space-y-2">
                              <div className="flex justify-between items-center">
-                                <Label>Items</Label>
+                                <Label>{t.items}</Label>
                                  <Button
                                     type="button"
                                     variant="outline"
@@ -731,7 +853,7 @@ export default function ApprovalSparepartPage() {
                                     onClick={() => fileInputRef.current?.click()}
                                   >
                                     <Upload className="mr-2 h-4 w-4" />
-                                    Import from File
+                                    {t.importFromFile}
                                   </Button>
                                   <Input
                                     type="file"
@@ -745,9 +867,9 @@ export default function ApprovalSparepartPage() {
                                  <div className="space-y-3">
                                     {poItems.map((item) => (
                                         <div key={item.id} className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center">
-                                            <Input placeholder="Name item" value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
-                                            <Input placeholder="Company" value={item.company} onChange={(e) => handleItemChange(item.id, 'company', e.target.value)} />
-                                            <Input type="number" min="1" className="w-24" placeholder="Qty" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
+                                            <Input placeholder={t.itemNamePlaceholder} value={item.itemName} onChange={(e) => handleItemChange(item.id, 'itemName', e.target.value)} />
+                                            <Input placeholder={t.companyPlaceholder} value={item.company} onChange={(e) => handleItemChange(item.id, 'company', e.target.value)} />
+                                            <Input type="number" min="1" className="w-24" placeholder={t.qtyPlaceholder} value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} />
                                             <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} disabled={poItems.length === 1}>
                                                 <Trash2 className="h-4 w-4 text-red-500" />
                                             </Button>
@@ -756,13 +878,13 @@ export default function ApprovalSparepartPage() {
                                 </div>
                             </ScrollArea>
                             <Button type="button" variant="outline" className="w-full" onClick={handleAddItem}>
-                                <PlusCircle className="mr-2 h-4 w-4" /> Add Item
+                                <PlusCircle className="mr-2 h-4 w-4" /> {t.addItem}
                             </Button>
                         </div>
                     </div>
                      <DialogFooter>
-                        <Button type="button" variant="ghost" onClick={() => { setCreatePoOpen(false); resetPoForm(); }}>Cancel</Button>
-                        <Button type="submit">Create Request</Button>
+                        <Button type="button" variant="ghost" onClick={() => { setCreatePoOpen(false); resetPoForm(); }}>{t.cancel}</Button>
+                        <Button type="submit">{t.createRequest}</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -773,7 +895,7 @@ export default function ApprovalSparepartPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-1))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total POs</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.totalPOs}</CardTitle>
             <Folder className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -782,7 +904,7 @@ export default function ApprovalSparepartPage() {
         </Card>
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-2))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Line Items</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.lineItems}</CardTitle>
             <Boxes className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -791,7 +913,7 @@ export default function ApprovalSparepartPage() {
         </Card>
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-3))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-sm font-medium">{t.pending}</CardTitle>
             <FileText className="h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -806,7 +928,7 @@ export default function ApprovalSparepartPage() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search PO or item..."
+              placeholder={t.searchPlaceholder}
               className="pl-8 w-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -814,10 +936,10 @@ export default function ApprovalSparepartPage() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="All Status" />
+              <SelectValue placeholder={t.allStatus} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="all">{t.allStatus}</SelectItem>
               <SelectItem value="Pending">Pending</SelectItem>
               <SelectItem value="Awaiting Approval">Awaiting Approval</SelectItem>
               <SelectItem value="Approved">Approved</SelectItem>
@@ -826,17 +948,17 @@ export default function ApprovalSparepartPage() {
           </Select>
           <Select>
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="All Time" />
+              <SelectValue placeholder={t.allTime} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all-time">All Time</SelectItem>
+              <SelectItem value="all-time">{t.allTime}</SelectItem>
             </SelectContent>
           </Select>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateFilter ? format(dateFilter, "PPP") : <span>Pick date</span>}
+                {dateFilter ? format(dateFilter, "PPP") : <span>{t.pickDate}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -845,9 +967,9 @@ export default function ApprovalSparepartPage() {
           </Popover>
           <div className="flex items-center space-x-2">
             <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
-            <Label htmlFor="select-all" className="whitespace-nowrap">Select All</Label>
+            <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
           </div>
-          <Button variant="ghost" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setDateFilter(undefined); setSelectedRows([]); }}>Clear Filters</Button>
+          <Button variant="ghost" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setDateFilter(undefined); setSelectedRows([]); }}>{t.clearFilters}</Button>
         </CardContent>
       </Card>
 
@@ -890,7 +1012,7 @@ export default function ApprovalSparepartPage() {
                                       >
                                           {req.status}
                                       </Badge>
-                                      <span>• {req.totalQuantity} units</span>
+                                      <span>• {req.totalQuantity} {t.units}</span>
                                       <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
                                   </div>
                               </div>
@@ -898,7 +1020,7 @@ export default function ApprovalSparepartPage() {
                           <div className="w-full sm:w-auto flex items-start justify-between">
                             <div className="text-left sm:text-right text-sm whitespace-nowrap sm:ml-4">
                                 <div className="font-medium">{format(new Date(req.requestDate), "MMMM dd, yyyy")}</div>
-                                <div className="text-muted-foreground">Req: {req.requester}</div>
+                                <div className="text-muted-foreground">{t.requesterLabel}: {req.requester}</div>
                             </div>
                             <div className="flex items-center ml-auto">
                                 <AccordionTrigger className="p-2 hover:bg-muted rounded-md">
@@ -911,23 +1033,23 @@ export default function ApprovalSparepartPage() {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                        <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
                                         {req.status === 'Awaiting Approval' && (
                                             <>
                                             <DropdownMenuItem onSelect={() => handleMarkAsApproved(req)}>
                                                 <Check className="mr-2 h-4 w-4" />
-                                                Mark as Approved
+                                                {t.markAsApproved}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => updateStatus(req, 'Pending')}>
                                                 <Undo2 className="mr-2 h-4 w-4" />
-                                                Undo Decision
+                                                {t.undoDecision}
                                             </DropdownMenuItem>
                                             </>
                                         )}
                                         {req.status === 'Approved' && (
                                             <DropdownMenuItem onSelect={() => updateStatus(req, 'Awaiting Approval')}>
                                                 <Undo2 className="mr-2 h-4 w-4" />
-                                                Undo Decision
+                                                {t.undoDecision}
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuSeparator />
@@ -939,7 +1061,7 @@ export default function ApprovalSparepartPage() {
                                             }}
                                         >
                                             <Trash2 className="mr-2 h-4 w-4" />
-                                            Delete
+                                            {t.delete}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -952,12 +1074,12 @@ export default function ApprovalSparepartPage() {
                              <Table>
                                 <TableHeader>
                                   <TableRow>
-                                    <TableHead>Item Name</TableHead>
-                                    <TableHead>Company</TableHead>
-                                    <TableHead>Qty Request</TableHead>
-                                    <TableHead>Revisi Qty Request</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="w-[50px]"><span className="sr-only">Actions</span></TableHead>
+                                    <TableHead>{t.itemName}</TableHead>
+                                    <TableHead>{t.company}</TableHead>
+                                    <TableHead>{t.qtyRequest}</TableHead>
+                                    <TableHead>{t.revisedQty}</TableHead>
+                                    <TableHead>{t.status}</TableHead>
+                                    <TableHead className="w-[50px]"><span className="sr-only">{t.actions}</span></TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -992,13 +1114,13 @@ export default function ApprovalSparepartPage() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                 <DropdownMenuItem onClick={() => handleEditItem(item)}>
-                                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                    <Pencil className="mr-2 h-4 w-4" /> {t.edit}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem className="text-green-600 focus:text-green-700" onClick={() => handleItemDecision(item, "Approved")}>
-                                                    <Check className="mr-2 h-4 w-4" /> Approve
+                                                    <Check className="mr-2 h-4 w-4" /> {t.approve}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem className="text-red-600 focus:text-red-700" onClick={() => handleItemDecision(item, "Rejected")}>
-                                                    <X className="mr-2 h-4 w-4" /> Reject
+                                                    <X className="mr-2 h-4 w-4" /> {t.reject}
                                                 </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -1021,10 +1143,10 @@ export default function ApprovalSparepartPage() {
                 <Wrench className="h-12 w-12 text-primary" />
             </div>
             <h3 className="text-2xl font-bold tracking-tight">
-              No pending approvals found
+              {t.noApprovalsTitle}
             </h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              There are currently no sparepart requests matching your filters.
+              {t.noApprovalsDesc}
             </p>
           </div>
         </div>
@@ -1034,16 +1156,16 @@ export default function ApprovalSparepartPage() {
       <Dialog open={isEditItemOpen} onOpenChange={setEditItemOpen}>
         <DialogContent>
             <DialogHeader>
-            <DialogTitle>Edit Quantity: {selectedOrderItem?.itemName}</DialogTitle>
+            <DialogTitle>{t.editQtyTitle(selectedOrderItem?.itemName || '')}</DialogTitle>
             <DialogDescription>
-                Revise the quantity for this item. The original request will be preserved.
+                {t.editQtyDesc}
             </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSaveRevisedQuantity}>
             <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="revised-quantity" className="text-right">
-                    Revised Quantity
+                    {t.revisedQtyLabel}
                 </Label>
                 <Input
                     id="revised-quantity"
@@ -1057,8 +1179,8 @@ export default function ApprovalSparepartPage() {
                 </div>
             </div>
             <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setEditItemOpen(false)}>Cancel</Button>
-                <Button type="submit">Save Changes</Button>
+                <Button type="button" variant="outline" onClick={() => setEditItemOpen(false)}>{t.cancel}</Button>
+                <Button type="submit">{t.saveChanges}</Button>
             </DialogFooter>
             </form>
         </DialogContent>
@@ -1068,15 +1190,14 @@ export default function ApprovalSparepartPage() {
       <AlertDialog open={isDeleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t.areYouSure}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the request{' '}
-              <span className="font-semibold">{selectedPo?.requestNumber}</span> and all its items.
+                {t.deleteWarning(selectedPo?.requestNumber || '')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setSelectedPo(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteRequest}>Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setSelectedPo(null)}>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteRequest}>{t.delete}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

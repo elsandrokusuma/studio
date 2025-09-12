@@ -26,16 +26,37 @@ import { useNotifications } from "@/hooks/use-notifications"
 import { ScrollArea } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useTheme } from "@/hooks/use-theme"
 
-const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inventory", label: "Inventory", icon: Boxes },
-  { href: "/pre-orders", label: "Pre-Order & Approval", icon: ShoppingCart },
-  { href: "/approval-sparepart", label: "Approval Sparepart", icon: Wrench },
-]
+const translations = {
+    en: {
+        dashboard: "Dashboard",
+        inventory: "Inventory",
+        preOrder: "Pre-Order & Approval",
+        sparepart: "Sparepart Approval",
+        notifications: "Notifications",
+        clearAll: "Clear All",
+        allCaughtUp: "You're all caught up!",
+        toggleMenu: "Toggle navigation menu",
+        appName: "Stationery Inv."
+    },
+    id: {
+        dashboard: "Dasbor",
+        inventory: "Inventaris",
+        preOrder: "Pra-Pesan & Persetujuan",
+        sparepart: "Persetujuan Sparepart",
+        notifications: "Notifikasi",
+        clearAll: "Hapus Semua",
+        allCaughtUp: "Anda sudah melihat semua!",
+        toggleMenu: "Buka/tutup menu navigasi",
+        appName: "Inv. Alat Tulis"
+    }
+};
 
 function NotificationBell() {
   const { notifications, clearNotifications } = useNotifications();
+  const { language } = useTheme();
+  const t = language === 'id' ? translations.id : translations.en;
   const hasNotifications = notifications.length > 0;
 
   return (
@@ -53,11 +74,11 @@ function NotificationBell() {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0">
         <div className="flex items-center justify-between p-4 border-b">
-            <h3 className="font-medium">Notifications</h3>
+            <h3 className="font-medium">{t.notifications}</h3>
             {hasNotifications && (
               <Button variant="ghost" size="sm" onClick={clearNotifications}>
                 <Trash2 className="mr-2 h-4 w-4" />
-                Clear All
+                {t.clearAll}
               </Button>
             )}
         </div>
@@ -90,7 +111,7 @@ function NotificationBell() {
                   })
               ) : (
                   <div className="p-4 text-center text-sm text-muted-foreground">
-                      You're all caught up!
+                      {t.allCaughtUp}
                   </div>
               )}
           </div>
@@ -102,9 +123,18 @@ function NotificationBell() {
 
 
 export function AppHeader() {
-  const pathname = usePathname()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { user } = useAuth();
+  const { language } = useTheme();
+  const t = language === 'id' ? translations.id : translations.en;
+
+  const navItems = React.useMemo(() => [
+    { href: "/", label: t.dashboard, icon: LayoutDashboard },
+    { href: "/inventory", label: t.inventory, icon: Boxes },
+    { href: "/pre-orders", label: t.preOrder, icon: ShoppingCart },
+    { href: "/approval-sparepart", label: t.sparepart, icon: Wrench },
+  ], [t]);
 
   const visibleNavItems = React.useMemo(() => {
     if (!user) return [];
@@ -118,7 +148,7 @@ export function AppHeader() {
         return navItems.filter(item => item.href === '/');
     }
     return navItems;
-  }, [user]);
+  }, [user, navItems]);
 
 
   const NavLinks = ({ className, inSheet = false }: { className?: string, inSheet?: boolean }) => (
@@ -170,14 +200,14 @@ export function AppHeader() {
                 <SheetTrigger asChild>
                   <Button variant="outline" size="icon">
                     <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle navigation menu</span>
+                    <span className="sr-only">{t.toggleMenu}</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left">
                   <div className="flex flex-col gap-6 pt-8">
                     <Link href="/" className="flex items-center gap-2 font-semibold text-lg px-2" onClick={() => setIsMobileMenuOpen(false)}>
                        <Image src="/favicon.ico?v=8" alt="Logo" width={32} height={32} className="h-8 w-8" />
-                      <span>Stationery Inv.</span>
+                      <span>{t.appName}</span>
                     </Link>
                     <NavLinks className="flex-col items-start gap-2" inSheet={true} />
                   </div>

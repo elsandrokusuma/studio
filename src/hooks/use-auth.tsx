@@ -19,6 +19,7 @@ import { FullPageSpinner } from '@/components/full-page-spinner';
 import { useToast } from './use-toast';
 import { useNotifications } from './use-notifications';
 import { LogIn, LogOut } from 'lucide-react';
+import { useTheme } from './use-theme';
 
 interface AuthContextType {
   user: User | null;
@@ -30,6 +31,41 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const translations = {
+  en: {
+    invalidEmail: "The email address is not valid.",
+    userDisabled: "This user account has been disabled.",
+    userNotFound: "No user found with this email.",
+    wrongPassword: "Incorrect password. Please try again.",
+    emailInUse: "This email address is already in use.",
+    weakPassword: "The password is too weak. Please use a stronger password.",
+    authFailed: "Authentication Failed",
+    unexpectedError: "An unexpected error occurred.",
+    signInSuccess: "Sign In Successful",
+    welcomeBack: "Welcome back!",
+    signOutSuccess: "Signed Out",
+    signOutDesc: "You have been successfully signed out.",
+    signOutFailed: "Sign Out Failed",
+    signOutFailedDesc: "There was a problem signing out.",
+  },
+  id: {
+    invalidEmail: "Alamat email tidak valid.",
+    userDisabled: "Akun pengguna ini telah dinonaktifkan.",
+    userNotFound: "Tidak ada pengguna yang ditemukan dengan email ini.",
+    wrongPassword: "Kata sandi salah. Silakan coba lagi.",
+    emailInUse: "Alamat email ini sudah digunakan.",
+    weakPassword: "Kata sandi terlalu lemah. Silakan gunakan kata sandi yang lebih kuat.",
+    authFailed: "Autentikasi Gagal",
+    unexpectedError: "Terjadi kesalahan yang tidak terduga.",
+    signInSuccess: "Berhasil Masuk",
+    welcomeBack: "Selamat datang kembali!",
+    signOutSuccess: "Berhasil Keluar",
+    signOutDesc: "Anda telah berhasil keluar.",
+    signOutFailed: "Gagal Keluar",
+    signOutFailedDesc: "Terjadi masalah saat keluar.",
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +73,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
   const { addNotification } = useNotifications();
   const router = useRouter();
+  // We need to get the language from the theme context to show translated toasts
+  // Since this provider wraps the ThemeProvider, we'll manage a local language state
+  // that syncs with the one from useTheme when available.
+  const [language, setLanguage] = useState<'id' | 'en'>('id');
+  const themeContext = useTheme();
+
+  useEffect(() => {
+    if (themeContext?.language) {
+      setLanguage(themeContext.language);
+    }
+  }, [themeContext?.language]);
+  
+  const t = language === 'id' ? translations.id : translations.en;
 
   useEffect(() => {
     if (firebaseEnabled && app) {
@@ -53,25 +102,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const handleAuthError = (error: AuthError) => {
-    let description = "An unexpected error occurred.";
+    let description = t.unexpectedError;
     switch (error.code) {
         case 'auth/invalid-email':
-            description = "The email address is not valid.";
+            description = t.invalidEmail;
             break;
         case 'auth/user-disabled':
-            description = "This user account has been disabled.";
+            description = t.userDisabled;
             break;
         case 'auth/user-not-found':
-            description = "No user found with this email.";
+            description = t.userNotFound;
             break;
         case 'auth/wrong-password':
-            description = "Incorrect password. Please try again.";
+            description = t.wrongPassword;
             break;
         case 'auth/email-already-in-use':
-            description = "This email address is already in use.";
+            description = t.emailInUse;
             break;
         case 'auth/weak-password':
-            description = "The password is too weak. Please use a stronger password.";
+            description = t.weakPassword;
             break;
         default:
             description = error.message;
@@ -79,7 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     toast({
         variant: "destructive",
-        title: "Authentication Failed",
+        title: t.authFailed,
         description,
     });
     throw error;
@@ -92,8 +141,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, pass);
         setUser(userCredential.user);
         addNotification({
-            title: "Sign In Successful",
-            description: "Welcome back!",
+            title: t.signInSuccess,
+            description: t.welcomeBack,
             icon: LogIn,
         });
     } catch (error: any) {
@@ -109,8 +158,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await signOut(auth);
       addNotification({
-          title: "Signed Out",
-          description: "You have been successfully signed out.",
+          title: t.signOutSuccess,
+          description: t.signOutDesc,
           icon: LogOut,
       });
       router.push('/');
@@ -118,8 +167,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error signing out", error);
       toast({
           variant: "destructive",
-          title: "Sign Out Failed",
-          description: "There was a problem signing out.",
+          title: t.signOutFailed,
+          description: t.signOutFailedDesc,
       });
     }
   };
