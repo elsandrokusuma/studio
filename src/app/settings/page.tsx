@@ -41,7 +41,7 @@ const colors: { name: Color, bgColor: string }[] = [
 
 const wallpaperCategories = {
     Nature: [
-        { name: 'Waterfall', value: 'https://picsum.photos/seed/waterfall/1920/1080', hint: 'nature waterfall' },
+        { name: 'Waterfall', value: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716', hint: 'nature waterfall' },
         { name: 'Mountains', value: 'https://picsum.photos/seed/mountains/1920/1080', hint: 'nature mountains' },
         { name: 'Lake', value: 'https://picsum.photos/seed/lake/1920/1080', hint: 'nature lake' },
         { name: 'Forest', value: 'https://picsum.photos/seed/forest/1920/1080', hint: 'nature forest' },
@@ -50,7 +50,7 @@ const wallpaperCategories = {
         { name: 'River', value: 'https://picsum.photos/seed/river/1920/1080', hint: 'nature river' },
         { name: 'Island', value: 'https://picsum.photos/seed/island/1920/1080', hint: 'nature island' },
         { name: 'Valley', value: 'https://picsum.photos/seed/valley/1920/1080', hint: 'nature valley' },
-        { name: 'Waterfall', value: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716', hint: 'nature waterfall' },
+        { name: 'Stars', value: 'https://images.unsplash.com/photo-1446776811953-b23d5795b4e6', hint: 'nature space' },
     ],
     City: [
         { name: 'City Map', value: 'https://images.unsplash.com/photo-1620139969134-3151b4f4c6e7', hint: 'city map' },
@@ -67,14 +67,14 @@ const wallpaperCategories = {
     Tech: [
         { name: 'Laptop', value: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef', hint: 'technology computer' },
         { name: 'Galaxy', value: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa', hint: 'technology network' },
-        { name: 'LED Panel', value: 'https://images.unsplash.com/photo-1597741066271-593d6b055813', hint: 'technology abstract' },
-        { name: 'Blue Lines', value: 'https://images.unsplash.com/photo-1698305389333-832d20100189', hint: 'technology abstract' },
-        { name: 'Monitor Code', value: 'https://images.unsplash.com/photo-1624996752380-8ec242e0f85d', hint: 'technology code' },
-        { name: 'Motherboard', value: 'https://images.unsplash.com/photo-1555618423-69b40a394a1d', hint: 'technology circuit' },
-        { name: 'Stripes', value: 'https://images.unsplash.com/photo-1580894732444-8ec5321f7378', hint: 'technology abstract' },
-        { name: 'Blue Lights', value: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a', hint: 'technology abstract' },
-        { name: 'Circuit Closeup', value: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b', hint: 'technology circuit' },
-        { name: 'Control Panel', value: 'https://images.unsplash.com/photo-1619120238346-978e0773b424', hint: 'technology server' },
+        { name: 'LED Panel', value: 'https://images.unsplash.com/photo-1534035431473-b39d36382162', hint: 'technology abstract' },
+        { name: 'Blue Lines', value: 'https://images.unsplash.com/photo-1554141542-03c278c525f6', hint: 'technology abstract' },
+        { name: 'Motherboard', value: 'https://images.unsplash.com/photo-1518770660439-4636190af475', hint: 'technology circuit' },
+        { name: 'Stripes', value: 'https://images.unsplash.com/photo-1614285459395-63865dca104a', hint: 'technology abstract' },
+        { name: 'Blue Lights', value: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769', hint: 'technology abstract' },
+        { name: 'Circuit Closeup', value: 'https://images.unsplash.com/photo-1593344484962-796b16d8a383', hint: 'technology circuit' },
+        { name: 'Control Panel', value: 'https://images.unsplash.com/photo-1581092921439-9a43a30311c9', hint: 'technology server' },
+        { name: 'Laptop Code', value: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713', hint: 'technology code' },
     ],
 };
 
