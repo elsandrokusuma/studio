@@ -53,7 +53,7 @@ const wallpaperCategories = {
         { name: 'Stars', value: 'https://picsum.photos/seed/starrynight/1920/1080', hint: 'nature galaxy' },
     ],
     City: [
-        { name: 'Cityscape', value: 'https://picsum.photos/seed/cityscape/1920/1080', hint: 'city architecture' },
+        { name: 'City Map', value: 'https://images.unsplash.com/photo-1620139969134-3151b4f4c6e7', hint: 'city map' },
         { name: 'Downtown', value: 'https://picsum.photos/seed/downtown/1920/1080', hint: 'city night' },
         { name: 'Metropolis', value: 'https://picsum.photos/seed/metropolis/1920/1080', hint: 'city skyline' },
         { name: 'Urban', value: 'https://picsum.photos/seed/urban/1920/1080', hint: 'city street' },
