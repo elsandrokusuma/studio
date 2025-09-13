@@ -2,7 +2,6 @@
 'use client';
 
 import * as React from 'react';
-import Cookies from 'js-cookie';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
@@ -73,8 +72,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    const savedTheme = Cookies.get('theme') as Theme | undefined;
-    const savedColor = Cookies.get('color') as Color | undefined;
+    const savedTheme = localStorage.getItem('theme') as Theme | undefined;
+    const savedColor = localStorage.getItem('color') as Color | undefined;
     const savedLanguage = localStorage.getItem('language') as Language | undefined;
     const savedWallpaper = localStorage.getItem('wallpaper') as Wallpaper | undefined;
     const savedWallpaperOpacity = localStorage.getItem('wallpaperOpacity');
@@ -101,12 +100,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    Cookies.set('theme', newTheme, { expires: 365 });
+    localStorage.setItem('theme', newTheme);
   };
 
   const setColor = (newColor: Color) => {
     setColorState(newColor);
-    Cookies.set('color', newColor, { expires: 365 });
+    localStorage.setItem('color', newColor);
   };
   
   const setLanguage = (newLanguage: Language) => {
