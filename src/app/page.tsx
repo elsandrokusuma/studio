@@ -119,7 +119,7 @@ const chartConfig = {
 
 const motivationalQuotes = {
   en: [
-    "Every small step is progress.", "Focus on progress, not perfection.", "Today is a new opportunity to grow.", "Hard work today is victory tomorrow.", "Don't stop when you're tired, stop when you're done.", "Start where you are. Use what you have.", "Success is the sum of small efforts.", "Make each day your masterpiece.", "Trust the process.", "The only limit is your mind.", "Keep moving forward, don't look back.", "Action is the foundational key to all success.", "Your passion is your fire. Keep it burning.", "Every accomplishment starts with the decision to try.", "Don't be afraid to fail, be afraid not to try.", "You are stronger than you think.", "Do your best, and forget the rest.", "Big dreams start with one step.", "Be the best version of yourself today.", "Challenges make life interesting.", "Consistency is more important than perfection.", "Focus on the goal, not the obstacles.", "Patience is the key to victory.", "Every day is a new page in your story.", "Don't wait for opportunity, create it.", "Stay positive, work hard, and make it happen.", "Learn from yesterday, live for today.", "Strength does not come from winning, but from struggle.", "Miracles happen when you don't give up.", "Do something today that your future self will thank you for.", "Fall down seven times, get up eight."
+    "Every small step is progress.", "Focus on progress, not perfection.", "Today is a new opportunity to grow.", "Hard work today is victory tomorrow.", "Don't stop when you're tired, stop when you're done.", "Start where you are. Use what you have.", "Success is the sum of small efforts.", "Make each day your masterpiece.", "Trust the process.", "The only limit is your mind.", "Keep moving forward, don't look back.", "Action is the foundational key to all success.", "Your passion is your fire. Keep it burning.", "Every accomplishment starts with the decision to try.", "Don't be afraid to fail, be afraid not to try.", "You are stronger than you think.", "Do your best, and forget the rest.", "Big dreams start with one step.", "Be the best version of yourself today.", "Challenges make life interesting.", "Consistency is more important than perfection.", "Focus on the goal, not on the obstacles.", "Patience is the key to victory.", "Every day is a new page in your story.", "Don't wait for opportunity, create it.", "Stay positive, work hard, and make it happen.", "Learn from yesterday, live for today.", "Strength does not come from winning, but from struggle.", "Miracles happen when you don't give up.", "Do something today that your future self will thank you for.", "Fall down seven times, get up eight."
   ],
   id: [
     "Setiap langkah kecil adalah kemajuan.", "Fokus pada kemajuan, bukan kesempurnaan.", "Hari ini adalah kesempatan baru untuk berkembang.", "Kerja keras hari ini adalah kemenangan esok hari.", "Jangan berhenti saat lelah, berhentilah saat selesai.", "Mulai dari mana Anda berada. Gunakan apa yang Anda miliki.", "Kesuksesan adalah jumlah dari usaha-usaha kecil.", "Jadikan setiap hari mahakarya Anda.", "Percayalah pada proses.", "Satu-satunya batasan adalah pikiran Anda.", "Terus bergerak maju, jangan melihat ke belakang.", "Tindakan adalah kunci dasar untuk semua kesuksesan.", "Semangatmu adalah apimu. Jaga agar tetap menyala.", "Setiap pencapaian dimulai dengan keputusan untuk mencoba.", "Jangan takut gagal, takutlah tidak mencoba.", "Anda lebih kuat dari yang Anda kira.", "Lakukan yang terbaik, dan lupakan sisanya.", "Mimpi besar dimulai dengan satu langkah.", "Jadilah versi terbaik dari dirimu hari ini.", "Tantangan membuat hidup menarik.", "Konsistensi lebih penting dari kesempurnaan.", "Fokus pada tujuan, bukan rintangan.", "Kesabaran adalah kunci kemenangan.", "Setiap hari adalah halaman baru dalam ceritamu.", "Jangan menunggu kesempatan, ciptakanlah.", "Tetap positif, bekerja keras, dan wujudkan.", "Belajar dari kemarin, hidup untuk hari ini.", "Kekuatan tidak datang dari kemenangan, tapi dari perjuangan.", "Keajaiban terjadi saat Anda tidak menyerah.", "Lakukan sesuatu hari ini yang akan membuat dirimu di masa depan berterima kasih.", "Jatuh tujuh kali, bangkit delapan kali."
@@ -146,10 +146,10 @@ const motivationalQuotes = {
 
 const translations = {
     en: {
-        goodMorning: "Good morning",
-        goodAfternoon: "Good afternoon",
-        goodEvening: "Good evening",
-        goodNight: "Good night",
+        goodMorning: (name: string) => `Good morning, ${name}!`,
+        goodAfternoon: (name: string) => `Good afternoon, ${name}!`,
+        goodEvening: (name: string) => `Good evening, ${name}!`,
+        goodNight: (name: string) => `Good night, ${name}!`,
         totalItems: "Total Items",
         stockValue: "Stock Value",
         lowStock: "Low Stock",
@@ -221,10 +221,10 @@ const translations = {
         }
     },
     id: {
-        goodMorning: "Selamat pagi",
-        goodAfternoon: "Selamat siang",
-        goodEvening: "Selamat sore",
-        goodNight: "Selamat malam",
+        goodMorning: (name: string) => `Selamat pagi, ${name}!`,
+        goodAfternoon: (name: string) => `Selamat siang, ${name}!`,
+        goodEvening: (name: string) => `Selamat sore, ${name}!`,
+        goodNight: (name: string) => `Selamat malam, ${name}!`,
         totalItems: "Total Barang",
         stockValue: "Nilai Stok",
         lowStock: "Stok Rendah",
@@ -296,10 +296,10 @@ const translations = {
         }
     },
     es: {
-        goodMorning: "Buenos días",
-        goodAfternoon: "Buenas tardes",
-        goodEvening: "Buenas tardes",
-        goodNight: "Buenas noches",
+        goodMorning: (name: string) => `Buenos días, ${name}!`,
+        goodAfternoon: (name: string) => `Buenas tardes, ${name}!`,
+        goodEvening: (name: string) => `Buenas tardes, ${name}!`,
+        goodNight: (name: string) => `Buenas noches, ${name}!`,
         totalItems: "Total de Artículos",
         stockValue: "Valor del Stock",
         lowStock: "Stock Bajo",
@@ -371,10 +371,10 @@ const translations = {
         }
     },
     fr: {
-        goodMorning: "Bonjour",
-        goodAfternoon: "Bon après-midi",
-        goodEvening: "Bonsoir",
-        goodNight: "Bonne nuit",
+        goodMorning: (name: string) => `Bonjour, ${name}!`,
+        goodAfternoon: (name: string) => `Bon après-midi, ${name}!`,
+        goodEvening: (name: string) => `Bonsoir, ${name}!`,
+        goodNight: (name: string) => `Bonne nuit, ${name}!`,
         totalItems: "Total des Articles",
         stockValue: "Valeur du Stock",
         lowStock: "Stock Faible",
@@ -446,10 +446,10 @@ const translations = {
         }
     },
     de: {
-        goodMorning: "Guten Morgen",
-        goodAfternoon: "Guten Tag",
-        goodEvening: "Guten Abend",
-        goodNight: "Gute Nacht",
+        goodMorning: (name: string) => `Guten Morgen, ${name}!`,
+        goodAfternoon: (name: string) => `Guten Tag, ${name}!`,
+        goodEvening: (name: string) => `Guten Abend, ${name}!`,
+        goodNight: (name: string) => `Gute Nacht, ${name}!`,
         totalItems: "Gesamtanzahl Artikel",
         stockValue: "Lagerwert",
         lowStock: "Niedriger Lagerbestand",
@@ -521,10 +521,10 @@ const translations = {
         }
     },
     ja: {
-        goodMorning: "おはようございます",
-        goodAfternoon: "こんにちは",
-        goodEvening: "こんばんは",
-        goodNight: "おやすみなさい",
+        goodMorning: (name: string) => `おはようございます、${name}さん！`,
+        goodAfternoon: (name: string) => `こんにちは、${name}さん！`,
+        goodEvening: (name: string) => `こんばんは、${name}さん！`,
+        goodNight: (name: string) => `おやすみなさい、${name}さん！`,
         totalItems: "総アイテム数",
         stockValue: "在庫評価額",
         lowStock: "在庫僅少",
@@ -596,10 +596,10 @@ const translations = {
         }
     },
     ko: {
-        goodMorning: "좋은 아침입니다",
-        goodAfternoon: "안녕하세요",
-        goodEvening: "좋은 저녁입니다",
-        goodNight: "안녕히 주무세요",
+        goodMorning: (name: string) => `좋은 아침입니다, ${name}님!`,
+        goodAfternoon: (name: string) => `안녕하세요, ${name}님!`,
+        goodEvening: (name: string) => `좋은 저녁입니다, ${name}님!`,
+        goodNight: (name: string) => `안녕히 주무세요, ${name}님!`,
         totalItems: "총 품목 수",
         stockValue: "재고 가치",
         lowStock: "재고 부족",
@@ -671,10 +671,10 @@ const translations = {
         }
     },
     'zh-CN': {
-        goodMorning: "早上好",
-        goodAfternoon: "下午好",
-        goodEvening: "晚上好",
-        goodNight: "晚安",
+        goodMorning: (name: string) => `早上好, ${name}!`,
+        goodAfternoon: (name: string) => `下午好, ${name}!`,
+        goodEvening: (name: string) => `晚上好, ${name}!`,
+        goodNight: (name: string) => `晚安, ${name}!`,
         totalItems: "物品总数",
         stockValue: "库存价值",
         lowStock: "低库存",
@@ -870,7 +870,15 @@ export default function DashboardPage() {
 
 
   React.useEffect(() => {
+    const getUserDisplayName = () => {
+        if (!user || !user.email) return '';
+        const namePart = user.email.split('@')[0];
+        // Capitalize the first letter
+        return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+
     const getGreeting = (): GreetingInfo => {
+        const displayName = getUserDisplayName();
         const now = new Date();
         const utcOffset = now.getTimezoneOffset() * 60000;
         const wibOffset = 7 * 3600000;
@@ -878,16 +886,18 @@ export default function DashboardPage() {
         const currentHour = wibTime.getHours();
 
         if (currentHour >= 1 && currentHour < 11) {
-            return { text: t.goodMorning, icon: Sun };
+            return { text: t.goodMorning(displayName), icon: Sun };
         } else if (currentHour >= 11 && currentHour < 15) {
-            return { text: t.goodAfternoon, icon: Sun };
+            return { text: t.goodAfternoon(displayName), icon: Sun };
         } else if (currentHour >= 15 && currentHour < 19) {
-            return { text: t.goodEvening, icon: Sunset };
+            return { text: t.goodEvening(displayName), icon: Sunset };
         } else {
-            return { text: t.goodNight, icon: Moon };
+            return { text: t.goodNight(displayName), icon: Moon };
         }
     };
-    setGreetingInfo(getGreeting());
+    if (user) {
+      setGreetingInfo(getGreeting());
+    }
 
     // Set daily motivational quote
     const dayOfMonth = new Date().getDate();
@@ -949,7 +959,7 @@ export default function DashboardPage() {
     };
 
     fetchData();
-  }, [toast, t, language]);
+  }, [toast, t, language, user]);
 
   React.useEffect(() => {
     if (!authLoading) {
@@ -1245,7 +1255,7 @@ export default function DashboardPage() {
               <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{`${greetingInfo.text}!`}</h1>
+              <h1 className="text-2xl font-bold">{greetingInfo.text}</h1>
               <p className="text-muted-foreground">
                 {dailyQuote}
               </p>
@@ -2143,5 +2153,3 @@ export default function DashboardPage() {
 }
 
     
-
-      
