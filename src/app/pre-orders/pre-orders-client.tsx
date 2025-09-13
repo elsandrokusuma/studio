@@ -77,6 +77,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { id, enUS, es, fr, de, ja, ko, zhCN } from 'date-fns/locale';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
@@ -98,6 +99,8 @@ type GroupedPO = {
   expectedDate: string;
 };
 
+const dateLocales = { en: enUS, id, es, fr, de, ja, ko, 'zh-CN': zhCN };
+
 const translations = {
     en: {
         title: "Pre-Order & Approval",
@@ -109,12 +112,6 @@ const translations = {
         requestApproval: "Request Approval",
         export: "Export",
         selectAll: "Select all",
-        pending: "Pending",
-        awaitingApproval: "Awaiting Approval",
-        approved: "Approved",
-        rejected: "Rejected",
-        fulfilled: "Fulfilled",
-        cancelled: "Cancelled",
         units: "units",
         item: "Item",
         unit: "Unit",
@@ -164,6 +161,17 @@ const translations = {
         selectItem: "Select an item...",
         searchItem: "Search item...",
         noItemFound: "No item found.",
+        statuses: {
+            'Pending': 'Pending',
+            'Awaiting Approval': 'Awaiting Approval',
+            'Approved': 'Approved',
+            'Rejected': 'Rejected',
+            'Fulfilled': 'Fulfilled',
+            'Cancelled': 'Cancelled'
+        },
+        unitsFull: {
+          "Pcs": "Pcs", "Pack": "Pack", "Box": "Box", "Roll": "Roll", "Rim": "Rim", "Tube": "Tube", "Bottle": "Bottle", "Can": "Can", "Sheet": "Sheet", "Cartridge": "Cartridge"
+        }
     },
     id: {
         title: "Pra-Pesan & Persetujuan",
@@ -175,12 +183,6 @@ const translations = {
         requestApproval: "Minta Persetujuan",
         export: "Ekspor",
         selectAll: "Pilih semua",
-        pending: "Tertunda",
-        awaitingApproval: "Menunggu Persetujuan",
-        approved: "Disetujui",
-        rejected: "Ditolak",
-        fulfilled: "Terpenuhi",
-        cancelled: "Dibatalkan",
         units: "unit",
         item: "Barang",
         unit: "Unit",
@@ -230,6 +232,17 @@ const translations = {
         selectItem: "Pilih item...",
         searchItem: "Cari item...",
         noItemFound: "Item tidak ditemukan.",
+        statuses: {
+            'Pending': 'Tertunda',
+            'Awaiting Approval': 'Menunggu Persetujuan',
+            'Approved': 'Disetujui',
+            'Rejected': 'Ditolak',
+            'Fulfilled': 'Terpenuhi',
+            'Cancelled': 'Dibatalkan'
+        },
+        unitsFull: {
+            "Pcs": "Pcs", "Pack": "Pak", "Box": "Kotak", "Roll": "Gulungan", "Rim": "Rim", "Tube": "Tabung", "Bottle": "Botol", "Can": "Kaleng", "Sheet": "Lembar", "Cartridge": "Kartrid"
+        }
     },
     es: {
         title: "Pre-Pedido y Aprobación",
@@ -241,12 +254,6 @@ const translations = {
         requestApproval: "Solicitar Aprobación",
         export: "Exportar",
         selectAll: "Seleccionar todo",
-        pending: "Pendiente",
-        awaitingApproval: "Esperando Aprobación",
-        approved: "Aprobado",
-        rejected: "Rechazado",
-        fulfilled: "Completado",
-        cancelled: "Cancelado",
         units: "unidades",
         item: "Artículo",
         unit: "Unidad",
@@ -296,6 +303,17 @@ const translations = {
         selectItem: "Selecciona un artículo...",
         searchItem: "Buscar artículo...",
         noItemFound: "No se encontró ningún artículo.",
+        statuses: {
+            'Pending': 'Pendiente',
+            'Awaiting Approval': 'Esperando Aprobación',
+            'Approved': 'Aprobado',
+            'Rejected': 'Rechazado',
+            'Fulfilled': 'Completado',
+            'Cancelled': 'Cancelado'
+        },
+        unitsFull: {
+            "Pcs": "Pcs", "Pack": "Paquete", "Box": "Caja", "Roll": "Rollo", "Rim": "Resma", "Tube": "Tubo", "Bottle": "Botella", "Can": "Lata", "Sheet": "Hoja", "Cartridge": "Cartucho"
+        }
     },
     fr: {
         title: "Pré-Commande & Approbation",
@@ -307,12 +325,6 @@ const translations = {
         requestApproval: "Demander l'Approbation",
         export: "Exporter",
         selectAll: "Tout sélectionner",
-        pending: "En attente",
-        awaitingApproval: "En Attente d'Approbation",
-        approved: "Approuvé",
-        rejected: "Rejeté",
-        fulfilled: "Rempli",
-        cancelled: "Annulé",
         units: "unités",
         item: "Article",
         unit: "Unité",
@@ -362,6 +374,17 @@ const translations = {
         selectItem: "Sélectionnez un article...",
         searchItem: "Rechercher un article...",
         noItemFound: "Aucun article trouvé.",
+        statuses: {
+            'Pending': 'En attente',
+            'Awaiting Approval': "En Attente d'Approbation",
+            'Approved': 'Approuvé',
+            'Rejected': 'Rejeté',
+            'Fulfilled': 'Rempli',
+            'Cancelled': 'Annulé'
+        },
+        unitsFull: {
+            "Pcs": "Pcs", "Pack": "Paquet", "Box": "Boîte", "Roll": "Rouleau", "Rim": "Rame", "Tube": "Tube", "Bottle": "Bouteille", "Can": "Canette", "Sheet": "Feuille", "Cartridge": "Cartouche"
+        }
     },
     de: {
         title: "Vorbestellung & Genehmigung",
@@ -373,12 +396,6 @@ const translations = {
         requestApproval: "Genehmigung anfordern",
         export: "Exportieren",
         selectAll: "Alle auswählen",
-        pending: "Ausstehend",
-        awaitingApproval: "Wartet auf Genehmigung",
-        approved: "Genehmigt",
-        rejected: "Abgelehnt",
-        fulfilled: "Erfüllt",
-        cancelled: "Storniert",
         units: "Einheiten",
         item: "Artikel",
         unit: "Einheit",
@@ -428,6 +445,17 @@ const translations = {
         selectItem: "Artikel auswählen...",
         searchItem: "Artikel suchen...",
         noItemFound: "Kein Artikel gefunden.",
+        statuses: {
+            'Pending': 'Ausstehend',
+            'Awaiting Approval': 'Wartet auf Genehmigung',
+            'Approved': 'Genehmigt',
+            'Rejected': 'Abgelehnt',
+            'Fulfilled': 'Erfüllt',
+            'Cancelled': 'Storniert'
+        },
+        unitsFull: {
+            "Pcs": "Stk", "Pack": "Packung", "Box": "Kasten", "Roll": "Rolle", "Rim": "Ries", "Tube": "Tube", "Bottle": "Flasche", "Can": "Dose", "Sheet": "Blatt", "Cartridge": "Patrone"
+        }
     },
     ja: {
         title: "予約注文と承認",
@@ -439,12 +467,6 @@ const translations = {
         requestApproval: "承認をリクエスト",
         export: "エクスポート",
         selectAll: "すべて選択",
-        pending: "保留中",
-        awaitingApproval: "承認待ち",
-        approved: "承認済み",
-        rejected: "拒否",
-        fulfilled: "完了",
-        cancelled: "キャンセル",
         units: "ユニット",
         item: "アイテム",
         unit: "単位",
@@ -494,6 +516,17 @@ const translations = {
         selectItem: "アイテムを選択...",
         searchItem: "アイテムを検索...",
         noItemFound: "アイテムが見つかりません。",
+        statuses: {
+            'Pending': '保留中',
+            'Awaiting Approval': '承認待ち',
+            'Approved': '承認済み',
+            'Rejected': '拒否',
+            'Fulfilled': '完了',
+            'Cancelled': 'キャンセル'
+        },
+        unitsFull: {
+            "Pcs": "個", "Pack": "パック", "Box": "箱", "Roll": "ロール", "Rim": "連", "Tube": "チューブ", "Bottle": "ボトル", "Can": "缶", "Sheet": "枚", "Cartridge": "カートリッジ"
+        }
     },
     ko: {
         title: "선주문 및 승인",
@@ -505,12 +538,6 @@ const translations = {
         requestApproval: "승인 요청",
         export: "내보내기",
         selectAll: "모두 선택",
-        pending: "대기 중",
-        awaitingApproval: "승인 대기 중",
-        approved: "승인됨",
-        rejected: "거부됨",
-        fulfilled: "완료됨",
-        cancelled: "취소됨",
         units: "개",
         item: "품목",
         unit: "단위",
@@ -560,6 +587,17 @@ const translations = {
         selectItem: "품목 선택...",
         searchItem: "품목 검색...",
         noItemFound: "품목을 찾을 수 없습니다.",
+        statuses: {
+            'Pending': '대기 중',
+            'Awaiting Approval': '승인 대기 중',
+            'Approved': '승인됨',
+            'Rejected': '거부됨',
+            'Fulfilled': '완료됨',
+            'Cancelled': '취소됨'
+        },
+        unitsFull: {
+            "Pcs": "개", "Pack": "팩", "Box": "상자", "Roll": "롤", "Rim": "연", "Tube": "튜브", "Bottle": "병", "Can": "캔", "Sheet": "장", "Cartridge": "카트리지"
+        }
     },
     'zh-CN': {
         title: "预购与审批",
@@ -571,12 +609,6 @@ const translations = {
         requestApproval: "请求批准",
         export: "导出",
         selectAll: "全选",
-        pending: "待处理",
-        awaitingApproval: "等待批准",
-        approved: "已批准",
-        rejected: "已拒绝",
-        fulfilled: "已完成",
-        cancelled: "已取消",
         units: "单位",
         item: "项目",
         unit: "单位",
@@ -626,6 +658,17 @@ const translations = {
         selectItem: "选择一个项目...",
         searchItem: "搜索项目...",
         noItemFound: "未找到项目。",
+        statuses: {
+            'Pending': '待处理',
+            'Awaiting Approval': '等待批准',
+            'Approved': '已批准',
+            'Rejected': '已拒绝',
+            'Fulfilled': '已完成',
+            'Cancelled': '已取消'
+        },
+        unitsFull: {
+            "Pcs": "件", "Pack": "包", "Box": "盒", "Roll": "卷", "Rim": "令", "Tube": "管", "Bottle": "瓶", "Can": "罐", "Sheet": "张", "Cartridge": "墨盒"
+        }
     },
 };
 
@@ -651,6 +694,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const { language } = useTheme();
   
   const t = translations[language] || translations.en;
+  const currentLocale = dateLocales[language] || enUS;
 
   // States for editing/deleting individual items
   const [isEditItemOpen, setEditItemOpen] = React.useState(false);
@@ -1107,15 +1151,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   };
 
   const getStatusText = (status: PreOrder['status']) => {
-    const statusMap: Record<PreOrder['status'], string> = {
-      'Pending': t.pending,
-      'Awaiting Approval': t.awaitingApproval,
-      'Approved': t.approved,
-      'Rejected': t.rejected,
-      'Fulfilled': t.fulfilled,
-      'Cancelled': t.cancelled,
-    };
-    return statusMap[status] || status;
+    return t.statuses[status] || status;
+  }
+  
+  const getUnitText = (unit: string) => {
+    return t.unitsFull[unit as keyof typeof t.unitsFull] || unit;
   }
 
   const groupedPreOrders = React.useMemo(() => {
@@ -1224,12 +1264,12 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t.allStatuses}</SelectItem>
-              <SelectItem value="Pending">{t.pending}</SelectItem>
-              <SelectItem value="Awaiting Approval">{t.awaitingApproval}</SelectItem>
-              <SelectItem value="Approved">{t.approved}</SelectItem>
-              <SelectItem value="Rejected">{t.rejected}</SelectItem>
-              <SelectItem value="Fulfilled">{t.fulfilled}</SelectItem>
-              <SelectItem value="Cancelled">{t.cancelled}</SelectItem>
+              <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+              <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+              <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+              <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
+              <SelectItem value="Fulfilled">{t.statuses.Fulfilled}</SelectItem>
+              <SelectItem value="Cancelled">{t.statuses.Cancelled}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -1238,11 +1278,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
               <PopoverTrigger asChild>
                 <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateFilter ? format(dateFilter, "PPP") : <span>{t.filterByDate}</span>}
+                  {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.filterByDate}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus />
+                <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
               </PopoverContent>
             </Popover>
             {dateFilter && (
@@ -1327,16 +1367,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
                         <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Pcs">Pcs</SelectItem>
-                          <SelectItem value="Pack">Pack</SelectItem>
-                          <SelectItem value="Box">Box</SelectItem>
-                          <SelectItem value="Roll">Roll</SelectItem>
-                          <SelectItem value="Rim">Rim</SelectItem>
-                          <SelectItem value="Tube">Tube</SelectItem>
-                          <SelectItem value="Bottle">Bottle</SelectItem>
-                          <SelectItem value="Can">Can</SelectItem>
-                          <SelectItem value="Sheet">Sheet</SelectItem>
-                          <SelectItem value="Cartridge">Cartridge</SelectItem>
+                          {Object.entries(t.unitsFull).map(([key, value]) => (
+                            <SelectItem key={key} value={key}>{value}</SelectItem>
+                          ))}
                         </SelectContent>
                     </Select>
                     </div>
@@ -1390,7 +1423,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                           </div>
                           <div className="w-full sm:w-auto flex items-start justify-between">
                             <div className="text-left sm:text-right text-sm whitespace-nowrap sm:ml-4">
-                                <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy")}</div>
+                                <div className="font-medium">{format(new Date(po.orderDate), "MMMM dd, yyyy", { locale: currentLocale })}</div>
                                 <div className="font-semibold">{formatCurrency(po.totalValue)}</div>
                             </div>
                             <div className="flex items-center ml-auto">
@@ -1451,7 +1484,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                           <TableBody>
                             {itemsToDisplay.map(order => (
                               <TableRow key={order.id}>
-                                <TableCell className="font-medium">{order.itemName}</TableCell> <TableCell>{order.unit}</TableCell>
+                                <TableCell className="font-medium">{order.itemName}</TableCell> <TableCell>{getUnitText(order.unit)}</TableCell>
                                 <TableCell> <Badge variant={ {'Approved': 'default', 'Fulfilled': 'default', 'Rejected': 'destructive', 'Cancelled': 'destructive', 'Pending': 'warning', 'Awaiting Approval': 'warning'}[order.status] as any || 'outline'} className={ {'Approved': 'bg-green-100 text-green-800', 'Fulfilled': 'bg-blue-100 text-blue-800', 'Rejected': 'bg-red-100 text-red-800', 'Cancelled': 'bg-red-100 text-red-800', 'Pending': 'bg-yellow-100 text-yellow-800', 'Awaiting Approval': 'bg-yellow-100 text-yellow-800'}[order.status] }> {getStatusText(order.status)} </Badge> </TableCell>
                                 <TableCell className="text-right">{order.quantity}</TableCell> <TableCell className="text-right">{formatCurrency(order.price)}</TableCell> <TableCell className="text-right font-medium">{formatCurrency(order.quantity * order.price)}</TableCell>
                                 <TableCell className="text-right">
@@ -1503,7 +1536,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                       </CardContent>
                       <CardFooter className="p-4 pt-2 bg-muted/30 flex-wrap gap-4 justify-between text-sm">
                            <div className="flex items-center gap-2"> <Box className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">{t.totalQuantity}</p> <p className="font-medium">{po.totalQuantity} {t.units}</p> </div> </div>
-                           <div className="flex items-center gap-2"> <CalendarDays className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">{t.expectedDelivery}</p> <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy")}</p> </div> </div>
+                           <div className="flex items-center gap-2"> <CalendarDays className="h-4 w-4 text-muted-foreground" /> <div> <p className="text-muted-foreground text-xs">{t.expectedDelivery}</p> <p className="font-medium">{format(new Date(po.expectedDate), "MMM d, yyyy", { locale: currentLocale })}</p> </div> </div>
                       </CardFooter>
                     </AccordionContent>
                    </Card>
@@ -1536,7 +1569,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                 <Label htmlFor="unit" className="text-right">{t.unit}</Label>
                 <Select name="unit" required onValueChange={setSelectedUnit} defaultValue={selectedOrderItem?.unit}>
                   <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
-                  <SelectContent> <SelectItem value="Pcs">Pcs</SelectItem> <SelectItem value="Pack">Pack</SelectItem> <SelectItem value="Box">Box</SelectItem> <SelectItem value="Roll">Roll</SelectItem> <SelectItem value="Rim">Rim</SelectItem> <SelectItem value="Tube">Tube</SelectItem> <SelectItem value="Bottle">Bottle</SelectItem> <SelectItem value="Can">Can</SelectItem> <SelectItem value="Sheet">Sheet</SelectItem> <SelectItem value="Cartridge">Cartridge</SelectItem> </SelectContent>
+                   <SelectContent>
+                      {Object.entries(t.unitsFull).map(([key, value]) => (
+                        <SelectItem key={key} value={key}>{value}</SelectItem>
+                      ))}
+                    </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="quantity" className="text-right">{t.qty}</Label> <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required /> </div>

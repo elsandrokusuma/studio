@@ -87,6 +87,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import type { SparepartRequest } from "@/lib/types";
 import { format } from "date-fns";
+import { id, enUS, es, fr, de, ja, ko, zhCN } from 'date-fns/locale';
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -127,6 +128,8 @@ type POItem = {
   company: string;
   quantity: number | string;
 };
+
+const dateLocales = { en: enUS, id, es, fr, de, ja, ko, 'zh-CN': zhCN };
 
 const translations = {
     en: {
@@ -185,6 +188,12 @@ const translations = {
         accessDeniedDesc: "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
         firebaseNotConfigured: "Firebase Not Configured",
         firebaseNotConfiguredDesc: "Please configure your Firebase credentials in the environment variables to use this application.",
+        statuses: {
+            'Pending': 'Pending',
+            'Awaiting Approval': 'Awaiting Approval',
+            'Approved': 'Approved',
+            'Rejected': 'Rejected'
+        }
     },
     id: {
         title: "Persetujuan Sparepart",
@@ -242,10 +251,16 @@ const translations = {
         accessDeniedDesc: "Anda tidak memiliki izin untuk melihat halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.",
         firebaseNotConfigured: "Firebase Tidak Dikonfigurasi",
         firebaseNotConfiguredDesc: "Harap konfigurasikan kredensial Firebase Anda di variabel lingkungan untuk menggunakan aplikasi ini.",
+        statuses: {
+            'Pending': 'Tertunda',
+            'Awaiting Approval': 'Menunggu Persetujuan',
+            'Approved': 'Disetujui',
+            'Rejected': 'Ditolak'
+        }
     },
     es: {
         title: "Aprobación de Repuestos",
-        description: (count: number, items: number) => `${count} grupos de PO • ${items} líneas de artículos`,
+        description: (count: number, items: number) => `${count} grupos de OC • ${items} líneas de artículos`,
         requestApproval: "Solicitar Aprobación",
         export: "Exportar",
         exportCsv: "Exportar como CSV",
@@ -264,10 +279,10 @@ const translations = {
         qtyPlaceholder: "Cant",
         addItem: "Añadir Artículo",
         cancel: "Cancelar",
-        totalPOs: "Total de POs",
+        totalPOs: "Total de OCs",
         lineItems: "Líneas de Artículos",
         pending: "Pendiente",
-        searchPlaceholder: "Buscar PO o artículo...",
+        searchPlaceholder: "Buscar OC o artículo...",
         allStatus: "Todos los Estados",
         allTime: "Todo el Tiempo",
         pickDate: "Seleccionar fecha",
@@ -299,6 +314,12 @@ const translations = {
         accessDeniedDesc: "No tiene permiso para ver esta página. Póngase en contacto con un administrador si cree que esto es un error.",
         firebaseNotConfigured: "Firebase No Configurado",
         firebaseNotConfiguredDesc: "Configure sus credenciales de Firebase en las variables de entorno para usar esta aplicación.",
+        statuses: {
+            'Pending': 'Pendiente',
+            'Awaiting Approval': 'Esperando Aprobación',
+            'Approved': 'Aprobado',
+            'Rejected': 'Rechazado'
+        }
     },
     fr: {
         title: "Approbation des Pièces de Rechange",
@@ -356,6 +377,12 @@ const translations = {
         accessDeniedDesc: "Vous n'avez pas la permission de voir cette page. Veuillez contacter un administrateur si vous pensez que c'est une erreur.",
         firebaseNotConfigured: "Firebase Non Configuré",
         firebaseNotConfiguredDesc: "Veuillez configurer vos informations d'identification Firebase dans les variables d'environnement pour utiliser cette application.",
+        statuses: {
+            'Pending': 'En attente',
+            'Awaiting Approval': "En Attente d'Approbation",
+            'Approved': 'Approuvé',
+            'Rejected': 'Rejeté'
+        }
     },
     de: {
         title: "Ersatzteil-Genehmigung",
@@ -413,6 +440,12 @@ const translations = {
         accessDeniedDesc: "Sie haben keine Berechtigung, diese Seite anzuzeigen. Bitte kontaktieren Sie einen Administrator, wenn Sie glauben, dass dies ein Fehler ist.",
         firebaseNotConfigured: "Firebase Nicht Konfiguriert",
         firebaseNotConfiguredDesc: "Bitte konfigurieren Sie Ihre Firebase-Anmeldeinformationen in den Umgebungsvariablen, um diese Anwendung zu verwenden.",
+        statuses: {
+            'Pending': 'Ausstehend',
+            'Awaiting Approval': 'Wartet auf Genehmigung',
+            'Approved': 'Genehmigt',
+            'Rejected': 'Abgelehnt'
+        }
     },
     ja: {
         title: "スペアパーツ承認",
@@ -470,6 +503,12 @@ const translations = {
         accessDeniedDesc: "このページを表示する権限がありません。これがエラーであると思われる場合は、管理者に連絡してください。",
         firebaseNotConfigured: "Firebaseが設定されていません",
         firebaseNotConfiguredDesc: "このアプリケーションを使用するには、環境変数でFirebaseの認証情報を設定してください。",
+        statuses: {
+            'Pending': '保留中',
+            'Awaiting Approval': '承認待ち',
+            'Approved': '承認済み',
+            'Rejected': '拒否'
+        }
     },
     ko: {
         title: "부품 승인",
@@ -527,6 +566,12 @@ const translations = {
         accessDeniedDesc: "이 페이지를 볼 권한이 없습니다. 오류라고 생각되면 관리자에게 문의하십시오.",
         firebaseNotConfigured: "Firebase가 구성되지 않음",
         firebaseNotConfiguredDesc: "이 응용 프로그램을 사용하려면 환경 변수에서 Firebase 자격 증명을 구성하십시오.",
+        statuses: {
+            'Pending': '대기 중',
+            'Awaiting Approval': '승인 대기 중',
+            'Approved': '승인됨',
+            'Rejected': '거부됨'
+        }
     },
     'zh-CN': {
         title: "备件批准",
@@ -584,6 +629,12 @@ const translations = {
         accessDeniedDesc: "您无权查看此页面。如果您认为这是错误，请联系管理员。",
         firebaseNotConfigured: "Firebase 未配置",
         firebaseNotConfiguredDesc: "请在环境变量中配置您的 Firebase 凭据以使用此应用程序。",
+        statuses: {
+            'Pending': '待处理',
+            'Awaiting Approval': '等待批准',
+            'Approved': '已批准',
+            'Rejected': '已拒绝'
+        }
     }
 };
 
@@ -599,6 +650,7 @@ export default function ApprovalSparepartPage() {
   const { language } = useTheme();
 
   const t = translations[language] || translations.en;
+  const currentLocale = dateLocales[language] || enUS;
 
   // State for Create PO Dialog
   const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
@@ -622,6 +674,9 @@ export default function ApprovalSparepartPage() {
   const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedPo, setSelectedPo] = React.useState<GroupedRequest | null>(null);
 
+  const getStatusText = (status: SparepartRequest['status'] | SparepartRequest['itemStatus']) => {
+    return t.statuses[status as keyof typeof t.statuses] || status;
+  }
 
   React.useEffect(() => {
     if (!db) {
@@ -1045,7 +1100,7 @@ export default function ApprovalSparepartPage() {
         toast({
             variant: 'destructive',
             title: 'No approved items in selected POs',
-            description: 'Please select POs that have been marked as "Approved" to export.',
+            description: "Please select POs that have been marked as 'Approved' to export.",
         });
         return;
     }
@@ -1282,10 +1337,10 @@ export default function ApprovalSparepartPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t.allStatus}</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Awaiting Approval">Awaiting Approval</SelectItem>
-              <SelectItem value="Approved">Approved</SelectItem>
-              <SelectItem value="Rejected">Rejected</SelectItem>
+              <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+              <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+              <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+              <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
             </SelectContent>
           </Select>
           <Select>
@@ -1300,11 +1355,11 @@ export default function ApprovalSparepartPage() {
             <PopoverTrigger asChild>
               <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateFilter ? format(dateFilter, "PPP") : <span>{t.pickDate}</span>}
+                {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus />
+              <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
             </PopoverContent>
           </Popover>
           <div className="flex items-center space-x-2">
@@ -1352,7 +1407,7 @@ export default function ApprovalSparepartPage() {
                                             req.status === 'Pending' || req.status === 'Awaiting Approval' ? 'bg-yellow-100 text-yellow-800' : ''
                                         }
                                       >
-                                          {req.status}
+                                          {getStatusText(req.status)}
                                       </Badge>
                                       <span>• {req.totalQuantity} {t.units}</span>
                                       <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
@@ -1361,7 +1416,7 @@ export default function ApprovalSparepartPage() {
                           </div>
                           <div className="w-full sm:w-auto flex items-start justify-between">
                             <div className="text-left sm:text-right text-sm whitespace-nowrap sm:ml-4">
-                                <div className="font-medium">{format(new Date(req.requestDate), "MMMM dd, yyyy")}</div>
+                                <div className="font-medium">{format(new Date(req.requestDate), "MMMM dd, yyyy", { locale: currentLocale })}</div>
                                 <div className="text-muted-foreground">{t.requesterLabel}: {req.requester}</div>
                             </div>
                             <div className="flex items-center ml-auto">
@@ -1443,7 +1498,7 @@ export default function ApprovalSparepartPage() {
                                                 item.itemStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' : ''
                                             }
                                         >
-                                            {item.itemStatus || 'Pending'}
+                                            {getStatusText(item.itemStatus || 'Pending')}
                                         </Badge>
                                       </TableCell>
                                       <TableCell>
@@ -1547,7 +1602,3 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
-
-    
-
-    
