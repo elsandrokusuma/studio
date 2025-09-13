@@ -25,6 +25,48 @@ const translations = {
         emailLabel: "Email",
         passwordLabel: "Kata Sandi",
         signInButton: "Masuk"
+    },
+    es: {
+        title: "¡Bienvenido!",
+        description: "Inicia sesión para continuar a tu panel.",
+        emailLabel: "Correo Electrónico",
+        passwordLabel: "Contraseña",
+        signInButton: "Iniciar Sesión"
+    },
+    fr: {
+        title: "Bienvenue !",
+        description: "Veuillez vous connecter pour continuer vers votre tableau de bord.",
+        emailLabel: "E-mail",
+        passwordLabel: "Mot de passe",
+        signInButton: "Se connecter"
+    },
+    de: {
+        title: "Willkommen!",
+        description: "Bitte melden Sie sich an, um zu Ihrem Dashboard zu gelangen.",
+        emailLabel: "E-Mail",
+        passwordLabel: "Passwort",
+        signInButton: "Anmelden"
+    },
+    ja: {
+        title: "ようこそ！",
+        description: "ダッシュボードに進むにはサインインしてください。",
+        emailLabel: "メールアドレス",
+        passwordLabel: "パスワード",
+        signInButton: "サインイン"
+    },
+    ko: {
+        title: "환영합니다!",
+        description: "대시보드로 계속하려면 로그인하십시오.",
+        emailLabel: "이메일",
+        passwordLabel: "비밀번호",
+        signInButton: "로그인"
+    },
+    'zh-CN': {
+        title: "欢迎！",
+        description: "请登录以继续访问您的仪表板。",
+        emailLabel: "电子邮件",
+        passwordLabel: "密码",
+        signInButton: "登录"
     }
 };
 
@@ -34,7 +76,7 @@ export function LoginForm() {
   const [password, setPassword] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const { language } = useTheme();
-  const t = language === 'id' ? translations.id : translations.en;
+  const t = translations[language] || translations.en;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
