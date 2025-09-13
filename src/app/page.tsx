@@ -808,8 +808,8 @@ export default function DashboardPage() {
     React.useState<string>("Select an item...");
 
   // State for chart type and time period
-  const [chartType, setChartType] = React.useState<'bar' | 'line' | 'area'>('bar');
-  const [timePeriod, setTimePeriod] = React.useState<'monthly' | 'daily'>('monthly');
+  const [chartType, setChartType] = React.useState<'bar' | 'line' | 'area'>('area');
+  const [timePeriod, setTimePeriod] = React.useState<'monthly' | 'daily'>('daily');
 
 
   const chartData = React.useMemo(() => {

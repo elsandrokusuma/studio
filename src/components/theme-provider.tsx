@@ -66,7 +66,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [color, setColorState] = React.useState<Color>('green');
   const [wallpaper, setWallpaperState] = React.useState<Wallpaper>('default');
   const [wallpaperOpacity, setWallpaperOpacityState] = React.useState(0.5);
-  const [componentOpacity, setComponentOpacityState] = React.useState(1);
+  const [componentOpacity, setComponentOpacityState] = React.useState(0.85);
   const [language, setLanguageState] = React.useState<Language>('id');
 
   const [isMounted, setIsMounted] = React.useState(false);
