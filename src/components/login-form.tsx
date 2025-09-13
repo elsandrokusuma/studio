@@ -2,6 +2,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,15 +13,15 @@ import { useTheme } from '@/hooks/use-theme';
 
 const translations = {
     en: {
-        title: "Sign In",
-        description: "Sign in with your existing credentials.",
+        title: "Welcome!",
+        description: "Please sign in to continue to your dashboard.",
         emailLabel: "Email",
         passwordLabel: "Password",
         signInButton: "Sign In"
     },
     id: {
-        title: "Masuk",
-        description: "Masuk dengan kredensial yang ada.",
+        title: "Selamat Datang!",
+        description: "Silakan masuk untuk melanjutkan ke dashboard Anda.",
         emailLabel: "Email",
         passwordLabel: "Kata Sandi",
         signInButton: "Masuk"
@@ -51,7 +52,8 @@ export function LoginForm() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
       <Card className="relative z-10 w-full max-w-sm">
-        <CardHeader>
+        <CardHeader className="items-center text-center">
+          <Image src="/favicon.ico?v=8" alt="Logo" width={48} height={48} className="mb-4" />
           <CardTitle className="text-2xl">{t.title}</CardTitle>
           <CardDescription>{t.description}</CardDescription>
         </CardHeader>
