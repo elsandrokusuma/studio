@@ -50,13 +50,79 @@ const translations = {
         allCaughtUp: "Anda sudah melihat semua!",
         toggleMenu: "Buka/tutup menu navigasi",
         appName: "Inv. Alat Tulis"
+    },
+    es: {
+        dashboard: "Tablero",
+        inventory: "Inventario",
+        preOrder: "Pre-Orden y Aprobación",
+        sparepart: "Aprobación de Repuestos",
+        notifications: "Notificaciones",
+        clearAll: "Limpiar Todo",
+        allCaughtUp: "¡Estás al día!",
+        toggleMenu: "Alternar menú de navegación",
+        appName: "Inv. de Papelería"
+    },
+    fr: {
+        dashboard: "Tableau de Bord",
+        inventory: "Inventaire",
+        preOrder: "Pré-Commande & Approbation",
+        sparepart: "Approbation des Pièces",
+        notifications: "Notifications",
+        clearAll: "Tout Effacer",
+        allCaughtUp: "Vous êtes à jour !",
+        toggleMenu: "Basculer le menu de navigation",
+        appName: "Inv. de Papeterie"
+    },
+    de: {
+        dashboard: "Dashboard",
+        inventory: "Inventar",
+        preOrder: "Vorbestellung & Genehmigung",
+        sparepart: "Ersatzteil-Genehmigung",
+        notifications: "Benachrichtigungen",
+        clearAll: "Alles Löschen",
+        allCaughtUp: "Sie sind auf dem neuesten Stand!",
+        toggleMenu: "Navigationsmenü umschalten",
+        appName: "Schreibwaren-Inv."
+    },
+    ja: {
+        dashboard: "ダッシュボード",
+        inventory: "在庫",
+        preOrder: "予約注文と承認",
+        sparepart: "スペアパーツ承認",
+        notifications: "通知",
+        clearAll: "すべてクリア",
+        allCaughtUp: "すべて確認済みです！",
+        toggleMenu: "ナビゲーションメニューの切り替え",
+        appName: "文房具在庫"
+    },
+    ko: {
+        dashboard: "대시보드",
+        inventory: "인벤토리",
+        preOrder: "선주문 및 승인",
+        sparepart: "부품 승인",
+        notifications: "알림",
+        clearAll: "모두 지우기",
+        allCaughtUp: "모두 확인했습니다!",
+        toggleMenu: "탐색 메뉴 토글",
+        appName: "문구 인벤토리"
+    },
+    'zh-CN': {
+        dashboard: "仪表板",
+        inventory: "库存",
+        preOrder: "预购与审批",
+        sparepart: "备件批准",
+        notifications: "通知",
+        clearAll: "全部清除",
+        allCaughtUp: "您已处理所有通知！",
+        toggleMenu: "切换导航菜单",
+        appName: "文具库存"
     }
 };
 
 function NotificationBell() {
   const { notifications, clearNotifications } = useNotifications();
   const { language } = useTheme();
-  const t = language === 'id' ? translations.id : translations.en;
+  const t = translations[language] || translations.en;
   const hasNotifications = notifications.length > 0;
 
   return (
@@ -127,7 +193,7 @@ export function AppHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { user } = useAuth();
   const { language } = useTheme();
-  const t = language === 'id' ? translations.id : translations.en;
+  const t = translations[language] || translations.en;
 
   const navItems = React.useMemo(() => [
     { href: "/", label: t.dashboard, icon: LayoutDashboard },
@@ -219,3 +285,5 @@ export function AppHeader() {
     </header>
   )
 }
+
+    
