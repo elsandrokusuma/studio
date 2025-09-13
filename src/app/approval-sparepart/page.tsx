@@ -604,7 +604,7 @@ export default function ApprovalSparepartPage() {
   const [poItems, setPoItems] = React.useState<POItem[]>([{ id: 1, itemName: '', company: '', quantity: 1 }]);
   const [requesterName, setRequesterName] = React.useState('');
   const [location, setLocation] = React.useState('Jakarta');
-  fileInputRef = React.useRef<HTMLInputElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   // Filtering and searching states
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -1045,7 +1045,7 @@ export default function ApprovalSparepartPage() {
         toast({
             variant: 'destructive',
             title: 'No approved items in selected POs',
-            description: 'Please select POs that have been marked as "Approved" to export.",
+            description: 'Please select POs that have been marked as "Approved" to export.',
         });
         return;
     }
