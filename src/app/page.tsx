@@ -210,6 +210,15 @@ const translations = {
         fieldRequired: "Field Required",
         fieldRequiredDesc: "This field cannot be empty.",
         negativeStock: "Stock cannot be negative.",
+        selectUnit: "Select a unit",
+        supplierNamePlaceholder: "e.g., Supplier Name",
+        customerDeptPlaceholder: "e.g., Customer, Department",
+        optionalPhotoUrl: "Optional: https://...",
+        searchItem: "Search item...",
+        noItemFound: "No item found.",
+        unitsFull: {
+          "Pcs": "Pcs", "Pack": "Pack", "Box": "Box", "Roll": "Roll", "Rim": "Rim", "Tube": "Tube", "Bottle": "Bottle", "Can": "Can", "Sheet": "Sheet", "Cartridge": "Cartridge"
+        }
     },
     id: {
         goodMorning: "Selamat pagi",
@@ -276,6 +285,15 @@ const translations = {
         fieldRequired: "Kolom Diperlukan",
         fieldRequiredDesc: "Kolom ini tidak boleh kosong.",
         negativeStock: "Stok tidak boleh negatif.",
+        selectUnit: "Pilih unit",
+        supplierNamePlaceholder: "contoh: Nama Pemasok",
+        customerDeptPlaceholder: "contoh: Pelanggan, Departemen",
+        optionalPhotoUrl: "Opsional: https://...",
+        searchItem: "Cari item...",
+        noItemFound: "Item tidak ditemukan.",
+        unitsFull: {
+          "Pcs": "Pcs", "Pack": "Pak", "Box": "Kotak", "Roll": "Gulungan", "Rim": "Rim", "Tube": "Tabung", "Bottle": "Botol", "Can": "Kaleng", "Sheet": "Lembar", "Cartridge": "Kartrid"
+        }
     },
     es: {
         goodMorning: "Buenos días",
@@ -342,6 +360,15 @@ const translations = {
         fieldRequired: "Campo Requerido",
         fieldRequiredDesc: "Este campo no puede estar vacío.",
         negativeStock: "El stock no puede ser negativo.",
+        selectUnit: "Selecciona una unidad",
+        supplierNamePlaceholder: "ej., Nombre del Proveedor",
+        customerDeptPlaceholder: "ej., Cliente, Departamento",
+        optionalPhotoUrl: "Opcional: https://...",
+        searchItem: "Buscar artículo...",
+        noItemFound: "No se encontró ningún artículo.",
+        unitsFull: {
+            "Pcs": "Pzs", "Pack": "Paquete", "Box": "Caja", "Roll": "Rollo", "Rim": "Resma", "Tube": "Tubo", "Bottle": "Botella", "Can": "Lata", "Sheet": "Hoja", "Cartridge": "Cartucho"
+        }
     },
     fr: {
         goodMorning: "Bonjour",
@@ -408,6 +435,15 @@ const translations = {
         fieldRequired: "Champ Requis",
         fieldRequiredDesc: "Ce champ ne peut pas être vide.",
         negativeStock: "Le stock ne peut pas être négatif.",
+        selectUnit: "Sélectionnez une unité",
+        supplierNamePlaceholder: "ex., Nom du Fournisseur",
+        customerDeptPlaceholder: "ex., Client, Département",
+        optionalPhotoUrl: "Facultatif : https://...",
+        searchItem: "Rechercher un article...",
+        noItemFound: "Aucun article trouvé.",
+        unitsFull: {
+            "Pcs": "Pcs", "Pack": "Paquet", "Box": "Boîte", "Roll": "Rouleau", "Rim": "Rame", "Tube": "Tube", "Bottle": "Bouteille", "Can": "Canette", "Sheet": "Feuille", "Cartridge": "Cartouche"
+        }
     },
     de: {
         goodMorning: "Guten Morgen",
@@ -474,6 +510,15 @@ const translations = {
         fieldRequired: "Feld Erforderlich",
         fieldRequiredDesc: "Dieses Feld darf nicht leer sein.",
         negativeStock: "Der Lagerbestand darf nicht negativ sein.",
+        selectUnit: "Wählen Sie eine Einheit",
+        supplierNamePlaceholder: "z.B., Lieferantenname",
+        customerDeptPlaceholder: "z.B., Kunde, Abteilung",
+        optionalPhotoUrl: "Optional: https://...",
+        searchItem: "Artikel suchen...",
+        noItemFound: "Kein Artikel gefunden.",
+        unitsFull: {
+            "Pcs": "Stk", "Pack": "Packung", "Box": "Kasten", "Roll": "Rolle", "Rim": "Ries", "Tube": "Tube", "Bottle": "Flasche", "Can": "Dose", "Sheet": "Blatt", "Cartridge": "Patrone"
+        }
     },
     ja: {
         goodMorning: "おはようございます",
@@ -540,6 +585,15 @@ const translations = {
         fieldRequired: "必須フィールド",
         fieldRequiredDesc: "このフィールドは空にできません。",
         negativeStock: "在庫はマイナスにできません。",
+        selectUnit: "単位を選択",
+        supplierNamePlaceholder: "例：サプライヤー名",
+        customerDeptPlaceholder: "例：顧客、部門",
+        optionalPhotoUrl: "オプション: https://...",
+        searchItem: "アイテムを検索...",
+        noItemFound: "アイテムが見つかりません。",
+        unitsFull: {
+            "Pcs": "個", "Pack": "パック", "Box": "箱", "Roll": "ロール", "Rim": "連", "Tube": "チューブ", "Bottle": "ボトル", "Can": "缶", "Sheet": "枚", "Cartridge": "カートリッジ"
+        }
     },
     ko: {
         goodMorning: "좋은 아침입니다",
@@ -606,6 +660,15 @@ const translations = {
         fieldRequired: "필수 필드",
         fieldRequiredDesc: "이 필드는 비워 둘 수 없습니다.",
         negativeStock: "재고는 음수가 될 수 없습니다.",
+        selectUnit: "단위를 선택하세요",
+        supplierNamePlaceholder: "예: 공급업체 이름",
+        customerDeptPlaceholder: "예: 고객, 부서",
+        optionalPhotoUrl: "선택 사항: https://...",
+        searchItem: "품목 검색...",
+        noItemFound: "품목을 찾을 수 없습니다.",
+        unitsFull: {
+            "Pcs": "개", "Pack": "팩", "Box": "상자", "Roll": "롤", "Rim": "연", "Tube": "튜브", "Bottle": "병", "Can": "캔", "Sheet": "장", "Cartridge": "카트리지"
+        }
     },
     'zh-CN': {
         goodMorning: "早上好",
@@ -672,6 +735,15 @@ const translations = {
         fieldRequired: "必填字段",
         fieldRequiredDesc: "此字段不能为空。",
         negativeStock: "库存不能为负。",
+        selectUnit: "选择一个单位",
+        supplierNamePlaceholder: "例如，供应商名称",
+        customerDeptPlaceholder: "例如，客户、部门",
+        optionalPhotoUrl: "可选：https://...",
+        searchItem: "搜索物品...",
+        noItemFound: "未找到物品。",
+        unitsFull: {
+            "Pcs": "件", "Pack": "包", "Box": "盒", "Roll": "卷", "Rim": "令", "Tube": "管", "Bottle": "瓶", "Can": "罐", "Sheet": "张", "Cartridge": "墨盒"
+        }
     },
 };
 
@@ -904,6 +976,10 @@ export default function DashboardPage() {
         setActivePoNumber(formattedPoNum);
     }
   }, [preOrders]);
+  
+  React.useEffect(() => {
+    setSelectedItemName(t.itemRequired);
+  }, [t.itemRequired]);
 
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -1008,7 +1084,7 @@ export default function DashboardPage() {
         else setStockOutOpen(false);
 
         setSelectedItemId(null);
-        setSelectedItemName("Select an item...");
+        setSelectedItemName(t.itemRequired);
       } catch(error) {
         console.error("Error updating stock:", error);
         toast({ variant: "destructive", title: "Failed to update stock" });
@@ -1052,7 +1128,7 @@ export default function DashboardPage() {
     setCreatePoOpen(false);
     setSelectedUnit(undefined);
     setSelectedItemId(null);
-    setSelectedItemName("Select an item...");
+    setSelectedItemName(t.itemRequired);
     setPoPrice("");
     (e.target as HTMLFormElement).reset();
   };
@@ -1663,19 +1739,12 @@ export default function DashboardPage() {
               </Label>
               <Select name="unit" required onValueChange={setSelectedUnit}>
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a unit" />
+                  <SelectValue placeholder={t.selectUnit} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Pcs">Pcs</SelectItem>
-                  <SelectItem value="Pack">Pack</SelectItem>
-                  <SelectItem value="Box">Box</SelectItem>
-                  <SelectItem value="Roll">Roll</SelectItem>
-                  <SelectItem value="Rim">Rim</SelectItem>
-                  <SelectItem value="Tube">Tube</SelectItem>
-                  <SelectItem value="Bottle">Bottle</SelectItem>
-                  <SelectItem value="Can">Can</SelectItem>
-                  <SelectItem value="Sheet">Sheet</SelectItem>
-                  <SelectItem value="Cartridge">Cartridge</SelectItem>
+                  {Object.entries(t.unitsFull).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -1699,7 +1768,7 @@ export default function DashboardPage() {
               <Input
                 id="photoUrl"
                 name="photoUrl"
-                placeholder="Optional: https://..."
+                placeholder={t.optionalPhotoUrl}
                 className="col-span-3"
               />
             </div>
@@ -1715,7 +1784,7 @@ export default function DashboardPage() {
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             setSelectedItemId(null);
-            setSelectedItemName("Select an item...");
+            setSelectedItemName(t.itemRequired);
           }
           setStockInOpen(isOpen);
         }}
@@ -1747,9 +1816,9 @@ export default function DashboardPage() {
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
                     <Command>
-                      <CommandInput placeholder="Search item..." />
+                      <CommandInput placeholder={t.searchItem} />
                       <CommandList>
-                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandEmpty>{t.noItemFound}</CommandEmpty>
                         <CommandGroup>
                           {inventoryItems.map((item) => (
                             <CommandItem
@@ -1799,7 +1868,7 @@ export default function DashboardPage() {
               <Input
                 id="person"
                 name="person"
-                placeholder="e.g., Supplier Name"
+                placeholder={t.supplierNamePlaceholder}
                 className="col-span-3"
               />
             </div>
@@ -1818,7 +1887,7 @@ export default function DashboardPage() {
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             setSelectedItemId(null);
-            setSelectedItemName("Select an item...");
+            setSelectedItemName(t.itemRequired);
           }
           setStockOutOpen(isOpen);
         }}
@@ -1850,9 +1919,9 @@ export default function DashboardPage() {
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
                     <Command>
-                      <CommandInput placeholder="Search item..." />
+                      <CommandInput placeholder={t.searchItem} />
                       <CommandList>
-                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandEmpty>{t.noItemFound}</CommandEmpty>
                         <CommandGroup>
                           {inventoryItems.map((item) => (
                             <CommandItem
@@ -1903,7 +1972,7 @@ export default function DashboardPage() {
               <Input
                 id="person"
                 name="person"
-                placeholder="e.g., Customer, Department"
+                placeholder={t.customerDeptPlaceholder}
                 className="col-span-3"
                 required
               />
@@ -1923,7 +1992,7 @@ export default function DashboardPage() {
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             setSelectedItemId(null);
-            setSelectedItemName("Select an item...");
+            setSelectedItemName(t.itemRequired);
             setPoPrice("");
           }
           setCreatePoOpen(isOpen);
@@ -1969,9 +2038,9 @@ export default function DashboardPage() {
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
                     <Command>
-                      <CommandInput placeholder="Search item..." />
+                      <CommandInput placeholder={t.searchItem} />
                       <CommandList>
-                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandEmpty>{t.noItemFound}</CommandEmpty>
                         <CommandGroup>
                           {inventoryItems.map((item) => (
                             <CommandItem
@@ -2029,19 +2098,12 @@ export default function DashboardPage() {
                 value={selectedUnit}
               >
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a unit" />
+                  <SelectValue placeholder={t.selectUnit} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Pcs">Pcs</SelectItem>
-                  <SelectItem value="Pack">Pack</SelectItem>
-                  <SelectItem value="Box">Box</SelectItem>
-                  <SelectItem value="Roll">Roll</SelectItem>
-                  <SelectItem value="Rim">Rim</SelectItem>
-                  <SelectItem value="Tube">Tube</SelectItem>
-                  <SelectItem value="Bottle">Bottle</SelectItem>
-                  <SelectItem value="Can">Can</SelectItem>
-                  <SelectItem value="Sheet">Sheet</SelectItem>
-                  <SelectItem value="Cartridge">Cartridge</SelectItem>
+                  {Object.entries(t.unitsFull).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -2081,3 +2143,5 @@ export default function DashboardPage() {
 }
 
     
+
+      
