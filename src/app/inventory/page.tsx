@@ -295,6 +295,9 @@ const translations = {
         accessDeniedDesc: "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
         firebaseNotConfigured: "Firebase Not Configured",
         firebaseNotConfiguredDesc: "Please configure your Firebase credentials in the environment variables to use this application.",
+        unitsFull: {
+          "Pcs": "Pcs", "Pack": "Pack", "Box": "Box", "Roll": "Roll", "Rim": "Rim", "Tube": "Tube", "Bottle": "Bottle", "Can": "Can", "Sheet": "Sheet", "Cartridge": "Cartridge"
+        }
     },
     id: {
         title: "Inventaris",
@@ -369,6 +372,9 @@ const translations = {
         accessDeniedDesc: "Anda tidak memiliki izin untuk melihat halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.",
         firebaseNotConfigured: "Firebase Tidak Dikonfigurasi",
         firebaseNotConfiguredDesc: "Harap konfigurasikan kredensial Firebase Anda di variabel lingkungan untuk menggunakan aplikasi ini.",
+        unitsFull: {
+            "Pcs": "Pcs", "Pack": "Pak", "Box": "Kotak", "Roll": "Gulungan", "Rim": "Rim", "Tube": "Tabung", "Bottle": "Botol", "Can": "Kaleng", "Sheet": "Lembar", "Cartridge": "Kartrid"
+        }
     },
     es: {
         title: "Inventario",
@@ -443,6 +449,9 @@ const translations = {
         accessDeniedDesc: "No tienes permiso para ver esta página. Por favor, contacta a un administrador si crees que esto es un error.",
         firebaseNotConfigured: "Firebase No Configurado",
         firebaseNotConfiguredDesc: "Por favor, configura tus credenciales de Firebase en las variables de entorno para usar esta aplicación.",
+        unitsFull: {
+            "Pcs": "Pzs", "Pack": "Paquete", "Box": "Caja", "Roll": "Rollo", "Rim": "Resma", "Tube": "Tubo", "Bottle": "Botella", "Can": "Lata", "Sheet": "Hoja", "Cartridge": "Cartucho"
+        }
     },
     fr: {
         title: "Inventaire",
@@ -517,6 +526,9 @@ const translations = {
         accessDeniedDesc: "Vous n'avez pas la permission de voir cette page. Veuillez contacter un administrateur si vous pensez que c'est une erreur.",
         firebaseNotConfigured: "Firebase Non Configuré",
         firebaseNotConfiguredDesc: "Veuillez configurer vos informations d'identification Firebase dans les variables d'environnement pour utiliser cette application.",
+        unitsFull: {
+            "Pcs": "Pcs", "Pack": "Paquet", "Box": "Boîte", "Roll": "Rouleau", "Rim": "Rame", "Tube": "Tube", "Bottle": "Bouteille", "Can": "Canette", "Sheet": "Feuille", "Cartridge": "Cartouche"
+        }
     },
     de: {
         title: "Inventar",
@@ -591,6 +603,9 @@ const translations = {
         accessDeniedDesc: "Sie haben keine Berechtigung, diese Seite anzuzeigen. Bitte kontaktieren Sie einen Administrator, wenn Sie glauben, dass dies ein Fehler ist.",
         firebaseNotConfigured: "Firebase Nicht Konfiguriert",
         firebaseNotConfiguredDesc: "Bitte konfigurieren Sie Ihre Firebase-Anmeldeinformationen in den Umgebungsvariablen, um diese Anwendung zu verwenden.",
+        unitsFull: {
+            "Pcs": "Stk", "Pack": "Packung", "Box": "Kasten", "Roll": "Rolle", "Rim": "Ries", "Tube": "Tube", "Bottle": "Flasche", "Can": "Dose", "Sheet": "Blatt", "Cartridge": "Patrone"
+        }
     },
     ja: {
         title: "在庫",
@@ -665,6 +680,9 @@ const translations = {
         accessDeniedDesc: "このページを表示する権限がありません。エラーだと思われる場合は、管理者に連絡してください。",
         firebaseNotConfigured: "Firebaseが設定されていません",
         firebaseNotConfiguredDesc: "このアプリケーションを使用するには、環境変数でFirebaseの認証情報を設定してください。",
+        unitsFull: {
+            "Pcs": "個", "Pack": "パック", "Box": "箱", "Roll": "ロール", "Rim": "連", "Tube": "チューブ", "Bottle": "ボトル", "Can": "缶", "Sheet": "枚", "Cartridge": "カートリッジ"
+        }
     },
     ko: {
         title: "재고",
@@ -739,6 +757,9 @@ const translations = {
         accessDeniedDesc: "이 페이지를 볼 권한이 없습니다. 오류라고 생각되면 관리자에게 문의하십시오.",
         firebaseNotConfigured: "Firebase가 구성되지 않았습니다",
         firebaseNotConfiguredDesc: "이 애플리케이션을 사용하려면 환경 변수에서 Firebase 자격 증명을 구성하세요.",
+        unitsFull: {
+            "Pcs": "개", "Pack": "팩", "Box": "상자", "Roll": "롤", "Rim": "연", "Tube": "튜브", "Bottle": "병", "Can": "캔", "Sheet": "장", "Cartridge": "카트리지"
+        }
     },
     'zh-CN': {
         title: "库存",
@@ -813,6 +834,9 @@ const translations = {
         accessDeniedDesc: "您无权查看此页面。如果您认为这是错误，请联系管理员。",
         firebaseNotConfigured: "Firebase未配置",
         firebaseNotConfiguredDesc: "请在环境变量中配置您的Firebase凭据以使用此应用程序。",
+        unitsFull: {
+            "Pcs": "件", "Pack": "包", "Box": "盒", "Roll": "卷", "Rim": "令", "Tube": "管", "Bottle": "瓶", "Can": "罐", "Sheet": "张", "Cartridge": "墨盒"
+        }
     }
 };
 
@@ -841,6 +865,9 @@ export default function InventoryPage() {
 
   const t = translations[language] || translations.en;
 
+  const getUnitText = (unit: string) => {
+    return t.unitsFull[unit as keyof typeof t.unitsFull] || unit;
+  }
 
   // States for camera functionality
   const [isCameraOpen, setCameraOpen] = React.useState(false);
@@ -1465,16 +1492,9 @@ export default function InventoryPage() {
                         <SelectValue placeholder="Select a unit" />
                         </SelectTrigger>
                         <SelectContent>
-                        <SelectItem value="Pcs">Pcs</SelectItem>
-                        <SelectItem value="Pack">Pack</SelectItem>
-                        <SelectItem value="Box">Box</SelectItem>
-                        <SelectItem value="Roll">Roll</SelectItem>
-                        <SelectItem value="Rim">Rim</SelectItem>
-                        <SelectItem value="Tube">Tube</SelectItem>
-                        <SelectItem value="Bottle">Bottle</SelectItem>
-                        <SelectItem value="Can">Can</SelectItem>
-                        <SelectItem value="Sheet">Sheet</SelectItem>
-                        <SelectItem value="Cartridge">Cartridge</SelectItem>
+                        {Object.entries(t.unitsFull).map(([key, value]) => (
+                            <SelectItem key={key} value={key}>{value}</SelectItem>
+                          ))}
                         </SelectContent>
                     </Select>
                     </div>
@@ -1557,7 +1577,7 @@ export default function InventoryPage() {
                       </TableCell>
                       <TableCell className="font-medium">{item.name}</TableCell>
                       <TableCell>{formatCurrency(item.price || 0)}</TableCell>
-                      <TableCell className="hidden md:table-cell">{item.unit}</TableCell>
+                      <TableCell className="hidden md:table-cell">{getUnitText(item.unit)}</TableCell>
                       <TableCell className="text-center">
                         <Badge
                           variant={item.quantity > 5 ? "outline" : item.quantity > 0 ? "warning" : "destructive"}
@@ -1710,7 +1730,7 @@ export default function InventoryPage() {
                     </Badge>
                      <div className="text-right">
                         <p className="font-bold text-lg">{item.quantity}</p>
-                        <p className="text-xs text-muted-foreground -mt-1">{item.unit}</p>
+                        <p className="text-xs text-muted-foreground -mt-1">{getUnitText(item.unit)}</p>
                     </div>
                 </CardFooter>
               </Card>
@@ -1766,16 +1786,9 @@ export default function InventoryPage() {
                   <SelectValue placeholder="Select a unit" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Pcs">Pcs</SelectItem>
-                  <SelectItem value="Pack">Pack</SelectItem>
-                  <SelectItem value="Box">Box</SelectItem>
-                  <SelectItem value="Roll">Roll</SelectItem>
-                  <SelectItem value="Rim">Rim</SelectItem>
-                  <SelectItem value="Tube">Tube</SelectItem>
-                  <SelectItem value="Bottle">Bottle</SelectItem>
-                  <SelectItem value="Can">Can</SelectItem>
-                  <SelectItem value="Sheet">Sheet</SelectItem>
-                  <SelectItem value="Cartridge">Cartridge</SelectItem>
+                  {Object.entries(t.unitsFull).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -2054,3 +2067,5 @@ export default function InventoryPage() {
   );
 }
 
+
+    
