@@ -7,7 +7,7 @@ type Theme = 'light' | 'dark';
 type Color = 'green' | 'blue' | 'orange' | 'rose' | 'violet';
 // Wallpaper can be a URL, a hex code, or 'default'
 type Wallpaper = string;
-type Language = 'id' | 'en';
+type Language = 'id' | 'en' | 'es' | 'fr' | 'de' | 'ja' | 'ko' | 'zh-CN';
 
 
 type ThemeContextType = {

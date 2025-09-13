@@ -75,7 +75,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     const savedTheme = Cookies.get('theme') as Theme | undefined;
     const savedColor = Cookies.get('color') as Color | undefined;
-    const savedLanguage = Cookies.get('language') as Language | undefined;
+    const savedLanguage = localStorage.getItem('language') as Language | undefined;
     const savedWallpaper = localStorage.getItem('wallpaper') as Wallpaper | undefined;
     const savedWallpaperOpacity = localStorage.getItem('wallpaperOpacity');
     const savedComponentOpacity = localStorage.getItem('componentOpacity');
@@ -111,7 +111,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage);
-    Cookies.set('language', newLanguage, { expires: 365 });
+    localStorage.setItem('language', newLanguage);
   };
   
   const setWallpaper = (newWallpaper: Wallpaper) => {
