@@ -28,9 +28,11 @@ const NOTIFICATION_STORAGE_KEY = 'app-notifications';
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Load notifications from sessionStorage on initial mount
   useEffect(() => {
+    setIsMounted(true); // Component is now mounted on the client
     try {
       const storedNotifications = sessionStorage.getItem(NOTIFICATION_STORAGE_KEY);
       if (storedNotifications) {
@@ -43,12 +45,13 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   
   // Save notifications to sessionStorage whenever they change
   useEffect(() => {
+    if (!isMounted) return; // Only run on client after mount
     try {
       sessionStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifications));
     } catch (error) {
       console.error("Failed to save notifications to sessionStorage", error);
     }
-  }, [notifications]);
+  }, [notifications, isMounted]);
 
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
     setNotifications(prev => [{ ...notification, id: `notif-${notificationId++}` }, ...prev]);
@@ -66,7 +69,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   }, [notifications]);
 
   useEffect(() => {
-    if (!db) return;
+    if (!db || !isMounted) return; // Only run on client after mount
 
     const unsubs: (() => void)[] = [];
 
@@ -126,10 +129,14 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       unsubs.forEach(unsub => unsub());
     };
     
-  }, []);
+  }, [isMounted]);
 
 
-  const value = { notifications, addNotification, clearNotifications };
+  const value = { 
+    notifications: isMounted ? notifications : [], // Return empty array until mounted
+    addNotification, 
+    clearNotifications 
+  };
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 };
