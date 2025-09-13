@@ -872,9 +872,20 @@ export default function DashboardPage() {
   React.useEffect(() => {
     const getUserDisplayName = () => {
         if (!user || !user.email) return '';
-        const namePart = user.email.split('@')[0];
-        // Capitalize the first letter
-        return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        const email = user.email;
+        switch (email) {
+            case 'devaadmin@gmail.com':
+                return 'deva';
+            case 'krezthrd@gmail.com':
+                return 'HRD';
+            case 'kreztservice@gmail.com':
+                return 'service';
+            case 'kreztuser@gmail.com':
+                return 'user';
+            default:
+                const namePart = email.split('@')[0];
+                return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        }
     }
 
     const getGreeting = (): GreetingInfo => {
@@ -901,7 +912,7 @@ export default function DashboardPage() {
 
     // Set daily motivational quote
     const dayOfMonth = new Date().getDate();
-    setDailyQuote(motivationalQuotes[language][dayOfMonth - 1] || motivationalQuotes.en[dayOfMonth - 1]);
+    setDailyQuote(motivationalQuotes[language][dayOfMonth - 1]);
 
     const fetchData = async () => {
         if (!db) {
