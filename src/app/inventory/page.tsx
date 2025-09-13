@@ -128,8 +128,8 @@ const seedData = [
   { name: "Double Tape Foam ( BEERYTAPE 24mm )", quantity: 8, photoUrl: "https://drive.google.com/file/d/1UznuOH97LB1wN4JEDewnkRB78TmU23W8/view?usp=drivesdk", unit: "Roll", price: 6500 },
   { name: "Elemen Solder", quantity: 0, photoUrl: "", unit: "Pcs", price: 25000 },
   { name: "Gembok", quantity: 0, photoUrl: "https://drive.google.com/file/d/1e4KJVv2zp1-6XavX50Ee44YBcemkrn53/view?usp=drivesdk", unit: "Pcs", price: 0 },
-  { name: "Gunting Besar ( Ideal 8.5" )", quantity: 2, photoUrl: "https://drive.google.com/file/d/1TpOLDdp6zV6PNAiuNepFa7BTGVrFM4my/view?usp=drivesdk", unit: "Pcs", price: 10000 },
-  { name: "Gunting Kecil ( Ideal 4.5" )", quantity: 0, photoUrl: "https://drive.google.com/file/d/1x-lSgsKwFyPk2OP3xlSagQ_pRMD_1vQ8/view?usp=drivesdk", unit: "Pcs", price: 4000 },
+  { name: "Gunting Besar ( Ideal 8.5' )", quantity: 2, photoUrl: "https://drive.google.com/file/d/1TpOLDdp6zV6PNAiuNepFa7BTGVrFM4my/view?usp=drivesdk", unit: "Pcs", price: 10000 },
+  { name: "Gunting Kecil ( Ideal 4.5' )", quantity: 0, photoUrl: "https://drive.google.com/file/d/1x-lSgsKwFyPk2OP3xlSagQ_pRMD_1vQ8/view?usp=drivesdk", unit: "Pcs", price: 4000 },
   { name: "ID Card ( BIG )", quantity: 9, photoUrl: "https://drive.google.com/file/d/1rr35HuoT8pvcx1DLU1T1G7DNkuR2dmcv/view?usp=drivesdk", unit: "Pcs", price: 0 },
   { name: "Isi Cutter Besar ( KENKO L-150 )", quantity: 23, photoUrl: "https://drive.google.com/file/d/1tDXoS5soYikHw21xsf7WlQcNZRX2hYL0/view?usp=drivesdk", unit: "Pcs", price: 40000 },
   { name: "Isi Cutter Kecil ( KENKO A-100 )", quantity: 129, photoUrl: "https://drive.google.com/file/d/1aGyYg5Tqb03V7er3LyplgDV037nsPrhv/view?usp=drivesdk", unit: "Pcs", price: 30000 },
@@ -2054,4 +2054,3 @@ export default function InventoryPage() {
   );
 }
 
-    
