@@ -167,6 +167,7 @@ const translations = {
         approverName: "Approver's Name",
         approverNamePlaceholder: "e.g. John Doe",
         confirmApproval: "Confirm Approval",
+        approvedBy: (name: string) => `Approved by ${name}`,
         statuses: {
             'Pending': 'Pending',
             'Awaiting Approval': 'Awaiting Approval',
@@ -243,6 +244,7 @@ const translations = {
         approverName: "Nama Penyetuju",
         approverNamePlaceholder: "contoh: Budi",
         confirmApproval: "Konfirmasi Persetujuan",
+        approvedBy: (name: string) => `Disetujui oleh ${name}`,
         statuses: {
             'Pending': 'Tertunda',
             'Awaiting Approval': 'Menunggu Persetujuan',
@@ -319,6 +321,7 @@ const translations = {
         approverName: "Nombre del Aprobador",
         approverNamePlaceholder: "ej. Juan Pérez",
         confirmApproval: "Confirmar Aprobación",
+        approvedBy: (name: string) => `Aprobado por ${name}`,
         statuses: {
             'Pending': 'Pendiente',
             'Awaiting Approval': 'Esperando Aprobación',
@@ -395,6 +398,7 @@ const translations = {
         approverName: "Nom de l'Approbateur",
         approverNamePlaceholder: "ex. Jean Dupont",
         confirmApproval: "Confirmer l'Approbation",
+        approvedBy: (name: string) => `Approuvé par ${name}`,
         statuses: {
             'Pending': 'En attente',
             'Awaiting Approval': "En Attente d'Approbation",
@@ -471,6 +475,7 @@ const translations = {
         approverName: "Name des Genehmigenden",
         approverNamePlaceholder: "z.B. Max Mustermann",
         confirmApproval: "Genehmigung Bestätigen",
+        approvedBy: (name: string) => `Genehmigt von ${name}`,
         statuses: {
             'Pending': 'Ausstehend',
             'Awaiting Approval': 'Wartet auf Genehmigung',
@@ -547,6 +552,7 @@ const translations = {
         approverName: "承認者名",
         approverNamePlaceholder: "例：山田太郎",
         confirmApproval: "承認を確定",
+        approvedBy: (name: string) => `${name}によって承認されました`,
         statuses: {
             'Pending': '保留中',
             'Awaiting Approval': '承認待ち',
@@ -623,6 +629,7 @@ const translations = {
         approverName: "승인자 이름",
         approverNamePlaceholder: "예: 홍길동",
         confirmApproval: "승인 확인",
+        approvedBy: (name: string) => `${name}에 의해 승인됨`,
         statuses: {
             'Pending': '대기 중',
             'Awaiting Approval': '승인 대기 중',
@@ -699,6 +706,7 @@ const translations = {
         approverName: "批准人姓名",
         approverNamePlaceholder: "例如：张三",
         confirmApproval: "确认批准",
+        approvedBy: (name: string) => `由 ${name} 批准`,
         statuses: {
             'Pending': '待处理',
             'Awaiting Approval': '等待批准',
@@ -1052,7 +1060,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     const batch = writeBatch(db);
     orders.forEach(order => {
         const orderRef = doc(db, "pre-orders", order.id);
-        batch.update(orderRef, { status });
+        batch.update(orderRef, { status, approver: '' }); // Clear approver on undo
     });
     await batch.commit();
     addNotification({
@@ -1445,7 +1453,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                         {getStatusText(po.status)}
                                     </Badge>
                                     <span>• {po.totalQuantity} {t.units}</span>
-                                    {po.approver && <span className='hidden sm:inline'>• Approved by {po.approver}</span>}
+                                    {po.approver && <span className='hidden sm:inline'>• {t.approvedBy(po.approver)}</span>}
                                 </div>
                             </div>
                           </div>
