@@ -120,6 +120,7 @@ type GroupedRequest = {
   requester: string;
   requestDate: string;
   location: string;
+  approver?: string;
 };
 
 type POItem = {
@@ -188,6 +189,11 @@ const translations = {
         accessDeniedDesc: "You do not have permission to view this page. Please contact an administrator if you believe this is an error.",
         firebaseNotConfigured: "Firebase Not Configured",
         firebaseNotConfiguredDesc: "Please configure your Firebase credentials in the environment variables to use this application.",
+        approveConfirmation: "Approve Confirmation",
+        approveConfirmationDesc: (po: string) => `Please enter your name to confirm the approval of PO ${po}.`,
+        approverName: "Approver's Name",
+        approverNamePlaceholder: "e.g. John Doe",
+        confirmApproval: "Confirm Approval",
         statuses: {
             'Pending': 'Pending',
             'Awaiting Approval': 'Awaiting Approval',
@@ -251,6 +257,11 @@ const translations = {
         accessDeniedDesc: "Anda tidak memiliki izin untuk melihat halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.",
         firebaseNotConfigured: "Firebase Tidak Dikonfigurasi",
         firebaseNotConfiguredDesc: "Harap konfigurasikan kredensial Firebase Anda di variabel lingkungan untuk menggunakan aplikasi ini.",
+        approveConfirmation: "Konfirmasi Persetujuan",
+        approveConfirmationDesc: (po: string) => `Silakan masukkan nama Anda untuk mengonfirmasi persetujuan PO ${po}.`,
+        approverName: "Nama Penyetuju",
+        approverNamePlaceholder: "contoh: Budi",
+        confirmApproval: "Konfirmasi Persetujuan",
         statuses: {
             'Pending': 'Tertunda',
             'Awaiting Approval': 'Menunggu Persetujuan',
@@ -314,6 +325,11 @@ const translations = {
         accessDeniedDesc: "No tiene permiso para ver esta página. Póngase en contacto con un administrador si cree que esto es un error.",
         firebaseNotConfigured: "Firebase No Configurado",
         firebaseNotConfiguredDesc: "Configure sus credenciales de Firebase en las variables de entorno para usar esta aplicación.",
+        approveConfirmation: "Confirmación de Aprobación",
+        approveConfirmationDesc: (po: string) => `Por favor, introduce tu nombre para confirmar la aprobación de la OC ${po}.`,
+        approverName: "Nombre del Aprobador",
+        approverNamePlaceholder: "ej. Juan Pérez",
+        confirmApproval: "Confirmar Aprobación",
         statuses: {
             'Pending': 'Pendiente',
             'Awaiting Approval': 'Esperando Aprobación',
@@ -377,6 +393,11 @@ const translations = {
         accessDeniedDesc: "Vous n'avez pas la permission de voir cette page. Veuillez contacter un administrateur si vous pensez que c'est une erreur.",
         firebaseNotConfigured: "Firebase Non Configuré",
         firebaseNotConfiguredDesc: "Veuillez configurer vos informations d'identification Firebase dans les variables d'environnement pour utiliser cette application.",
+        approveConfirmation: "Confirmation d'Approbation",
+        approveConfirmationDesc: (po: string) => `Veuillez saisir votre nom pour confirmer l'approbation du BC ${po}.`,
+        approverName: "Nom de l'Approbateur",
+        approverNamePlaceholder: "ex. Jean Dupont",
+        confirmApproval: "Confirmer l'Approbation",
         statuses: {
             'Pending': 'En attente',
             'Awaiting Approval': "En Attente d'Approbation",
@@ -440,6 +461,11 @@ const translations = {
         accessDeniedDesc: "Sie haben keine Berechtigung, diese Seite anzuzeigen. Bitte kontaktieren Sie einen Administrator, wenn Sie glauben, dass dies ein Fehler ist.",
         firebaseNotConfigured: "Firebase Nicht Konfiguriert",
         firebaseNotConfiguredDesc: "Bitte konfigurieren Sie Ihre Firebase-Anmeldeinformationen in den Umgebungsvariablen, um diese Anwendung zu verwenden.",
+        approveConfirmation: "Genehmigungsbestätigung",
+        approveConfirmationDesc: (po: string) => `Bitte geben Sie Ihren Namen ein, um die Genehmigung der Bestellung ${po} zu bestätigen.`,
+        approverName: "Name des Genehmigenden",
+        approverNamePlaceholder: "z.B. Max Mustermann",
+        confirmApproval: "Genehmigung Bestätigen",
         statuses: {
             'Pending': 'Ausstehend',
             'Awaiting Approval': 'Wartet auf Genehmigung',
@@ -503,6 +529,11 @@ const translations = {
         accessDeniedDesc: "このページを表示する権限がありません。これがエラーであると思われる場合は、管理者に連絡してください。",
         firebaseNotConfigured: "Firebaseが設定されていません",
         firebaseNotConfiguredDesc: "このアプリケーションを使用するには、環境変数でFirebaseの認証情報を設定してください。",
+        approveConfirmation: "承認の確認",
+        approveConfirmationDesc: (po: string) => `PO ${po} の承認を確認するには、お名前を入力してください。`,
+        approverName: "承認者名",
+        approverNamePlaceholder: "例：山田太郎",
+        confirmApproval: "承認を確定",
         statuses: {
             'Pending': '保留中',
             'Awaiting Approval': '承認待ち',
@@ -566,6 +597,11 @@ const translations = {
         accessDeniedDesc: "이 페이지를 볼 권한이 없습니다. 오류라고 생각되면 관리자에게 문의하십시오.",
         firebaseNotConfigured: "Firebase가 구성되지 않음",
         firebaseNotConfiguredDesc: "이 응용 프로그램을 사용하려면 환경 변수에서 Firebase 자격 증명을 구성하십시오.",
+        approveConfirmation: "승인 확인",
+        approveConfirmationDesc: (po: string) => `PO ${po}의 승인을 확인하려면 이름을 입력하십시오.`,
+        approverName: "승인자 이름",
+        approverNamePlaceholder: "예: 홍길동",
+        confirmApproval: "승인 확인",
         statuses: {
             'Pending': '대기 중',
             'Awaiting Approval': '승인 대기 중',
@@ -629,6 +665,11 @@ const translations = {
         accessDeniedDesc: "您无权查看此页面。如果您认为这是错误，请联系管理员。",
         firebaseNotConfigured: "Firebase 未配置",
         firebaseNotConfiguredDesc: "请在环境变量中配置您的 Firebase 凭据以使用此应用程序。",
+        approveConfirmation: "批准确认",
+        approveConfirmationDesc: (po: string) => `请输入您的姓名以确认批准采购订单 ${po}。`,
+        approverName: "批准人姓名",
+        approverNamePlaceholder: "例如：张三",
+        confirmApproval: "确认批准",
         statuses: {
             'Pending': '待处理',
             'Awaiting Approval': '等待批准',
@@ -673,6 +714,11 @@ export default function ApprovalSparepartPage() {
   // States for deleting a PO
   const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedPo, setSelectedPo] = React.useState<GroupedRequest | null>(null);
+
+  // States for approval dialog
+  const [isApprovalOpen, setApprovalOpen] = React.useState(false);
+  const [poToApprove, setPoToApprove] = React.useState<GroupedRequest | null>(null);
+  const [approverName, setApproverName] = React.useState('');
 
   const getStatusText = (status: SparepartRequest['status'] | SparepartRequest['itemStatus']) => {
     return t.statuses[status as keyof typeof t.statuses] || status;
@@ -729,19 +775,28 @@ export default function ApprovalSparepartPage() {
     }
   };
 
-  const handleMarkAsApproved = async (po: GroupedRequest) => {
-    if (!db) return;
+  const handleMarkAsApproved = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!poToApprove || !db) return;
+
+    if (!approverName.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Approver name required',
+      });
+      return;
+    }
 
     try {
         const batch = writeBatch(db);
-        po.requests.forEach(request => {
+        poToApprove.requests.forEach(request => {
             const docRef = doc(db, "sparepart-requests", request.id);
-            batch.update(docRef, { status: 'Approved', itemStatus: 'Approved' });
+            batch.update(docRef, { status: 'Approved', itemStatus: 'Approved', approver: approverName });
         });
         await batch.commit();
         addNotification({
             title: "PO Approved",
-            description: `Request ${po.requestNumber} has been marked as Approved.`,
+            description: `Request ${poToApprove.requestNumber} has been marked as Approved.`,
             icon: Check,
         });
     } catch (error) {
@@ -750,6 +805,10 @@ export default function ApprovalSparepartPage() {
             variant: "destructive",
             title: "Failed to approve PO."
         });
+    } finally {
+      setApprovalOpen(false);
+      setPoToApprove(null);
+      setApproverName('');
     }
   };
   
@@ -837,7 +896,7 @@ export default function ApprovalSparepartPage() {
     const batch = writeBatch(db);
     po.requests.forEach(request => {
         const docRef = doc(db, "sparepart-requests", request.id);
-        batch.update(docRef, { status });
+        batch.update(docRef, { status, approver: '' }); // Clear approver on undo
     });
     await batch.commit();
     addNotification({
@@ -1036,6 +1095,7 @@ export default function ApprovalSparepartPage() {
 
       const requester = requests[0]?.requester || '';
       const location = requests[0]?.location || 'Unknown';
+      const approver = requests.find(o => o.approver)?.approver
 
       return {
           requestNumber,
@@ -1045,7 +1105,8 @@ export default function ApprovalSparepartPage() {
           status: overallStatus,
           requester,
           requestDate: requests[0].requestDate,
-          location: location
+          location: location,
+          approver: approver
       }
     }).filter(req => req.requests.length > 0)
     .sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime());
@@ -1411,6 +1472,7 @@ export default function ApprovalSparepartPage() {
                                       </Badge>
                                       <span>• {req.totalQuantity} {t.units}</span>
                                       <span className="hidden sm:inline-flex items-center"><MapPin className="h-3 w-3 mr-1"/>{req.location}</span>
+                                      {req.approver && <span className='hidden sm:inline'>• Approved by {req.approver}</span>}
                                   </div>
                               </div>
                           </div>
@@ -1433,7 +1495,7 @@ export default function ApprovalSparepartPage() {
                                         <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
                                         {req.status === 'Awaiting Approval' && (
                                             <>
-                                            <DropdownMenuItem onSelect={() => handleMarkAsApproved(req)}>
+                                            <DropdownMenuItem onSelect={() => { setPoToApprove(req); setApprovalOpen(true); }}>
                                                 <Check className="mr-2 h-4 w-4" />
                                                 {t.markAsApproved}
                                             </DropdownMenuItem>
@@ -1598,6 +1660,35 @@ export default function ApprovalSparepartPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Approval Confirmation Dialog */}
+       <Dialog open={isApprovalOpen} onOpenChange={setApprovalOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t.approveConfirmation}</DialogTitle>
+                    <DialogDescription>{t.approveConfirmationDesc(poToApprove?.requestNumber || '')}</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleMarkAsApproved}>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="approver-name" className="text-right">{t.approverName}</Label>
+                            <Input
+                                id="approver-name"
+                                value={approverName}
+                                onChange={(e) => setApproverName(e.target.value)}
+                                className="col-span-3"
+                                placeholder={t.approverNamePlaceholder}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setApprovalOpen(false)}>{t.cancel}</Button>
+                        <Button type="submit">{t.confirmApproval}</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
 
     </div>
   );

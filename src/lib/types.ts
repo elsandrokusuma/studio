@@ -45,6 +45,7 @@ export type SparepartRequest = {
   status: 'Pending' | 'Awaiting Approval' | 'Approved' | 'Rejected';
   itemStatus?: 'Pending' | 'Approved' | 'Rejected';
   location: string;
+  approver?: string;
 };
 
 export type SparepartOrder = {
