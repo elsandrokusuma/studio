@@ -1262,12 +1262,12 @@ export default function DashboardPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="bg-primary/10 p-3 rounded-full">
+            <div className="bg-primary/10 p-3 rounded-full shrink-0">
               <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{greetingInfo.text}</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-xl md:text-2xl font-bold">{greetingInfo.text}</h1>
+              <p className="text-muted-foreground text-sm md:text-base">
                 {dailyQuote}
               </p>
             </div>
@@ -1303,7 +1303,7 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl md:text-2xl font-bold break-words">
               {formatCurrency(stockValue)}
             </div>
           </CardContent>
@@ -2178,3 +2178,5 @@ export default function DashboardPage() {
     
 
       
+
+    
