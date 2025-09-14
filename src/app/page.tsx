@@ -1277,8 +1277,11 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card
-          onClick={() => router.push("/inventory")}
-          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          onClick={isStandardUser ? undefined : () => router.push("/inventory")}
+          className={cn(
+            "text-white",
+            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+          )}
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1306,8 +1309,11 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card
-          onClick={handleShowLowStock}
-          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          onClick={isStandardUser ? undefined : handleShowLowStock}
+          className={cn(
+            "text-white",
+            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+          )}
            style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1319,8 +1325,11 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card
-          onClick={handleShowOutOfStock}
-          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          onClick={isStandardUser ? undefined : handleShowOutOfStock}
+          className={cn(
+            "text-white",
+            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+          )}
           style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1332,8 +1341,11 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card
-          onClick={() => router.push("/pre-orders")}
-          className="cursor-pointer hover:shadow-lg transition-shadow text-white"
+          onClick={isStandardUser ? undefined : () => router.push("/pre-orders")}
+          className={cn(
+            "text-white",
+            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+          )}
           style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
