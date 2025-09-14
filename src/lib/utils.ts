@@ -16,7 +16,8 @@ export function getGoogleDriveImageSrc(url: string | undefined | null): string {
 
   if (match && match[1]) {
     const fileId = match[1];
-    return `https://lh3.googleusercontent.com/d/${fileId}`;
+    // Append '=rw' to request the image in WebP format for better performance
+    return `https://lh3.googleusercontent.com/d/${fileId}=rw`;
   }
 
   return "";
