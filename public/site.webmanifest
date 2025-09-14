@@ -1,23 +1,19 @@
 {
   "name": "Stationery Inventory",
-  "short_name": "Stationery",
-  "description": "Comprehensive inventory and stock management ERP",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "short_name": "Stationery Inv.",
   "icons": [
     {
-      "src": "https://i.imgur.com/vofm5PY.png",
+      "src": "/favicon.ico?v=9",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/x-icon"
     },
     {
-      "src": "https://i.imgur.com/vofm5PY.png",
+      "src": "/favicon.ico?v=9",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/x-icon"
     }
-  ]
+  ],
+  "theme_color": "#17b878",
+  "background_color": "#111827",
+  "display": "standalone"
 }

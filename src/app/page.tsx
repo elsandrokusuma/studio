@@ -1260,7 +1260,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4 md:p-6">
           <div className="flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-full shrink-0">
               <GreetingIcon className="h-6 w-6 text-primary" />
@@ -1284,11 +1284,11 @@ export default function DashboardPage() {
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
             <CardTitle className="text-sm font-medium">{t.totalItems}</CardTitle>
             <Package className="h-4 w-4" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <div className="text-2xl font-bold">
               {totalItems.toLocaleString()}
             </div>
@@ -1298,11 +1298,11 @@ export default function DashboardPage() {
             className="text-white"
             style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
             <CardTitle className="text-sm font-medium">{t.stockValue}</CardTitle>
             <DollarSign className="h-4 w-4" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <div className="text-xl md:text-2xl font-bold break-words">
               {formatCurrency(stockValue)}
             </div>
@@ -1316,11 +1316,11 @@ export default function DashboardPage() {
           )}
            style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
             <CardTitle className="text-sm font-medium">{t.lowStock}</CardTitle>
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <div className="text-2xl font-bold">{lowStockItems}</div>
           </CardContent>
         </Card>
@@ -1332,11 +1332,11 @@ export default function DashboardPage() {
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
             <CardTitle className="text-sm font-medium">{t.outOfStock}</CardTitle>
             <Ban className="h-4 w-4" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <div className="text-2xl font-bold">{outOfStockItems}</div>
           </CardContent>
         </Card>
@@ -1348,13 +1348,13 @@ export default function DashboardPage() {
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
             <CardTitle className="text-sm font-medium">
               {t.pendingApprovals}
             </CardTitle>
             <Clock className="h-4 w-4" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <div className="text-2xl font-bold">{awaitingApprovalCount}</div>
           </CardContent>
         </Card>
@@ -1362,7 +1362,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center gap-3">
+          <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
               <Zap className="h-6 w-6 text-primary" />
             </div>
@@ -1371,7 +1371,7 @@ export default function DashboardPage() {
               <CardDescription>{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-3">
+          <CardContent className="grid gap-3 p-4 md:p-6 pt-0">
             <Button
               onClick={() => setAddOpen(true)}
               className="w-full justify-start h-auto p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
