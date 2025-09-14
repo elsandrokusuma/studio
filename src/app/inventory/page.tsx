@@ -503,7 +503,7 @@ const translations = {
         deleteWarning: (name: string) => `Cette action est irréversible. Elle supprimera définitivement l'article ${name} de votre inventaire.`,
         cancel: "Annuler",
         delete: "Supprimer",
-        areYouSureSeed: "Êtes-vous absolument sûr ?",
+        areYouSureSeed: "Êtes-vous absolutely sûr ?",
         seedWarning: "Cette action est irréversible. Elle supprimera définitivement tous les articles actuels de votre inventaire et les remplacera par le nouvel ensemble de données.",
         confirmSeed: "Oui, remplacer mes données",
         cameraTitle: "Prendre une Photo",
@@ -1555,24 +1555,14 @@ export default function InventoryPage() {
                     <TableRow key={item.id}>
                       <TableCell className="hidden sm:table-cell">
                         <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
-                          {isPlaceholder ? (
-                            <Image
-                                alt={item.name}
-                                className="aspect-square rounded-md object-cover"
-                                height="64"
-                                src={src}
-                                width="64"
-                              />
-                          ) : (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              alt={item.name}
-                              className="aspect-square rounded-md object-cover"
-                              height="64"
-                              src={src}
-                              width="64"
-                            />
-                          )}
+                          <Image
+                            alt={item.name}
+                            className="aspect-square rounded-md object-cover"
+                            height="64"
+                            src={src}
+                            width="64"
+                            unoptimized={!isPlaceholder}
+                          />
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">{item.name}</TableCell>
@@ -1661,24 +1651,14 @@ export default function InventoryPage() {
                 <CardHeader className="p-0">
                   <div className="relative">
                     <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
-                       {isPlaceholder ? (
-                          <Image
-                              alt={item.name}
-                              className="aspect-video w-full rounded-t-lg object-cover"
-                              height={180}
-                              src={src}
-                              width={320}
-                            />
-                        ) : (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            alt={item.name}
-                            className="aspect-video w-full rounded-t-lg object-cover"
-                            height={180}
-                            src={src}
-                            width={320}
-                          />
-                        )}
+                      <Image
+                          alt={item.name}
+                          className="aspect-video w-full rounded-t-lg object-cover"
+                          height={180}
+                          src={src}
+                          width={320}
+                          unoptimized={!isPlaceholder}
+                        />
                     </div>
                     {!isHrdUser && (
                         <div className="absolute top-2 right-2">
@@ -1749,13 +1729,13 @@ export default function InventoryPage() {
             </DialogDescription>
           </DialogHeader>
           {photoToShow && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+             <Image
               src={photoToShow}
               alt="Enlarged inventory item"
               width={600}
               height={400}
               className="rounded-lg object-contain w-full"
+              unoptimized={photoToShow.includes('googleusercontent')}
             />
           )}
         </DialogContent>
