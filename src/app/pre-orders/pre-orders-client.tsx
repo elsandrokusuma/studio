@@ -567,7 +567,7 @@ const translations = {
     },
     ko: {
         title: "선주문 및 승인",
-        description: "모든 문구류 선주문 및 승인을 한 곳에서 관리합니다.",
+        description: "모든 문구류 선주문 및 승인을 한 곳에서 관리합니다。",
         allStatuses: "모든 상태",
         filterByDate: "날짜로 필터링",
         addItemToPO: "PO에 품목 추가",
@@ -1055,17 +1055,18 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     }
   };
 
-  const updateStatus = async (orders: PreOrder[], status: PreOrder['status']) => {
+  const updateStatus = async (po: GroupedPO, status: PreOrder['status']) => {
     if (!db) return;
     const batch = writeBatch(db);
-    orders.forEach(order => {
+    // When undoing, all items in the group should be updated.
+    po.orders.forEach(order => {
         const orderRef = doc(db, "pre-orders", order.id);
         batch.update(orderRef, { status, approver: '' }); // Clear approver on undo
     });
     await batch.commit();
     addNotification({
       title: 'Status Updated',
-      description: `PO ${orders[0].poNumber} marked as ${status}.`,
+      description: `PO ${po.poNumber} marked as ${status}.`,
       icon: CheckCircle,
     });
   };
@@ -1484,22 +1485,22 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                       )}
                                       
                                       {po.status === 'Fulfilled' && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders.filter(o => o.status === 'Fulfilled'), 'Approved')}>
+                                        <DropdownMenuItem onSelect={() => updateStatus(po, 'Approved')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> {t.undo}
                                         </DropdownMenuItem>
                                       )}
                                       {(po.status === 'Approved' || po.status === 'Rejected') && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Awaiting Approval')}>
+                                        <DropdownMenuItem onSelect={() => updateStatus(po, 'Awaiting Approval')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> {t.undoDecision}
                                         </DropdownMenuItem>
                                       )}
                                       {(po.status === 'Awaiting Approval' || po.status === 'Cancelled') && (
-                                        <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Pending')}>
+                                        <DropdownMenuItem onSelect={() => updateStatus(po, 'Pending')}>
                                           <Undo2 className="mr-2 h-4 w-4" /> {t.undo}
                                         </DropdownMenuItem>
                                       )}
 
-                                      {canPerformWriteActions && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po.orders, 'Cancelled')}>{t.cancelOrder}</DropdownMenuItem>}
+                                      {canPerformWriteActions && po.status === 'Pending' && <DropdownMenuItem onSelect={() => updateStatus(po, 'Cancelled')}>{t.cancelOrder}</DropdownMenuItem>}
 
                                       <DropdownMenuSeparator />
                                       {canPerformWriteActions && po.status !== 'Fulfilled' && <DropdownMenuItem className="text-red-600 focus:text-red-700" onSelect={() => { setSelectedPo(po); setDeleteOpen(true); }}> <Trash2 className="mr-2 h-4 w-4" /> {t.delete} </DropdownMenuItem>}
