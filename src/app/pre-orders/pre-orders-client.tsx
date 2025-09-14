@@ -97,6 +97,7 @@ type GroupedPO = {
   status: PreOrder['status'];
   orderDate: string;
   expectedDate: string;
+  approver?: string;
 };
 
 const dateLocales = { en: enUS, id, es, fr, de, ja, ko, 'zh-CN': zhCN };
@@ -161,6 +162,11 @@ const translations = {
         selectItem: "Select an item...",
         searchItem: "Search item...",
         noItemFound: "No item found.",
+        approveConfirmation: "Approve Confirmation",
+        approveConfirmationDesc: (po: string) => `Please enter your name to confirm the approval of PO ${po}.`,
+        approverName: "Approver's Name",
+        approverNamePlaceholder: "e.g. John Doe",
+        confirmApproval: "Confirm Approval",
         statuses: {
             'Pending': 'Pending',
             'Awaiting Approval': 'Awaiting Approval',
@@ -232,6 +238,11 @@ const translations = {
         selectItem: "Pilih item...",
         searchItem: "Cari item...",
         noItemFound: "Item tidak ditemukan.",
+        approveConfirmation: "Konfirmasi Persetujuan",
+        approveConfirmationDesc: (po: string) => `Silakan masukkan nama Anda untuk mengonfirmasi persetujuan PO ${po}.`,
+        approverName: "Nama Penyetuju",
+        approverNamePlaceholder: "contoh: Budi",
+        confirmApproval: "Konfirmasi Persetujuan",
         statuses: {
             'Pending': 'Tertunda',
             'Awaiting Approval': 'Menunggu Persetujuan',
@@ -303,6 +314,11 @@ const translations = {
         selectItem: "Selecciona un artículo...",
         searchItem: "Buscar artículo...",
         noItemFound: "No se encontró ningún artículo.",
+        approveConfirmation: "Confirmación de Aprobación",
+        approveConfirmationDesc: (po: string) => `Por favor, introduce tu nombre para confirmar la aprobación de la OC ${po}.`,
+        approverName: "Nombre del Aprobador",
+        approverNamePlaceholder: "ej. Juan Pérez",
+        confirmApproval: "Confirmar Aprobación",
         statuses: {
             'Pending': 'Pendiente',
             'Awaiting Approval': 'Esperando Aprobación',
@@ -374,6 +390,11 @@ const translations = {
         selectItem: "Sélectionnez un article...",
         searchItem: "Rechercher un article...",
         noItemFound: "Aucun article trouvé.",
+        approveConfirmation: "Confirmation d'Approbation",
+        approveConfirmationDesc: (po: string) => `Veuillez saisir votre nom pour confirmer l'approbation du BC ${po}.`,
+        approverName: "Nom de l'Approbateur",
+        approverNamePlaceholder: "ex. Jean Dupont",
+        confirmApproval: "Confirmer l'Approbation",
         statuses: {
             'Pending': 'En attente',
             'Awaiting Approval': "En Attente d'Approbation",
@@ -445,6 +466,11 @@ const translations = {
         selectItem: "Artikel auswählen...",
         searchItem: "Artikel suchen...",
         noItemFound: "Kein Artikel gefunden.",
+        approveConfirmation: "Genehmigungsbestätigung",
+        approveConfirmationDesc: (po: string) => `Bitte geben Sie Ihren Namen ein, um die Genehmigung der Bestellung ${po} zu bestätigen.`,
+        approverName: "Name des Genehmigenden",
+        approverNamePlaceholder: "z.B. Max Mustermann",
+        confirmApproval: "Genehmigung Bestätigen",
         statuses: {
             'Pending': 'Ausstehend',
             'Awaiting Approval': 'Wartet auf Genehmigung',
@@ -516,6 +542,11 @@ const translations = {
         selectItem: "アイテムを選択...",
         searchItem: "アイテムを検索...",
         noItemFound: "アイテムが見つかりません。",
+        approveConfirmation: "承認の確認",
+        approveConfirmationDesc: (po: string) => `PO ${po} の承認を確認するには、お名前を入力してください。`,
+        approverName: "承認者名",
+        approverNamePlaceholder: "例：山田太郎",
+        confirmApproval: "承認を確定",
         statuses: {
             'Pending': '保留中',
             'Awaiting Approval': '承認待ち',
@@ -587,6 +618,11 @@ const translations = {
         selectItem: "품목 선택...",
         searchItem: "품목 검색...",
         noItemFound: "품목을 찾을 수 없습니다.",
+        approveConfirmation: "승인 확인",
+        approveConfirmationDesc: (po: string) => `PO ${po}의 승인을 확인하려면 이름을 입력하십시오.`,
+        approverName: "승인자 이름",
+        approverNamePlaceholder: "예: 홍길동",
+        confirmApproval: "승인 확인",
         statuses: {
             'Pending': '대기 중',
             'Awaiting Approval': '승인 대기 중',
@@ -654,10 +690,15 @@ const translations = {
         accessDenied: "访问被拒绝",
         accessDeniedDesc: "您无权查看此页面。如果您认为这是错误，请联系管理员。",
         firebaseNotConfigured: "Firebase 未配置",
-        firebaseNotConfiguredDesc: "请配置您的 Firebase 凭据以使用此应用程序。",
+        firebaseNotConfiguredDesc: "请配置您的 Firebase 憑據以使用此应用程序。",
         selectItem: "选择一个项目...",
         searchItem: "搜索项目...",
         noItemFound: "未找到项目。",
+        approveConfirmation: "批准确认",
+        approveConfirmationDesc: (po: string) => `请输入您的姓名以确认批准采购订单 ${po}。`,
+        approverName: "批准人姓名",
+        approverNamePlaceholder: "例如：张三",
+        confirmApproval: "确认批准",
         statuses: {
             'Pending': '待处理',
             'Awaiting Approval': '等待批准',
@@ -705,6 +746,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [isFulfillOpen, setFulfillOpen] = React.useState(false);
   const [itemToFulfill, setItemToFulfill] = React.useState<PreOrder | null>(null);
   const [fulfillQuantity, setFulfillQuantity] = React.useState<number | string>('');
+
+  // States for approval dialog
+  const [isApprovalOpen, setApprovalOpen] = React.useState(false);
+  const [poToApprove, setPoToApprove] = React.useState<GroupedPO | null>(null);
+  const [approverName, setApproverName] = React.useState('');
 
   // State for viewing details
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
@@ -941,37 +987,6 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     setSelectedPo(null);
   }
 
-  const handleDecision = async (po: GroupedPO, decision: "approved" | "rejected") => {
-    if (!db) return;
-    const newStatus = decision === "approved" ? "Approved" : "Rejected";
-    
-    try {
-        const batch = writeBatch(db);
-        po.orders.forEach(order => {
-            if (!db) return;
-            // Only update items that are still awaiting approval
-            if (order.status === 'Awaiting Approval') {
-                const orderRef = doc(db, "pre-orders", order.id);
-                batch.update(orderRef, { status: newStatus });
-            }
-        });
-        await batch.commit();
-
-        addNotification({
-          title: `Pre-Order ${decision}`,
-          description: `The pre-order ${po.poNumber} has been updated.`,
-          icon: decision === "approved" ? Check : X,
-        });
-        
-    } catch(error) {
-        console.error("Failed to update pre-order status", error);
-        toast({
-            variant: "destructive",
-            title: "Error updating pre-order status",
-        });
-    }
-  };
-
   const handleItemDecision = async (item: PreOrder, decision: 'Approved' | 'Rejected') => {
     if (!db) return;
     try {
@@ -993,22 +1008,30 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     }
   };
   
-  const handleMarkAsApproved = async (po: GroupedPO) => {
-    if (!db) return;
+  const handleMarkAsApproved = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!poToApprove || !db) return;
+
+    if (!approverName.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Approver name required',
+      });
+      return;
+    }
 
     try {
         const batch = writeBatch(db);
-        po.orders.forEach(request => {
-            // Approve all items that are awaiting approval
+        poToApprove.orders.forEach(request => {
             if (request.status === 'Awaiting Approval' || request.status === 'Pending') {
                 const docRef = doc(db, "pre-orders", request.id);
-                batch.update(docRef, { status: 'Approved' });
+                batch.update(docRef, { status: 'Approved', approver: approverName });
             }
         });
         await batch.commit();
         addNotification({
             title: "PO Approved",
-            description: `Request ${po.poNumber} has been marked as Approved.`,
+            description: `Request ${poToApprove.poNumber} has been marked as Approved.`,
             icon: Check,
         });
     } catch (error) {
@@ -1017,6 +1040,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             variant: "destructive",
             title: "Failed to approve PO."
         });
+    } finally {
+      setApprovalOpen(false);
+      setPoToApprove(null);
+      setApproverName('');
     }
   };
 
@@ -1040,7 +1067,6 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     setFulfillQuantity(orderItem.quantity);
     setFulfillOpen(true);
   };
-
 
   const handleRequestApproval = async () => {
     if (!db) return;
@@ -1187,6 +1213,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         status: getOverallStatus(),
         orderDate: orders[0]?.orderDate,
         expectedDate: orders[0]?.expectedDate,
+        approver: orders.find(o => o.approver)?.approver,
       };
     }).filter(po => po.orders.length > 0);
   }, [preOrders]);
@@ -1418,6 +1445,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                         {getStatusText(po.status)}
                                     </Badge>
                                     <span>• {po.totalQuantity} {t.units}</span>
+                                    {po.approver && <span className='hidden sm:inline'>• Approved by {po.approver}</span>}
                                 </div>
                             </div>
                           </div>
@@ -1442,7 +1470,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
                                       {canApprove && po.status === 'Awaiting Approval' && (
-                                        <DropdownMenuItem onSelect={() => handleMarkAsApproved(po)}>
+                                        <DropdownMenuItem onSelect={() => { setPoToApprove(po); setApprovalOpen(true); }}>
                                           <Check className="mr-2 h-4 w-4" />{t.markAsApproved}
                                         </DropdownMenuItem>
                                       )}
@@ -1599,6 +1627,34 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                 <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>{t.cancelBtn}</Button> <Button type="submit">{t.confirmAndAdd}</Button> </DialogFooter>
               </form>
           </DialogContent>
+        </Dialog>
+
+        <Dialog open={isApprovalOpen} onOpenChange={setApprovalOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t.approveConfirmation}</DialogTitle>
+                    <DialogDescription>{t.approveConfirmationDesc(poToApprove?.poNumber || '')}</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleMarkAsApproved}>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="approver-name" className="text-right">{t.approverName}</Label>
+                            <Input
+                                id="approver-name"
+                                value={approverName}
+                                onChange={(e) => setApproverName(e.target.value)}
+                                className="col-span-3"
+                                placeholder={t.approverNamePlaceholder}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setApprovalOpen(false)}>{t.cancelBtn}</Button>
+                        <Button type="submit">{t.confirmApproval}</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
         </Dialog>
 
     </div>
