@@ -1258,16 +1258,16 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="flex flex-col gap-4 md:gap-8">
+    <div className="flex flex-col gap-4 md:gap-6">
       <Card>
         <CardHeader className="p-4 md:p-6">
            <div className="flex items-center gap-4">
-            <div className="bg-primary/10 p-3 rounded-full shrink-0">
-              <GreetingIcon className="h-6 w-6 text-primary" />
+            <div className="bg-primary/10 p-2 md:p-3 rounded-full shrink-0">
+              <GreetingIcon className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl md:text-2xl font-bold">{greetingInfo.text}</h1>
-              <p className="text-muted-foreground text-sm md:text-base">
+              <h1 className="text-lg md:text-2xl font-bold">{greetingInfo.text}</h1>
+              <p className="text-muted-foreground text-xs md:text-base">
                 {dailyQuote}
               </p>
             </div>
@@ -1275,11 +1275,11 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-2">
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
-            "text-white md:col-span-1",
+            "text-white md:col-span-2",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
@@ -1295,7 +1295,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card 
-            className="text-white md:col-span-2"
+            className="text-white md:col-span-3"
             style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
@@ -1311,7 +1311,7 @@ export default function DashboardPage() {
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : handleShowLowStock}
           className={cn(
-            "text-white",
+            "text-white md:col-span-2",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
            style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
@@ -1327,7 +1327,7 @@ export default function DashboardPage() {
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : handleShowOutOfStock}
           className={cn(
-            "text-white",
+            "text-white md:col-span-2",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
@@ -1364,11 +1364,11 @@ export default function DashboardPage() {
         <Card>
            <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
-              <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+              <Zap className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle>{t.quickActions}</CardTitle>
-              <CardDescription>{t.commonTasks}</CardDescription>
+              <CardTitle className="text-base md:text-xl">{t.quickActions}</CardTitle>
+              <CardDescription className="text-xs md:text-sm">{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:p-6 md:pt-0 md:grid-cols-1 md:space-y-3">
@@ -1378,7 +1378,7 @@ export default function DashboardPage() {
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-2">
-                <Plus className="h-4 w-4 md:h-5 md:w-5" />
+                <Plus className="h-4 w-4" />
               </div>
               <div>
                 <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
@@ -1393,7 +1393,7 @@ export default function DashboardPage() {
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-2">
-                <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
+                <TrendingUp className="h-4 w-4" />
               </div>
               <div>
                 <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
@@ -1406,7 +1406,7 @@ export default function DashboardPage() {
               disabled={isHrdUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-2">
-                <TrendingDown className="h-4 w-4 md:h-5 md:w-5" />
+                <TrendingDown className="h-4 w-4" />
               </div>
               <div>
                 <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
@@ -1419,7 +1419,7 @@ export default function DashboardPage() {
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg mr-2">
-                <FileText className="h-4 w-4 md:h-5 md:w-5" />
+                <FileText className="h-4 w-4" />
               </div>
               <div>
                 <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
@@ -1436,8 +1436,8 @@ export default function DashboardPage() {
                   <BarChart4 className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <CardTitle>{t.stockMovement}</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-base md:text-xl">{t.stockMovement}</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
                     {timePeriod === 'monthly' ? t.last6Months : t.last7Days}
                   </CardDescription>
                 </div>
@@ -1546,8 +1546,8 @@ export default function DashboardPage() {
 
       <Card>
         <CardHeader className="p-4 md:p-6">
-          <CardTitle>{t.recentTransactions}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-base md:text-xl">{t.recentTransactions}</CardTitle>
+          <CardDescription className="text-xs md:text-sm">
             {t.recentTransactionsDesc}
           </CardDescription>
         </CardHeader>
