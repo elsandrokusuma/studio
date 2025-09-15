@@ -1360,7 +1360,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="flex flex-col">
            <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
@@ -1371,61 +1371,63 @@ export default function DashboardPage() {
               <CardDescription className="text-xs md:text-sm">{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:grid-cols-1 md:space-y-3 md:p-6 md:pt-0 flex-1">
-            <Button
-              onClick={() => setAddOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 gap-2 md:gap-4 md:p-4"
-              disabled={isHrdUser || isStandardUser}
-            >
-              <div className="bg-white/20 p-2 rounded-lg">
-                <Plus className="h-4 w-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
-                <p className="font-normal text-[10px] md:text-xs">
-                  {t.addItemDesc}
-                </p>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setStockInOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 gap-2 md:gap-4 md:p-4"
-              disabled={isHrdUser || isStandardUser}
-            >
-              <div className="bg-white/20 p-2 rounded-lg">
-                <TrendingUp className="h-4 w-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
-                <p className="font-normal text-[10px] md:text-xs">{t.stockInDesc}</p>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setStockOutOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 gap-2 md:gap-4 md:p-4"
-              disabled={isHrdUser}
-            >
-              <div className="bg-white/20 p-2 rounded-lg">
-                <TrendingDown className="h-4 w-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
-                <p className="font-normal text-[10px] md:text-xs">{t.stockOutDesc}</p>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setCreatePoOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 gap-2 md:gap-4 md:p-4"
-              disabled={isHrdUser || isStandardUser}
-            >
-              <div className="bg-white/20 p-2 rounded-lg">
-                <FileText className="h-4 w-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
-                <p className="font-normal text-[10px] md:text-xs">{t.createPODesc}</p>
-              </div>
-            </Button>
+          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:flex md:flex-1 md:flex-col md:justify-center md:p-6 md:pt-0">
+             <div className="col-span-2 grid grid-cols-2 gap-3 md:flex md:flex-1 md:flex-col md:gap-2">
+                <Button
+                onClick={() => setAddOpen(true)}
+                className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 gap-2 md:gap-4 md:py-6"
+                disabled={isHrdUser || isStandardUser}
+                >
+                <div className="bg-white/20 p-2 rounded-lg">
+                    <Plus className="h-4 w-4" />
+                </div>
+                <div className="text-left">
+                    <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
+                    <p className="font-normal text-[10px] md:text-xs">
+                    {t.addItemDesc}
+                    </p>
+                </div>
+                </Button>
+                <Button
+                onClick={() => setStockInOpen(true)}
+                className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 gap-2 md:gap-4 md:py-6"
+                disabled={isHrdUser || isStandardUser}
+                >
+                <div className="bg-white/20 p-2 rounded-lg">
+                    <TrendingUp className="h-4 w-4" />
+                </div>
+                <div className="text-left">
+                    <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
+                    <p className="font-normal text-[10px] md:text-xs">{t.stockInDesc}</p>
+                </div>
+                </Button>
+                <Button
+                onClick={() => setStockOutOpen(true)}
+                className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 gap-2 md:gap-4 md:py-6"
+                disabled={isHrdUser}
+                >
+                <div className="bg-white/20 p-2 rounded-lg">
+                    <TrendingDown className="h-4 w-4" />
+                </div>
+                <div className="text-left">
+                    <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
+                    <p className="font-normal text-[10px] md:text-xs">{t.stockOutDesc}</p>
+                </div>
+                </Button>
+                <Button
+                onClick={() => setCreatePoOpen(true)}
+                className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 gap-2 md:gap-4 md:py-6"
+                disabled={isHrdUser || isStandardUser}
+                >
+                <div className="bg-white/20 p-2 rounded-lg">
+                    <FileText className="h-4 w-4" />
+                </div>
+                <div className="text-left">
+                    <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
+                    <p className="font-normal text-[10px] md:text-xs">{t.createPODesc}</p>
+                </div>
+                </Button>
+            </div>
           </CardContent>
         </Card>
         <Card className="lg:col-span-2">
