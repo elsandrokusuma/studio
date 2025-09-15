@@ -1275,7 +1275,7 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
@@ -1371,16 +1371,16 @@ export default function DashboardPage() {
               <CardDescription className="text-xs md:text-sm">{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:p-6 md:pt-0 md:grid-cols-1 md:space-y-3">
+          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:grid-cols-1 md:space-y-3 md:p-6 md:pt-0">
             <Button
               onClick={() => setAddOpen(true)}
-              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 gap-2"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2">
+              <div className="bg-white/20 p-2 rounded-lg">
                 <Plus className="h-4 w-4" />
               </div>
-              <div className="text-left">
+              <div>
                 <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
                 <p className="font-normal text-[10px] md:text-xs">
                   {t.addItemDesc}
@@ -1389,39 +1389,39 @@ export default function DashboardPage() {
             </Button>
             <Button
               onClick={() => setStockInOpen(true)}
-              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 gap-2"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2">
+              <div className="bg-white/20 p-2 rounded-lg">
                 <TrendingUp className="h-4 w-4" />
               </div>
-              <div className="text-left">
+              <div>
                 <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
                 <p className="font-normal text-[10px] md:text-xs">{t.stockInDesc}</p>
               </div>
             </Button>
             <Button
               onClick={() => setStockOutOpen(true)}
-              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 gap-2"
               disabled={isHrdUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2">
+              <div className="bg-white/20 p-2 rounded-lg">
                 <TrendingDown className="h-4 w-4" />
               </div>
-              <div className="text-left">
+              <div>
                 <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
                 <p className="font-normal text-[10px] md:text-xs">{t.stockOutDesc}</p>
               </div>
             </Button>
             <Button
               onClick={() => setCreatePoOpen(true)}
-              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 gap-2"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2">
+              <div className="bg-white/20 p-2 rounded-lg">
                 <FileText className="h-4 w-4" />
               </div>
-              <div className="text-left">
+              <div>
                 <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
                 <p className="font-normal text-[10px] md:text-xs">{t.createPODesc}</p>
               </div>
