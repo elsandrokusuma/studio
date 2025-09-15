@@ -1500,7 +1500,7 @@ export default function DashboardPage() {
                 className="min-w-[300px] w-full h-[300px]"
               >
                 {chartType === 'bar' && (
-                  <BarChart accessibilityLayer data={chartData}>
+                  <BarChart accessibilityLayer data={chartData} margin={{ left: -20 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1511,7 +1511,7 @@ export default function DashboardPage() {
                   </BarChart>
                 )}
                 {chartType === 'line' && (
-                  <LineChart accessibilityLayer data={chartData}>
+                  <LineChart accessibilityLayer data={chartData} margin={{ left: -20 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1522,7 +1522,7 @@ export default function DashboardPage() {
                   </LineChart>
                 )}
                 {chartType === 'area' && (
-                  <AreaChart accessibilityLayer data={chartData}>
+                  <AreaChart accessibilityLayer data={chartData} margin={{ left: -20 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
