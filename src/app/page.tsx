@@ -1258,7 +1258,7 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="flex flex-col gap-4 md:gap-6">
+    <div className="flex flex-col gap-4 md:gap-2">
       <Card>
         <CardHeader className="p-4 md:p-6">
            <div className="flex items-center gap-4">
@@ -1279,30 +1279,30 @@ export default function DashboardPage() {
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
-            "text-white md:col-span-2",
+            "text-white",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 md:p-6 md:pb-2">
             <CardTitle className="text-sm font-medium">{t.totalItems}</CardTitle>
             <Package className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="text-2xl font-bold">
               {totalItems.toLocaleString()}
             </div>
           </CardContent>
         </Card>
         <Card 
-            className="text-white md:col-span-3"
+            className="text-white"
             style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 md:p-6 md:pb-2">
             <CardTitle className="text-sm font-medium">{t.stockValue}</CardTitle>
             <DollarSign className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="text-lg md:text-2xl font-bold break-words">
               {formatCurrency(stockValue)}
             </div>
@@ -1311,32 +1311,32 @@ export default function DashboardPage() {
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : handleShowLowStock}
           className={cn(
-            "text-white md:col-span-2",
+            "text-white",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
            style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 md:p-6 md:pb-2">
             <CardTitle className="text-sm font-medium">{t.lowStock}</CardTitle>
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="text-2xl font-bold">{lowStockItems}</div>
           </CardContent>
         </Card>
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : handleShowOutOfStock}
           className={cn(
-            "text-white md:col-span-2",
+            "text-white",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 md:p-6 md:pb-2">
             <CardTitle className="text-sm font-medium">{t.outOfStock}</CardTitle>
             <Ban className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="text-2xl font-bold">{outOfStockItems}</div>
           </CardContent>
         </Card>
@@ -1348,13 +1348,13 @@ export default function DashboardPage() {
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 md:p-6 md:pb-2">
             <CardTitle className="text-sm font-medium">
               {t.pendingApprovals}
             </CardTitle>
             <Clock className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="text-2xl font-bold">{awaitingApprovalCount}</div>
           </CardContent>
         </Card>
