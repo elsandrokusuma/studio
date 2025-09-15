@@ -1258,10 +1258,10 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4 md:gap-8">
       <Card>
         <CardHeader className="p-4 md:p-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+           <div className="flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-full shrink-0">
               <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
@@ -1275,11 +1275,11 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
-            "text-white",
+            "text-white md:col-span-1",
             !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
@@ -1295,7 +1295,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card 
-            className="text-white"
+            className="text-white md:col-span-2"
             style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
@@ -1360,9 +1360,9 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
+           <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
               <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
@@ -1371,7 +1371,7 @@ export default function DashboardPage() {
               <CardDescription>{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:p-6 md:pt-0 md:grid-cols-1">
+          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:p-6 md:pt-0 md:grid-cols-1 md:space-y-3">
             <Button
               onClick={() => setAddOpen(true)}
               className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
@@ -1442,7 +1442,7 @@ export default function DashboardPage() {
                   </CardDescription>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
+               <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
                  <ToggleGroup 
                   type="single" 
                   defaultValue={chartType}
