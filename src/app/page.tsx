@@ -1275,7 +1275,7 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Card
           onClick={isStandardUser ? undefined : () => router.push("/inventory")}
           className={cn(
@@ -1343,7 +1343,7 @@ export default function DashboardPage() {
         <Card
           onClick={isStandardUser ? undefined : () => router.push("/pre-orders")}
           className={cn(
-            "col-span-2 md:col-span-1 text-white",
+            "col-span-2 md:col-span-1 lg:col-span-1 text-white",
             !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
@@ -1362,7 +1362,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
+          <CardHeader className="flex flex-row items-center gap-3 p-4">
             <div className="bg-primary/10 p-2 rounded-full">
               <Zap className="h-6 w-6 text-primary" />
             </div>
@@ -1371,7 +1371,7 @@ export default function DashboardPage() {
               <CardDescription>{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-3 p-4 md:p-6 pt-0">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 pt-0">
             <Button
               onClick={() => setAddOpen(true)}
               className="w-full justify-start h-auto p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
@@ -1429,7 +1429,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card className="lg:col-span-2">
-          <CardHeader>
+          <CardHeader className="p-4 md:p-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="bg-primary/10 p-2 rounded-md">
@@ -1489,7 +1489,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="overflow-x-auto h-[350px] flex items-end">
               <ChartContainer
                 config={chartConfig}
@@ -1545,13 +1545,13 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4 md:p-6">
           <CardTitle>{t.recentTransactions}</CardTitle>
           <CardDescription>
             {t.recentTransactionsDesc}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
           {recentTransactions.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
