@@ -1361,7 +1361,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:gap-4 lg:grid-cols-3">
-        <Card>
+        <Card className="flex flex-col">
            <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
               <Zap className="h-5 w-5 text-primary" />
@@ -1371,10 +1371,10 @@ export default function DashboardPage() {
               <CardDescription className="text-xs md:text-sm">{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:grid-cols-1 md:space-y-3 md:p-6 md:pt-0">
+          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:grid-cols-1 md:space-y-3 md:p-6 md:pt-0 flex-1">
             <Button
               onClick={() => setAddOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 md:gap-4"
+              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 gap-2 md:gap-4 md:p-4"
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
@@ -1389,7 +1389,7 @@ export default function DashboardPage() {
             </Button>
             <Button
               onClick={() => setStockInOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 md:gap-4"
+              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 gap-2 md:gap-4 md:p-4"
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
@@ -1402,7 +1402,7 @@ export default function DashboardPage() {
             </Button>
             <Button
               onClick={() => setStockOutOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 md:gap-4"
+              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 gap-2 md:gap-4 md:p-4"
               disabled={isHrdUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
@@ -1415,7 +1415,7 @@ export default function DashboardPage() {
             </Button>
             <Button
               onClick={() => setCreatePoOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 md:gap-4"
+              className="h-auto w-full justify-start p-3 text-left bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 gap-2 md:gap-4 md:p-4"
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
