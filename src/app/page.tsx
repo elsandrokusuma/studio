@@ -1494,7 +1494,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
-            <div className="h-[350px] flex items-end">
+            <div className="h-[350px] flex justify-center items-end md:overflow-x-auto">
               <ChartContainer
                 config={chartConfig}
                 className="min-w-[300px] w-full h-[300px]"
