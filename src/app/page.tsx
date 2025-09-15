@@ -1444,8 +1444,8 @@ export default function DashboardPage() {
                   </CardDescription>
                 </div>
               </div>
-               <div className="flex flex-col w-full md:w-auto gap-2">
-                 <div className="flex gap-2">
+               <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
+                 <div className="flex w-full gap-2">
                     <ToggleGroup 
                       type="single" 
                       defaultValue={chartType}
