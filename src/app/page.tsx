@@ -1275,7 +1275,7 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-5 md:gap-4">
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
@@ -1288,7 +1288,7 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">{t.totalItems}</CardTitle>
             <Package className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0 md:pb-8">
             <div className="text-2xl font-bold">
               {totalItems.toLocaleString()}
             </div>
@@ -1302,7 +1302,7 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">{t.stockValue}</CardTitle>
             <DollarSign className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0 md:pb-8">
             <div className="text-lg md:text-2xl font-bold break-words">
               {formatCurrency(stockValue)}
             </div>
@@ -1320,7 +1320,7 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">{t.lowStock}</CardTitle>
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0 md:pb-8">
             <div className="text-2xl font-bold">{lowStockItems}</div>
           </CardContent>
         </Card>
@@ -1336,7 +1336,7 @@ export default function DashboardPage() {
             <CardTitle className="text-sm font-medium">{t.outOfStock}</CardTitle>
             <Ban className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0 md:pb-8">
             <div className="text-2xl font-bold">{outOfStockItems}</div>
           </CardContent>
         </Card>
@@ -1354,7 +1354,7 @@ export default function DashboardPage() {
             </CardTitle>
             <Clock className="h-4 w-4" />
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0 md:pb-8">
             <div className="text-2xl font-bold">{awaitingApprovalCount}</div>
           </CardContent>
         </Card>
@@ -1374,13 +1374,13 @@ export default function DashboardPage() {
           <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:grid-cols-1 md:space-y-3 md:p-6 md:pt-0">
             <Button
               onClick={() => setAddOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 gap-2"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 md:gap-4"
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
                 <Plus className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
                 <p className="font-normal text-[10px] md:text-xs">
                   {t.addItemDesc}
@@ -1389,39 +1389,39 @@ export default function DashboardPage() {
             </Button>
             <Button
               onClick={() => setStockInOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 gap-2"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 md:gap-4"
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
                 <TrendingUp className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
                 <p className="font-normal text-[10px] md:text-xs">{t.stockInDesc}</p>
               </div>
             </Button>
             <Button
               onClick={() => setStockOutOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 gap-2"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 md:gap-4"
               disabled={isHrdUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
                 <TrendingDown className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
                 <p className="font-normal text-[10px] md:text-xs">{t.stockOutDesc}</p>
               </div>
             </Button>
             <Button
               onClick={() => setCreatePoOpen(true)}
-              className="h-auto w-full justify-start p-3 text-left md:p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 gap-2"
+              className="h-auto w-full justify-start p-3 text-left md:p-4 md:py-6 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 md:gap-4"
               disabled={isHrdUser || isStandardUser}
             >
               <div className="bg-white/20 p-2 rounded-lg">
                 <FileText className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
                 <p className="font-normal text-[10px] md:text-xs">{t.createPODesc}</p>
               </div>
