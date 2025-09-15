@@ -1380,9 +1380,9 @@ export default function DashboardPage() {
               <div className="bg-white/20 p-2 rounded-lg mr-2">
                 <Plus className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
-                <p className="font-normal text-xs text-left">
+                <p className="font-normal text-[10px] md:text-xs">
                   {t.addItemDesc}
                 </p>
               </div>
@@ -1395,9 +1395,9 @@ export default function DashboardPage() {
               <div className="bg-white/20 p-2 rounded-lg mr-2">
                 <TrendingUp className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
-                <p className="font-normal text-xs text-left">{t.stockInDesc}</p>
+                <p className="font-normal text-[10px] md:text-xs">{t.stockInDesc}</p>
               </div>
             </Button>
             <Button
@@ -1408,9 +1408,9 @@ export default function DashboardPage() {
               <div className="bg-white/20 p-2 rounded-lg mr-2">
                 <TrendingDown className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
-                <p className="font-normal text-xs text-left">{t.stockOutDesc}</p>
+                <p className="font-normal text-[10px] md:text-xs">{t.stockOutDesc}</p>
               </div>
             </Button>
             <Button
@@ -1421,9 +1421,9 @@ export default function DashboardPage() {
               <div className="bg-white/20 p-2 rounded-lg mr-2">
                 <FileText className="h-4 w-4" />
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
-                <p className="font-normal text-xs text-left">{t.createPODesc}</p>
+                <p className="font-normal text-[10px] md:text-xs">{t.createPODesc}</p>
               </div>
             </Button>
           </CardContent>
