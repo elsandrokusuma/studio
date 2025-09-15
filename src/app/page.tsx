@@ -1258,7 +1258,7 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="flex flex-col gap-4 md:gap-2">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader className="p-4 md:p-6">
            <div className="flex items-center gap-4">
@@ -1275,7 +1275,7 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-2">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-4">
         <Card
           onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
@@ -1360,7 +1360,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:gap-4 lg:grid-cols-3">
         <Card>
            <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
