@@ -29,7 +29,12 @@ export default function RootLayout({
         {/* Favicon links for different devices with cache-busting */}
         <link rel="icon" href="/favicon.ico?v=9" sizes="any" />
         <link rel="apple-touch-icon" href="/favicon.ico?v=9" />
-        <link rel="manifest" href="/site.webmanifest" />
+        
+        {/* Manifest and theme color for PWA */}
+        <link rel="manifest" href="/site.webmanifest?v=9" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

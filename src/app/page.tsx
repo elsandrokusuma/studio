@@ -1260,7 +1260,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <Card>
-        <CardHeader className="p-4">
+        <CardHeader className="p-4 md:p-6">
           <div className="flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-full shrink-0">
               <GreetingIcon className="h-6 w-6 text-primary" />
@@ -2174,5 +2174,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
