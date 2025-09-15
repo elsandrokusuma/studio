@@ -1261,7 +1261,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8">
       <Card>
         <CardHeader className="p-4 md:p-6">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-full shrink-0">
               <GreetingIcon className="h-6 w-6 text-primary" />
             </div>
@@ -1303,7 +1303,7 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4" />
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <div className="text-lg md:text-xl font-bold break-words">
+            <div className="text-lg md:text-2xl font-bold break-words">
               {formatCurrency(stockValue)}
             </div>
           </CardContent>
@@ -1362,27 +1362,27 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center gap-3 p-4">
+          <CardHeader className="flex flex-row items-center gap-3 p-4 md:p-6">
             <div className="bg-primary/10 p-2 rounded-full">
-              <Zap className="h-6 w-6 text-primary" />
+              <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
             <div>
               <CardTitle>{t.quickActions}</CardTitle>
               <CardDescription>{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0">
+          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:p-6 md:pt-0 md:grid-cols-1">
             <Button
               onClick={() => setAddOpen(true)}
               className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
-                <Plus className="h-5 w-5" />
+              <div className="bg-white/20 p-2 rounded-lg mr-2">
+                <Plus className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div>
-                <p className="font-semibold text-sm md:text-base">{t.addItem}</p>
-                <p className="font-normal text-xs md:text-sm text-left">
+                <p className="font-semibold text-xs md:text-base">{t.addItem}</p>
+                <p className="font-normal text-xs text-left">
                   {t.addItemDesc}
                 </p>
               </div>
@@ -1392,12 +1392,12 @@ export default function DashboardPage() {
               className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
-                <TrendingUp className="h-5 w-5" />
+              <div className="bg-white/20 p-2 rounded-lg mr-2">
+                <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div>
-                <p className="font-semibold text-sm md:text-base">{t.stockIn}</p>
-                <p className="font-normal text-xs md:text-sm text-left">{t.stockInDesc}</p>
+                <p className="font-semibold text-xs md:text-base">{t.stockIn}</p>
+                <p className="font-normal text-xs text-left">{t.stockInDesc}</p>
               </div>
             </Button>
             <Button
@@ -1405,12 +1405,12 @@ export default function DashboardPage() {
               className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500"
               disabled={isHrdUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
-                <TrendingDown className="h-5 w-5" />
+              <div className="bg-white/20 p-2 rounded-lg mr-2">
+                <TrendingDown className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div>
-                <p className="font-semibold text-sm md:text-base">{t.stockOut}</p>
-                <p className="font-normal text-xs md:text-sm text-left">{t.stockOutDesc}</p>
+                <p className="font-semibold text-xs md:text-base">{t.stockOut}</p>
+                <p className="font-normal text-xs text-left">{t.stockOutDesc}</p>
               </div>
             </Button>
             <Button
@@ -1418,18 +1418,18 @@ export default function DashboardPage() {
               className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
-                <FileText className="h-5 w-5" />
+              <div className="bg-white/20 p-2 rounded-lg mr-2">
+                <FileText className="h-4 w-4 md:h-5 md:w-5" />
               </div>
               <div>
-                <p className="font-semibold text-sm md:text-base">{t.createPO}</p>
-                <p className="font-normal text-xs md:text-sm text-left">{t.createPODesc}</p>
+                <p className="font-semibold text-xs md:text-base">{t.createPO}</p>
+                <p className="font-normal text-xs text-left">{t.createPODesc}</p>
               </div>
             </Button>
           </CardContent>
         </Card>
         <Card className="lg:col-span-2">
-          <CardHeader className="p-4">
+          <CardHeader className="p-4 md:p-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="bg-primary/10 p-2 rounded-md">
@@ -1489,7 +1489,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-4 pt-0">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <div className="overflow-x-auto h-[350px] flex items-end">
               <ChartContainer
                 config={chartConfig}
@@ -1545,13 +1545,13 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader className="p-4">
+        <CardHeader className="p-4 md:p-6">
           <CardTitle>{t.recentTransactions}</CardTitle>
           <CardDescription>
             {t.recentTransactionsDesc}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 pt-0">
+        <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
           {recentTransactions.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
