@@ -1444,39 +1444,41 @@ export default function DashboardPage() {
                   </CardDescription>
                 </div>
               </div>
-               <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
-                 <ToggleGroup 
-                  type="single" 
-                  defaultValue={chartType}
-                  variant="outline" 
-                  className="w-full sm:w-auto"
-                  onValueChange={(value: 'bar' | 'line' | 'area') => value && setChartType(value)}
-                >
-                  <ToggleGroupItem value="bar" aria-label="Bar chart" className="px-2 h-9">
-                    <BarChart4 className="h-4 w-4" />
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="line" aria-label="Line chart" className="px-2 h-9">
-                    <LineChartIcon className="h-4 w-4" />
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="area" aria-label="Area chart" className="px-2 h-9">
-                    <AreaChartIcon className="h-4 w-4" />
-                  </ToggleGroupItem>
-                </ToggleGroup>
-                 <ToggleGroup 
-                  type="single" 
-                  defaultValue={timePeriod}
-                  variant="outline" 
-                  className="w-full sm:w-auto"
-                  onValueChange={(value: 'daily' | 'monthly') => value && setTimePeriod(value)}
-                >
-                  <ToggleGroupItem value="daily" aria-label="Daily view" className="text-xs h-9">{t.daily}</ToggleGroupItem>
-                  <ToggleGroupItem value="monthly" aria-label="Monthly view" className="text-xs h-9">{t.monthly}</ToggleGroupItem>
-                </ToggleGroup>
+               <div className="flex flex-col w-full md:w-auto gap-2">
+                 <div className="flex gap-2">
+                    <ToggleGroup 
+                      type="single" 
+                      defaultValue={chartType}
+                      variant="outline" 
+                      className="w-full"
+                      onValueChange={(value: 'bar' | 'line' | 'area') => value && setChartType(value)}
+                    >
+                      <ToggleGroupItem value="bar" aria-label="Bar chart" className="px-2 h-9 flex-1">
+                        <BarChart4 className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="line" aria-label="Line chart" className="px-2 h-9 flex-1">
+                        <LineChartIcon className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="area" aria-label="Area chart" className="px-2 h-9 flex-1">
+                        <AreaChartIcon className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                    <ToggleGroup 
+                      type="single" 
+                      defaultValue={timePeriod}
+                      variant="outline" 
+                      className="w-full"
+                      onValueChange={(value: 'daily' | 'monthly') => value && setTimePeriod(value)}
+                    >
+                      <ToggleGroupItem value="daily" aria-label="Daily view" className="text-xs h-9 flex-1">{t.daily}</ToggleGroupItem>
+                      <ToggleGroupItem value="monthly" aria-label="Monthly view" className="text-xs h-9 flex-1">{t.monthly}</ToggleGroupItem>
+                    </ToggleGroup>
+                 </div>
                 <Select
                   value={selectedChartItem}
                   onValueChange={setSelectedChartItem}
                 >
-                  <SelectTrigger className="w-full md:w-[120px] h-9 text-xs">
+                  <SelectTrigger className="w-full h-9 text-xs">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1492,7 +1494,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
-            <div className="overflow-x-auto h-[350px] flex items-end">
+            <div className="h-[350px] flex items-end">
               <ChartContainer
                 config={chartConfig}
                 className="min-w-[300px] w-full h-[300px]"
