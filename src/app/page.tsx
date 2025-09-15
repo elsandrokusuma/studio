@@ -1260,7 +1260,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <Card>
-        <CardHeader className="p-4 md:p-6">
+        <CardHeader className="p-4">
           <div className="flex items-center gap-4">
             <div className="bg-primary/10 p-3 rounded-full shrink-0">
               <GreetingIcon className="h-6 w-6 text-primary" />
@@ -1275,16 +1275,16 @@ export default function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         <Card
-          onClick={isStandardUser ? undefined : () => router.push("/inventory")}
+          onClick={isStandardUser || isHrdUser ? undefined : () => router.push("/inventory")}
           className={cn(
             "text-white",
-            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+            !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-1))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
             <CardTitle className="text-sm font-medium">{t.totalItems}</CardTitle>
             <Package className="h-4 w-4" />
           </CardHeader>
@@ -1298,25 +1298,25 @@ export default function DashboardPage() {
             className="text-white"
             style={{ backgroundColor: 'hsl(var(--stock-card-2))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
             <CardTitle className="text-sm font-medium">{t.stockValue}</CardTitle>
             <DollarSign className="h-4 w-4" />
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <div className="text-xl md:text-2xl font-bold break-words">
+            <div className="text-lg md:text-xl font-bold break-words">
               {formatCurrency(stockValue)}
             </div>
           </CardContent>
         </Card>
         <Card
-          onClick={isStandardUser ? undefined : handleShowLowStock}
+          onClick={isStandardUser || isHrdUser ? undefined : handleShowLowStock}
           className={cn(
             "text-white",
-            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+            !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
            style={{ backgroundColor: 'hsl(var(--stock-card-3))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
             <CardTitle className="text-sm font-medium">{t.lowStock}</CardTitle>
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
@@ -1325,14 +1325,14 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         <Card
-          onClick={isStandardUser ? undefined : handleShowOutOfStock}
+          onClick={isStandardUser || isHrdUser ? undefined : handleShowOutOfStock}
           className={cn(
             "text-white",
-            !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
+            !isStandardUser && !isHrdUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-4))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
             <CardTitle className="text-sm font-medium">{t.outOfStock}</CardTitle>
             <Ban className="h-4 w-4" />
           </CardHeader>
@@ -1343,12 +1343,12 @@ export default function DashboardPage() {
         <Card
           onClick={isStandardUser ? undefined : () => router.push("/pre-orders")}
           className={cn(
-            "col-span-2 md:col-span-1 lg:col-span-1 text-white",
+            "col-span-2 md:col-span-1 text-white",
             !isStandardUser && "cursor-pointer hover:shadow-lg transition-shadow"
           )}
           style={{ backgroundColor: 'hsl(var(--stock-card-5))' }}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
             <CardTitle className="text-sm font-medium">
               {t.pendingApprovals}
             </CardTitle>
@@ -1371,65 +1371,65 @@ export default function DashboardPage() {
               <CardDescription>{t.commonTasks}</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 pt-0">
+          <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0">
             <Button
               onClick={() => setAddOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
+              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
+              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
                 <Plus className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">{t.addItem}</p>
-                <p className="font-normal text-sm text-left">
+                <p className="font-semibold text-sm md:text-base">{t.addItem}</p>
+                <p className="font-normal text-xs md:text-sm text-left">
                   {t.addItemDesc}
                 </p>
               </div>
             </Button>
             <Button
               onClick={() => setStockInOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
+              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
+              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">{t.stockIn}</p>
-                <p className="font-normal text-sm text-left">{t.stockInDesc}</p>
+                <p className="font-semibold text-sm md:text-base">{t.stockIn}</p>
+                <p className="font-normal text-xs md:text-sm text-left">{t.stockInDesc}</p>
               </div>
             </Button>
             <Button
               onClick={() => setStockOutOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500"
+              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500"
               disabled={isHrdUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
+              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
                 <TrendingDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">{t.stockOut}</p>
-                <p className="font-normal text-sm text-left">{t.stockOutDesc}</p>
+                <p className="font-semibold text-sm md:text-base">{t.stockOut}</p>
+                <p className="font-normal text-xs md:text-sm text-left">{t.stockOutDesc}</p>
               </div>
             </Button>
             <Button
               onClick={() => setCreatePoOpen(true)}
-              className="w-full justify-start h-auto p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
+              className="w-full justify-start h-auto p-3 md:p-4 bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500"
               disabled={isHrdUser || isStandardUser}
             >
-              <div className="bg-white/20 p-2 rounded-lg mr-4">
+              <div className="bg-white/20 p-2 rounded-lg mr-2 md:mr-4">
                 <FileText className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-base">{t.createPO}</p>
-                <p className="font-normal text-sm text-left">{t.createPODesc}</p>
+                <p className="font-semibold text-sm md:text-base">{t.createPO}</p>
+                <p className="font-normal text-xs md:text-sm text-left">{t.createPODesc}</p>
               </div>
             </Button>
           </CardContent>
         </Card>
         <Card className="lg:col-span-2">
-          <CardHeader className="p-4 md:p-6">
+          <CardHeader className="p-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="bg-primary/10 p-2 rounded-md">
@@ -1450,13 +1450,13 @@ export default function DashboardPage() {
                   className="w-full sm:w-auto"
                   onValueChange={(value: 'bar' | 'line' | 'area') => value && setChartType(value)}
                 >
-                  <ToggleGroupItem value="bar" aria-label="Bar chart">
+                  <ToggleGroupItem value="bar" aria-label="Bar chart" className="px-2 h-9">
                     <BarChart4 className="h-4 w-4" />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="line" aria-label="Line chart">
+                  <ToggleGroupItem value="line" aria-label="Line chart" className="px-2 h-9">
                     <LineChartIcon className="h-4 w-4" />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="area" aria-label="Area chart">
+                  <ToggleGroupItem value="area" aria-label="Area chart" className="px-2 h-9">
                     <AreaChartIcon className="h-4 w-4" />
                   </ToggleGroupItem>
                 </ToggleGroup>
@@ -1467,14 +1467,14 @@ export default function DashboardPage() {
                   className="w-full sm:w-auto"
                   onValueChange={(value: 'daily' | 'monthly') => value && setTimePeriod(value)}
                 >
-                  <ToggleGroupItem value="daily" aria-label="Daily view">{t.daily}</ToggleGroupItem>
-                  <ToggleGroupItem value="monthly" aria-label="Monthly view">{t.monthly}</ToggleGroupItem>
+                  <ToggleGroupItem value="daily" aria-label="Daily view" className="text-xs h-9">{t.daily}</ToggleGroupItem>
+                  <ToggleGroupItem value="monthly" aria-label="Monthly view" className="text-xs h-9">{t.monthly}</ToggleGroupItem>
                 </ToggleGroup>
                 <Select
                   value={selectedChartItem}
                   onValueChange={setSelectedChartItem}
                 >
-                  <SelectTrigger className="w-full md:w-auto">
+                  <SelectTrigger className="w-full md:w-[120px] h-9 text-xs">
                     <SelectValue placeholder="Select an item" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1489,7 +1489,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="p-4 pt-0">
             <div className="overflow-x-auto h-[350px] flex items-end">
               <ChartContainer
                 config={chartConfig}
@@ -1545,13 +1545,13 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <CardHeader className="p-4 md:p-6">
+        <CardHeader className="p-4">
           <CardTitle>{t.recentTransactions}</CardTitle>
           <CardDescription>
             {t.recentTransactionsDesc}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+        <CardContent className="p-4 pt-0">
           {recentTransactions.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
@@ -2174,9 +2174,5 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-      
 
     
