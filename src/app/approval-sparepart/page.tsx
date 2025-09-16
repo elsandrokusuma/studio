@@ -1402,7 +1402,7 @@ export default function ApprovalSparepartPage() {
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4 md:flex md:items-center">
+          <div className="grid grid-cols-[1fr_1fr_auto] gap-2 md:flex md:items-center md:gap-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t.allStatus} />
@@ -1425,9 +1425,11 @@ export default function ApprovalSparepartPage() {
               </Select>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant={"outline"} className="w-full col-span-2 justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
+                <Button variant={"outline"} className="w-full md:w-auto md:min-w-[200px] justify-start text-left font-normal">
+                  <CalendarIcon className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">
+                    {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
+                  </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -1436,7 +1438,7 @@ export default function ApprovalSparepartPage() {
             </Popover>
 
              {showClearOptions && (
-              <div className="col-span-2 flex items-center justify-between md:ml-auto md:w-auto md:justify-start md:gap-4">
+              <div className="col-span-3 flex items-center justify-between md:ml-auto md:w-auto md:justify-start md:gap-4">
                   <div className="flex items-center space-x-2">
                       <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
                       <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
