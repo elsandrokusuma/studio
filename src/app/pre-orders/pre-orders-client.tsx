@@ -1415,7 +1415,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   </Button>
                 )}
                 {(canExport || isHrdUser) && (
-                  <Button onClick={handleExportPdf} size="sm" className="md:size-auto">
+                  <Button variant="outline" onClick={handleExportPdf} size="sm" className="md:size-auto">
                     <FileDown className="mr-2 h-4 w-4" />
                     <span className="hidden md:inline">{t.export}</span>
                   </Button>

@@ -1246,7 +1246,7 @@ export default function ApprovalSparepartPage() {
             {t.description(totalRequestsCount, totalLineItems)}
           </p>
         </div>
-        <div className="flex w-full md:w-auto items-center justify-between gap-2">
+        <div className="flex w-full md:w-auto items-center justify-between md:justify-start gap-2">
             {selectedRows.length > 0 && (
                 <div className="flex items-center gap-2">
                     <Button onClick={handleRequestApproval} disabled={!canRequestApproval} size="sm" className="md:size-auto">
@@ -1269,7 +1269,7 @@ export default function ApprovalSparepartPage() {
             )}
             <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
                 <DialogTrigger asChild>
-                  <Button className={cn(selectedRows.length > 0 && "flex-1 md:flex-initial")}>
+                  <Button className={cn("flex-1 md:flex-initial", selectedRows.length > 0 && "md:flex-1")}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {t.createRequest}
                   </Button>
@@ -1394,7 +1394,7 @@ export default function ApprovalSparepartPage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="grid grid-cols-[1fr_auto] md:flex md:items-center gap-2">
+                <div className="grid grid-cols-[1fr_auto] gap-2 md:hidden">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger>
                             <SelectValue placeholder={t.allStatus} />
@@ -1409,11 +1409,33 @@ export default function ApprovalSparepartPage() {
                     </Select>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant={"outline"} className="w-full justify-center md:justify-start text-left font-normal px-3 md:min-w-[200px]">
-                                <CalendarIcon className="h-4 w-4 md:mr-2" />
-                                <span className="hidden md:inline">
-                                    {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
-                                </span>
+                            <Button variant={"outline"} className="w-full justify-center text-left font-normal px-3">
+                                <CalendarIcon className="h-4 w-4" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                <div className="hidden md:flex md:items-center gap-2">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="min-w-[180px]">
+                            <SelectValue placeholder={t.allStatus} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">{t.allStatus}</SelectItem>
+                            <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+                            <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+                            <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+                            <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant={"outline"} className="w-full justify-start text-left font-normal px-3 min-w-[240px]">
+                                <CalendarIcon className="h-4 w-4 mr-2" />
+                                {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
