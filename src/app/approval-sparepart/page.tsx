@@ -1209,6 +1209,7 @@ export default function ApprovalSparepartPage() {
   
   const canRequestApproval = selectedRows.some(poNumber => groupedRequests.find(po => po.requestNumber === poNumber)?.status === 'Pending');
   const isHrdUser = user && user.email === 'krezthrd@gmail.com';
+  const showClearOptions = searchQuery || statusFilter !== 'all' || dateFilter;
 
 
   if (loading || authLoading) {
@@ -1389,7 +1390,7 @@ export default function ApprovalSparepartPage() {
       </div>
       
        <Card>
-        <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
+        <CardContent className="p-4 flex flex-col gap-4">
           <div className="relative flex-grow w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -1400,42 +1401,50 @@ export default function ApprovalSparepartPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder={t.allStatus} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.allStatus}</SelectItem>
-              <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
-              <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
-              <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
-              <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder={t.allTime} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-time">{t.allTime}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
-            </PopoverContent>
-          </Popover>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
-            <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
+          
+          <div className="grid grid-cols-2 gap-4 md:flex md:items-center">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t.allStatus} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.allStatus}</SelectItem>
+                  <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+                  <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+                  <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+                  <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t.allTime} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all-time">{t.allTime}</SelectItem>
+                </SelectContent>
+              </Select>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant={"outline"} className="w-full col-span-2 justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
+              </PopoverContent>
+            </Popover>
+
+             {showClearOptions && (
+              <div className="col-span-2 flex items-center justify-between md:ml-auto md:w-auto md:justify-start md:gap-4">
+                  <div className="flex items-center space-x-2">
+                      <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
+                      <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
+                  </div>
+                  <Button variant="ghost" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setDateFilter(undefined); setSelectedRows([]); }}>{t.clearFilters}</Button>
+              </div>
+            )}
           </div>
-          <Button variant="ghost" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setDateFilter(undefined); setSelectedRows([]); }}>{t.clearFilters}</Button>
         </CardContent>
       </Card>
 
