@@ -1508,11 +1508,11 @@ export default function InventoryPage() {
                 )}
             </div>
 
-            <div className="md:hidden flex-grow flex items-center gap-2">
+            <div className="flex md:hidden flex-grow items-center gap-2">
                 {!isHrdUser && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="flex-1">
                         {t.actions}
                         <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
@@ -1537,7 +1537,7 @@ export default function InventoryPage() {
                 {!isHrdUser && (
                 <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
                     <DialogTrigger asChild>
-                    <Button className="flex-grow">
+                    <Button className="flex-1">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         {t.addItem}
                     </Button>
@@ -1820,7 +1820,7 @@ export default function InventoryPage() {
       
       {/* Photo Viewer Dialog */}
       <Dialog open={isPhotoOpen} onOpenChange={setPhotoOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="max-w-xs sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="hidden sm:block">{t.itemPhoto}</DialogTitle>
             <DialogDescription className="hidden sm:block">
@@ -1829,7 +1829,7 @@ export default function InventoryPage() {
           </DialogHeader>
           <div className="flex flex-col gap-4">
               {photoToShow && (
-                <div className="relative aspect-square sm:aspect-auto sm:h-[400px] w-full">
+                <div className="relative aspect-square w-full">
                     <Image
                     src={photoToShow}
                     alt={selectedItem?.name || 'Enlarged inventory item'}
