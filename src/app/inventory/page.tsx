@@ -1392,7 +1392,7 @@ export default function InventoryPage() {
             {t.description}
           </p>
         </div>
-        <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
+        <div className="flex flex-col w-full md:w-auto md:items-center gap-2">
            <div className="relative flex-grow w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -1403,68 +1403,141 @@ export default function InventoryPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <ToggleGroup type="single" value={layout} onValueChange={(value: 'list' | 'grid') => value && setLayout(value)} variant="outline">
-            <ToggleGroupItem value="list" aria-label="List view">
-              <List className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="grid" aria-label="Grid view">
-              <LayoutGrid className="h-4 w-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          {!isHrdUser && (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full md:w-auto">
-                    {t.actions}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setImportOpen(true)}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    {t.importFromCsv}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleExportCsv}>
-                    <Download className="mr-2 h-4 w-4" />
-                    {t.exportToCsv}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => setSeedConfirmOpen(true)} className="text-red-600 focus:text-red-700">
-                    <Database className="mr-2 h-4 w-4" />
-                    {t.seedDatabase}
-                </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <ToggleGroup type="single" value={layout} onValueChange={(value: 'list' | 'grid') => value && setLayout(value)} variant="outline">
+                <ToggleGroupItem value="list" aria-label="List view">
+                <List className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="grid" aria-label="Grid view">
+                <LayoutGrid className="h-4 w-4" />
+                </ToggleGroupItem>
+            </ToggleGroup>
+            
+            <div className="hidden md:flex items-center gap-2">
+                {!isHrdUser && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full md:w-auto">
+                        {t.actions}
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        {t.importFromCsv}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleExportCsv}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {t.exportToCsv}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => setSeedConfirmOpen(true)} className="text-red-600 focus:text-red-700">
+                        <Database className="mr-2 h-4 w-4" />
+                        {t.seedDatabase}
+                    </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                )}
+                {!isHrdUser && (
+                <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
+                    <DialogTrigger asChild>
+                    <Button className="w-full md:w-auto">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        {t.addItem}
+                    </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t.addNewItem}</DialogTitle>
+                        <DialogDescription>
+                        {t.addNewItemDesc}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleAddItem} className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">{t.name}</Label>
+                        <Input id="name" name="name" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="price" className="text-right">{t.price}</Label>
+                        <Input id="price" name="price" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="unit" className="text-right">{t.unit}</Label>
+                        <Select name="unit" required onValueChange={setSelectedUnit}>
+                            <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="Select a unit" />
+                            </SelectTrigger>
+                            <SelectContent>
+                            {Object.entries(t.unitsFull).map(([key, value]) => (
+                                <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="quantity" className="text-right">{t.quantity}</Label>
+                        <Input id="quantity" name="quantity" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="photoUrl" className="text-right">{t.photoUrl}</Label>
+                        <div className="col-span-3 flex items-center gap-2">
+                            <Input 
+                                id="photoUrl" 
+                                name="photoUrl" 
+                                type="text" 
+                                placeholder={t.pasteGdrive} 
+                                className="flex-grow"
+                                value={photoUrl}
+                                onChange={(e) => setPhotoUrl(e.target.value)}
+                            />
+                            <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
+                                <Camera className="h-4 w-4" />
+                                <span className="sr-only">{t.takePhoto}</span>
+                            </Button>
+                        </div>
+                        </div>
+                        <DialogFooter>
+                        <Button type="submit">{t.saveItem}</Button>
+                        </DialogFooter>
+                    </form>
+                    </DialogContent>
+                </Dialog>
+                )}
+            </div>
 
-          <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t.importTitle}</DialogTitle>
-                <DialogDescription>
-                  {t.importDesc}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                  <Label htmlFor="csv-file">{t.csvFile}</Label>
-                  <Input 
-                    id="csv-file" 
-                    type="file" 
-                    accept=".csv"
-                    onChange={(e) => setCsvFile(e.target.files ? e.target.files[0] : null)}
-                  />
-              </div>
-              <DialogFooter>
-                <Button onClick={handleImportCsv} disabled={!csvFile || isImporting}>
-                  {isImporting ? t.importing : t.importData}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          {!isHrdUser && (
+            <div className="md:hidden flex-grow">
+                {!isHrdUser && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                        {t.actions}
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)]">
+                    <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        {t.importFromCsv}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleExportCsv}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {t.exportToCsv}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => setSeedConfirmOpen(true)} className="text-red-600 focus:text-red-700">
+                        <Database className="mr-2 h-4 w-4" />
+                        {t.seedDatabase}
+                    </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                )}
+            </div>
+            {!isHrdUser && (
             <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
                 <DialogTrigger asChild>
-                <Button className="w-full md:w-auto">
+                <Button className="md:hidden flex-grow">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {t.addItem}
                 </Button>
@@ -1526,7 +1599,32 @@ export default function InventoryPage() {
                 </form>
                 </DialogContent>
             </Dialog>
-          )}
+            )}
+            <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t.importTitle}</DialogTitle>
+                <DialogDescription>
+                  {t.importDesc}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                  <Label htmlFor="csv-file">{t.csvFile}</Label>
+                  <Input 
+                    id="csv-file" 
+                    type="file" 
+                    accept=".csv"
+                    onChange={(e) => setCsvFile(e.target.files ? e.target.files[0] : null)}
+                  />
+              </div>
+              <DialogFooter>
+                <Button onClick={handleImportCsv} disabled={!csvFile || isImporting}>
+                  {isImporting ? t.importing : t.importData}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
         </div>
       </header>
       
