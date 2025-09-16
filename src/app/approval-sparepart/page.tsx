@@ -1391,7 +1391,7 @@ export default function ApprovalSparepartPage() {
       
       <Card>
         <CardContent className="p-4 flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row md:items-center gap-2">
+             <div className="flex flex-col md:flex-row md:items-center gap-2">
                 <div className="relative flex-grow">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -1402,7 +1402,7 @@ export default function ApprovalSparepartPage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="grid grid-cols-2 md:flex md:items-center gap-2">
+                <div className="grid grid-cols-[1fr_auto] md:flex md:items-center gap-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder={t.allStatus} />
@@ -1417,7 +1417,7 @@ export default function ApprovalSparepartPage() {
                     </Select>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant={"outline"} className="w-full justify-start text-left font-normal px-3 md:min-w-[200px]">
+                            <Button variant={"outline"} className="w-full justify-center md:justify-start text-left font-normal px-3 md:min-w-[200px]">
                                 <CalendarIcon className="h-4 w-4 md:mr-2" />
                                 <span className="hidden md:inline">
                                     {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
