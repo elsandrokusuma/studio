@@ -1391,56 +1391,56 @@ export default function ApprovalSparepartPage() {
       
        <Card>
         <CardContent className="p-4 flex flex-col gap-4">
-          <div className="relative flex-grow w-full">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t.searchPlaceholder}
-              className="pl-8 w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex flex-col md:flex-row md:items-center gap-2">
-            <div className="grid grid-cols-2 md:flex md:flex-1 gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t.allStatus} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t.allStatus}</SelectItem>
-                  <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
-                  <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
-                  <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
-                  <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t.allTime} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-time">{t.allTime}</SelectItem>
-                </SelectContent>
-              </Select>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant={"outline"} className="w-full md:w-auto md:min-w-[200px] justify-start text-left font-normal">
-                  <CalendarIcon className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">
-                    {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
-                  </span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
-              </PopoverContent>
-            </Popover>
-           </div>
+            <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <div className="relative flex-grow w-full">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    type="search"
+                    placeholder={t.searchPlaceholder}
+                    className="pl-8 w-full"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <div className="grid grid-cols-3 md:flex md:flex-1 gap-2">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t.allStatus} />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="all">{t.allStatus}</SelectItem>
+                        <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+                        <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+                        <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+                        <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select>
+                        <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t.allTime} />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="all-time">{t.allTime}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant={"outline"} className="w-full justify-start text-left font-normal px-3 md:min-w-[200px]">
+                                <CalendarIcon className="h-4 w-4 md:mr-2" />
+                                <span className="hidden md:inline">
+                                    {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.pickDate}</span>}
+                                </span>
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+            </div>
 
              {showClearOptions && (
-              <div className="flex items-center justify-between md:ml-auto md:w-auto md:justify-start md:gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-border">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                   <div className="flex items-center space-x-2">
                       <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
                       <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
@@ -1448,7 +1448,6 @@ export default function ApprovalSparepartPage() {
                   <Button variant="ghost" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setDateFilter(undefined); setSelectedRows([]); }}>{t.clearFilters}</Button>
               </div>
             )}
-          </div>
         </CardContent>
       </Card>
 
