@@ -1217,10 +1217,11 @@ export default function InventoryPage() {
   };
 
 
-  const handlePhotoClick = (photoUrl: string | undefined | null) => {
-    const { src: imageUrl } = getDisplayImage(photoUrl);
+  const handlePhotoClick = (item: InventoryItem) => {
+    const { src: imageUrl } = getDisplayImage(item.photoUrl);
     if (imageUrl) {
         setPhotoToShow(imageUrl);
+        setSelectedItem(item);
         setPhotoOpen(true);
     }
   };
@@ -1652,7 +1653,7 @@ export default function InventoryPage() {
                     return (
                     <TableRow key={item.id}>
                       <TableCell className="hidden sm:table-cell">
-                        <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
+                        <div className="cursor-pointer" onClick={() => handlePhotoClick(item)}>
                           <Image
                             alt={item.name}
                             className="aspect-square rounded-md object-cover"
@@ -1748,7 +1749,7 @@ export default function InventoryPage() {
               <Card key={item.id} className="flex flex-col">
                 <CardHeader className="p-0">
                   <div className="relative">
-                    <div className="cursor-pointer" onClick={() => handlePhotoClick(item.photoUrl)}>
+                    <div className="cursor-pointer" onClick={() => handlePhotoClick(item)}>
                       <Image
                           alt={item.name}
                           className="aspect-video w-full rounded-t-lg object-cover"
@@ -1819,23 +1820,39 @@ export default function InventoryPage() {
       
       {/* Photo Viewer Dialog */}
       <Dialog open={isPhotoOpen} onOpenChange={setPhotoOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t.itemPhoto}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="hidden sm:block">{t.itemPhoto}</DialogTitle>
+            <DialogDescription className="hidden sm:block">
              {t.itemPhotoDesc}
             </DialogDescription>
           </DialogHeader>
-          {photoToShow && (
-             <Image
-              src={photoToShow}
-              alt="Enlarged inventory item"
-              width={600}
-              height={400}
-              className="rounded-lg object-contain w-full"
-              unoptimized={photoToShow.includes('googleusercontent')}
-            />
-          )}
+          <div className="flex flex-col gap-4">
+              {photoToShow && (
+                <div className="relative aspect-square sm:aspect-auto sm:h-[400px] w-full">
+                    <Image
+                    src={photoToShow}
+                    alt={selectedItem?.name || 'Enlarged inventory item'}
+                    fill
+                    className="rounded-lg object-contain"
+                    unoptimized={photoToShow.includes('googleusercontent')}
+                    />
+                </div>
+              )}
+              {selectedItem && (
+                  <div className="sm:hidden flex flex-col gap-2 p-2 rounded-lg bg-muted/50">
+                      <h3 className="font-bold text-lg">{selectedItem.name}</h3>
+                      <div className="flex justify-between items-center text-sm">
+                          <p className="text-muted-foreground">{t.price}</p>
+                          <p className="font-semibold">{formatCurrency(selectedItem.price)}</p>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                          <p className="text-muted-foreground">{t.quantity}</p>
+                          <p className="font-semibold">{selectedItem.quantity} {getUnitText(selectedItem.unit)}</p>
+                      </div>
+                  </div>
+              )}
+          </div>
         </DialogContent>
       </Dialog>
       
