@@ -1389,38 +1389,30 @@ export default function ApprovalSparepartPage() {
         </Card>
       </div>
       
-       <Card>
+      <Card>
         <CardContent className="p-4 flex flex-col gap-4">
             <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <div className="relative flex-grow w-full">
+                <div className="relative flex-grow">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                    type="search"
-                    placeholder={t.searchPlaceholder}
-                    className="pl-8 w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                        type="search"
+                        placeholder={t.searchPlaceholder}
+                        className="pl-8 w-full"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <div className="grid grid-cols-3 md:flex md:flex-1 gap-2">
+                <div className="grid grid-cols-2 md:flex md:items-center gap-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t.allStatus} />
+                            <SelectValue placeholder={t.allStatus} />
                         </SelectTrigger>
                         <SelectContent>
-                        <SelectItem value="all">{t.allStatus}</SelectItem>
-                        <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
-                        <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
-                        <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
-                        <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Select>
-                        <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t.allTime} />
-                        </SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="all-time">{t.allTime}</SelectItem>
+                            <SelectItem value="all">{t.allStatus}</SelectItem>
+                            <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+                            <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+                            <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+                            <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Popover>
@@ -1713,3 +1705,5 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
+
+    
