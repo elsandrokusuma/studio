@@ -1507,7 +1507,7 @@ export default function InventoryPage() {
                 )}
             </div>
 
-            <div className="md:hidden flex-grow">
+            <div className="md:hidden flex-grow flex items-center gap-2">
                 {!isHrdUser && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -1533,73 +1533,73 @@ export default function InventoryPage() {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 )}
+                {!isHrdUser && (
+                <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
+                    <DialogTrigger asChild>
+                    <Button className="flex-grow">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        {t.addItem}
+                    </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t.addNewItem}</DialogTitle>
+                        <DialogDescription>
+                        {t.addNewItemDesc}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleAddItem} className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">{t.name}</Label>
+                        <Input id="name" name="name" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="price" className="text-right">{t.price}</Label>
+                        <Input id="price" name="price" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="unit" className="text-right">{t.unit}</Label>
+                        <Select name="unit" required onValueChange={setSelectedUnit}>
+                            <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="Select a unit" />
+                            </SelectTrigger>
+                            <SelectContent>
+                            {Object.entries(t.unitsFull).map(([key, value]) => (
+                                <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="quantity" className="text-right">{t.quantity}</Label>
+                        <Input id="quantity" name="quantity" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="photoUrl" className="text-right">{t.photoUrl}</Label>
+                        <div className="col-span-3 flex items-center gap-2">
+                            <Input 
+                                id="photoUrl" 
+                                name="photoUrl" 
+                                type="text" 
+                                placeholder={t.pasteGdrive} 
+                                className="flex-grow"
+                                value={photoUrl}
+                                onChange={(e) => setPhotoUrl(e.target.value)}
+                            />
+                            <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
+                                <Camera className="h-4 w-4" />
+                                <span className="sr-only">{t.takePhoto}</span>
+                            </Button>
+                        </div>
+                        </div>
+                        <DialogFooter>
+                        <Button type="submit">{t.saveItem}</Button>
+                        </DialogFooter>
+                    </form>
+                    </DialogContent>
+                </Dialog>
+                )}
             </div>
-            {!isHrdUser && (
-            <Dialog open={isAddOpen} onOpenChange={(isOpen) => { setAddOpen(isOpen); if (!isOpen) setPhotoUrl(""); }}>
-                <DialogTrigger asChild>
-                <Button className="md:hidden flex-grow">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    {t.addItem}
-                </Button>
-                </DialogTrigger>
-                <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t.addNewItem}</DialogTitle>
-                    <DialogDescription>
-                    {t.addNewItemDesc}
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAddItem} className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">{t.name}</Label>
-                    <Input id="name" name="name" className="col-span-3" required />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right">{t.price}</Label>
-                    <Input id="price" name="price" type="number" className="col-span-3" required />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="unit" className="text-right">{t.unit}</Label>
-                    <Select name="unit" required onValueChange={setSelectedUnit}>
-                        <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Select a unit" />
-                        </SelectTrigger>
-                        <SelectContent>
-                        {Object.entries(t.unitsFull).map(([key, value]) => (
-                            <SelectItem key={key} value={key}>{value}</SelectItem>
-                          ))}
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="quantity" className="text-right">{t.quantity}</Label>
-                    <Input id="quantity" name="quantity" type="number" className="col-span-3" required />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="photoUrl" className="text-right">{t.photoUrl}</Label>
-                    <div className="col-span-3 flex items-center gap-2">
-                        <Input 
-                            id="photoUrl" 
-                            name="photoUrl" 
-                            type="text" 
-                            placeholder={t.pasteGdrive} 
-                            className="flex-grow"
-                            value={photoUrl}
-                            onChange={(e) => setPhotoUrl(e.target.value)}
-                        />
-                        <Button type="button" size="icon" variant="outline" onClick={() => setCameraOpen(true)}>
-                            <Camera className="h-4 w-4" />
-                            <span className="sr-only">{t.takePhoto}</span>
-                        </Button>
-                    </div>
-                    </div>
-                    <DialogFooter>
-                    <Button type="submit">{t.saveItem}</Button>
-                    </DialogFooter>
-                </form>
-                </DialogContent>
-            </Dialog>
-            )}
             <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
             <DialogContent>
               <DialogHeader>
@@ -1741,7 +1741,7 @@ export default function InventoryPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredItems.map((item) => {
              const { src, isPlaceholder } = getDisplayImage(item.photoUrl);
              return (
