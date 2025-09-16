@@ -32,8 +32,7 @@ export default function RootLayout({
         
         {/* Manifest and theme color for PWA */}
         <link rel="manifest" href="/site.webmanifest?v=9" />
-        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#000000" />
 
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />

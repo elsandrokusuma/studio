@@ -1563,7 +1563,7 @@ export default function DashboardPage() {
                   <TableRow>
                     <TableHead>{t.item}</TableHead>
                     <TableHead className="text-right">{t.qty}</TableHead>
-                    <TableHead className="text-right hidden sm:table-cell">
+                    <TableHead className="text-right">
                       {t.type}
                     </TableHead>
                   </TableRow>
@@ -1582,33 +1582,11 @@ export default function DashboardPage() {
                         <div className="text-sm text-muted-foreground">
                           {new Date(transaction.date).toLocaleDateString()}
                         </div>
-                         <div className="sm:hidden mt-1">
-                           <Badge
-                            variant={
-                              transaction.type === "in" ||
-                              transaction.type === "add"
-                                ? "default"
-                                : transaction.type === "edit"
-                                ? "secondary"
-                                : "destructive"
-                            }
-                            className={
-                              transaction.type === "in" ||
-                              transaction.type === "add"
-                                ? "bg-green-100 text-green-800"
-                                : transaction.type === "edit"
-                                ? "bg-gray-100 text-gray-800"
-                                : "bg-red-100 text-red-800"
-                            }
-                          >
-                             {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                          </Badge>
-                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         {transaction.quantity}
                       </TableCell>
-                      <TableCell className="text-right hidden sm:table-cell">
+                      <TableCell className="text-right">
                         <Badge
                           variant={
                             transaction.type === "in" ||
