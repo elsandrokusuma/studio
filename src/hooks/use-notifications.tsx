@@ -29,21 +29,45 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true); // Component is now mounted on the client
+    setIsMounted(true);
+    try {
+        const storedNotifications = sessionStorage.getItem('userNotifications');
+        if (storedNotifications) {
+            setNotifications(prev => [...JSON.parse(storedNotifications), ...prev.filter(n => n.id.startsWith('system-'))]);
+        }
+    } catch (error) {
+        console.error("Failed to parse notifications from sessionStorage", error);
+    }
   }, []);
   
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
-    // User-generated notifications are only stored in local state and not persisted.
-    setNotifications(prev => [{ ...notification, id: `notif-${notificationId++}` }, ...prev]);
+    setNotifications(prev => {
+        const newNotif = { ...notification, id: `notif-${notificationId++}` };
+        const updatedNotifications = [newNotif, ...prev];
+        
+        try {
+            // Persist only user-generated notifications
+            const userNotifications = updatedNotifications.filter(n => n.id.startsWith('notif-'));
+            sessionStorage.setItem('userNotifications', JSON.stringify(userNotifications));
+        } catch (error) {
+            console.error("Failed to save notifications to sessionStorage", error);
+        }
+        
+        return updatedNotifications;
+    });
   }, []);
 
   const clearNotifications = useCallback(() => {
-    // Only keep system notifications from Firestore
     setNotifications(prev => prev.filter(n => n.id.startsWith('system-')));
+    try {
+        sessionStorage.removeItem('userNotifications');
+    } catch (error) {
+        console.error("Failed to clear notifications from sessionStorage", error);
+    }
   }, []);
-
+  
   useEffect(() => {
-    if (!db || !isMounted) return; // Only run on client after mount
+    if (!db || !isMounted) return;
 
     const unsubs: (() => void)[] = [];
 
@@ -52,7 +76,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       statusField: string,
       statusValue: string,
       groupByField: string,
-      notificationType: string, // Unique key for this notification type
+      notificationType: string,
       title: string,
       href: string,
       icon: React.ElementType
@@ -60,9 +84,9 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       const q = query(collection(db, collectionName), where(statusField, "==", statusValue));
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const uniqueItems = new Set(snapshot.docs.map(doc => doc.data()[groupByField]));
+        
         setNotifications(prev => {
-          // Remove old notification of this type
-          const others = prev.filter(n => n.id !== `system-${notificationType}` && !n.id.startsWith('notif-'));
+          const others = prev.filter(n => n.id !== `system-${notificationType}`);
           if (uniqueItems.size > 0) {
             return [{
               id: `system-${notificationType}`,
@@ -81,22 +105,17 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
     const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
         setNotifications(prev => {
-            // Keep user-added notifications and filter out old system notifications
-            const userNotifications = prev.filter(n => n.id.startsWith('notif-'));
-            const otherSystemNotifications = prev.filter(n => n.id.startsWith('system-') && n.id !== 'system-low_stock');
-            
-            let newNotifications = [...userNotifications, ...otherSystemNotifications];
-
+            const others = prev.filter(n => n.id !== 'system-low_stock');
             if (!snapshot.empty) {
-                newNotifications.unshift({
+                return [{
                     id: 'system-low_stock',
                     title: 'Low Stock Items',
                     description: `You have ${snapshot.size} items with low stock.`,
                     href: '/inventory',
                     icon: AlertCircle,
-                });
+                }, ...others];
             }
-            return newNotifications;
+            return others;
         });
     });
     unsubs.push(unsubscribeLowStock);
@@ -110,9 +129,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     
   }, [isMounted]);
 
-
   const value = { 
-    notifications: isMounted ? notifications : [], // Return empty array until mounted
+    notifications: isMounted ? notifications : [],
     addNotification, 
     clearNotifications 
   };
