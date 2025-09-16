@@ -1358,7 +1358,7 @@ export default function ApprovalSparepartPage() {
         </div>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-1))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t.totalPOs}</CardTitle>
@@ -1377,7 +1377,7 @@ export default function ApprovalSparepartPage() {
             <div className="text-3xl font-bold">{totalLineItems}</div>
           </CardContent>
         </Card>
-        <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-3))' }}>
+        <Card className="col-span-2 lg:col-span-1 text-white" style={{ backgroundColor: 'hsl(var(--summary-card-3))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t.pending}</CardTitle>
             <FileText className="h-4 w-4" />
