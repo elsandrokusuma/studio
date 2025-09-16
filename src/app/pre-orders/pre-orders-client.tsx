@@ -1293,28 +1293,27 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             {t.description}
           </p>
         </div>
-        <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-2">
-           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder={t.allStatuses} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.allStatuses}</SelectItem>
-              <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
-              <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
-              <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
-              <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
-              <SelectItem value="Fulfilled">{t.statuses.Fulfilled}</SelectItem>
-              <SelectItem value="Cancelled">{t.statuses.Cancelled}</SelectItem>
-            </SelectContent>
-          </Select>
-
-           <div className="flex w-full md:w-auto items-center gap-2">
-             <Popover>
+        <div className="flex w-full flex-col md:flex-row md:w-auto items-center gap-2">
+          <div className="flex w-full items-center gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t.allStatuses} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t.allStatuses}</SelectItem>
+                <SelectItem value="Pending">{t.statuses.Pending}</SelectItem>
+                <SelectItem value="Awaiting Approval">{t.statuses['Awaiting Approval']}</SelectItem>
+                <SelectItem value="Approved">{t.statuses.Approved}</SelectItem>
+                <SelectItem value="Rejected">{t.statuses.Rejected}</SelectItem>
+                <SelectItem value="Fulfilled">{t.statuses.Fulfilled}</SelectItem>
+                <SelectItem value="Cancelled">{t.statuses.Cancelled}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Popover>
               <PopoverTrigger asChild>
-                <Button variant={"outline"} className="w-full md:w-auto justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.filterByDate}</span>}
+                <Button variant={"outline"} className="w-auto justify-start text-left font-normal px-3">
+                  <CalendarIcon className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">{dateFilter ? format(dateFilter, "PPP", { locale: currentLocale }) : <span>{t.filterByDate}</span>}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -1322,108 +1321,188 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
               </PopoverContent>
             </Popover>
             {dateFilter && (
-                <Button variant="ghost" size="icon" onClick={() => setDateFilter(undefined)}>
+                <Button variant="ghost" size="icon" onClick={() => setDateFilter(undefined)} className='hidden md:inline-flex'>
                     <X className="h-4 w-4" />
                 </Button>
             )}
-           </div>
-          
-          {selectedRows.length > 0 && (
-            <>
-              {canPerformWriteActions && (
-                <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
-                  <Send className="mr-2 h-4 w-4" />
-                  {t.requestApproval}
-                </Button>
-              )}
-              {(canExport || isHrdUser) && (
-                <Button onClick={handleExportPdf}>
-                  <FileDown className="mr-2 h-4 w-4" />
-                  {t.export}
-                </Button>
-              )}
-            </>
-          )}
+            {canPerformWriteActions && (
+              <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
+                  <DialogTrigger asChild>
+                  <Button size="icon" className="md:hidden">
+                      <PlusCircle className="h-4 w-4" />
+                  </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                  <DialogHeader>
+                      <DialogTitle>{isCreatingNewPo ? t.createNewPOTitle : t.addItemTitle(activePoNumber)}</DialogTitle>
+                      <DialogDescription>
+                      {isCreatingNewPo ? t.createNewPODesc : t.addItemDesc}
+                      </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="poNumber" className="text-right">{t.poNumber}</Label>
+                      <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="item" className="text-right">{t.item}</Label>
+                      <div className="col-span-3">
+                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                          <PopoverTrigger asChild>
+                              <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
+                              {selectedItemName}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0">
+                              <Command>
+                              <CommandInput placeholder={t.searchItem} />
+                              <CommandList>
+                                  <CommandEmpty>{t.noItemFound}</CommandEmpty>
+                                  <CommandGroup>
+                                  {inventoryItems.map((item) => (
+                                      <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                      <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
+                                      {item.name}
+                                      </CommandItem>
+                                  ))}
+                                  </CommandGroup>
+                              </CommandList>
+                              </Command>
+                          </PopoverContent>
+                          </Popover>
+                      </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="price" className="text-right">{t.price}</Label>
+                      <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="unit" className="text-right">{t.unit}</Label>
+                      <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
+                          <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(t.unitsFull).map(([key, value]) => (
+                              <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                          </SelectContent>
+                      </Select>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
+                      <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
+                      <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
+                      </div>
+                      <DialogFooter>
+                      <Button type="submit">{t.addItemBtn}</Button>
+                      </DialogFooter>
+                  </form>
+                  </DialogContent>
+              </Dialog>
+            )}
+          </div>
 
-          {canPerformWriteActions && (
-            <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
-                <DialogTrigger asChild>
-                <Button>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
-                </Button>
-                </DialogTrigger>
-                <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{isCreatingNewPo ? t.createNewPOTitle : t.addItemTitle(activePoNumber)}</DialogTitle>
-                    <DialogDescription>
-                    {isCreatingNewPo ? t.createNewPODesc : t.addItemDesc}
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="poNumber" className="text-right">{t.poNumber}</Label>
-                    <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="item" className="text-right">{t.item}</Label>
-                    <div className="col-span-3">
-                        <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
-                            {selectedItemName}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[300px] p-0">
-                            <Command>
-                            <CommandInput placeholder={t.searchItem} />
-                            <CommandList>
-                                <CommandEmpty>{t.noItemFound}</CommandEmpty>
-                                <CommandGroup>
-                                {inventoryItems.map((item) => (
-                                    <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
-                                    <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
-                                    {item.name}
-                                    </CommandItem>
-                                ))}
-                                </CommandGroup>
-                            </CommandList>
-                            </Command>
-                        </PopoverContent>
-                        </Popover>
-                    </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="price" className="text-right">{t.price}</Label>
-                    <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="unit" className="text-right">{t.unit}</Label>
-                    <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
-                        <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(t.unitsFull).map(([key, value]) => (
-                            <SelectItem key={key} value={key}>{value}</SelectItem>
-                          ))}
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
-                    <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
-                    <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
-                    </div>
-                    <DialogFooter>
-                    <Button type="submit">{t.addItemBtn}</Button>
-                    </DialogFooter>
-                </form>
-                </DialogContent>
-            </Dialog>
-          )}
+          <div className="hidden md:flex items-center gap-2">
+            {selectedRows.length > 0 && (
+              <>
+                {canPerformWriteActions && (
+                  <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
+                    <Send className="mr-2 h-4 w-4" />
+                    {t.requestApproval}
+                  </Button>
+                )}
+                {(canExport || isHrdUser) && (
+                  <Button onClick={handleExportPdf}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    {t.export}
+                  </Button>
+                )}
+              </>
+            )}
+
+            {canPerformWriteActions && (
+              <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
+                  <DialogTrigger asChild>
+                  <Button>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
+                  </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                  <DialogHeader>
+                      <DialogTitle>{isCreatingNewPo ? t.createNewPOTitle : t.addItemTitle(activePoNumber)}</DialogTitle>
+                      <DialogDescription>
+                      {isCreatingNewPo ? t.createNewPODesc : t.addItemDesc}
+                      </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="poNumber" className="text-right">{t.poNumber}</Label>
+                      <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="item" className="text-right">{t.item}</Label>
+                      <div className="col-span-3">
+                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                          <PopoverTrigger asChild>
+                              <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
+                              {selectedItemName}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0">
+                              <Command>
+                              <CommandInput placeholder={t.searchItem} />
+                              <CommandList>
+                                  <CommandEmpty>{t.noItemFound}</CommandEmpty>
+                                  <CommandGroup>
+                                  {inventoryItems.map((item) => (
+                                      <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                      <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
+                                      {item.name}
+                                      </CommandItem>
+                                  ))}
+                                  </CommandGroup>
+                              </CommandList>
+                              </Command>
+                          </PopoverContent>
+                          </Popover>
+                      </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="price" className="text-right">{t.price}</Label>
+                      <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="unit" className="text-right">{t.unit}</Label>
+                      <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
+                          <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(t.unitsFull).map(([key, value]) => (
+                              <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                          </SelectContent>
+                      </Select>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
+                      <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
+                      <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
+                      </div>
+                      <DialogFooter>
+                      <Button type="submit">{t.addItemBtn}</Button>
+                      </DialogFooter>
+                  </form>
+                  </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
       </header>
       
