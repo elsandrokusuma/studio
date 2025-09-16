@@ -1328,7 +1328,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             {canPerformWriteActions && (
               <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
                   <DialogTrigger asChild>
-                  <Button size="icon" className="md:hidden">
+                  <Button size="icon" className="md:hidden w-auto px-3">
                       <PlusCircle className="h-4 w-4" />
                   </Button>
                   </DialogTrigger>
