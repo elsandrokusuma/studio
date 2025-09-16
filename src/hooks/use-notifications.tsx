@@ -25,7 +25,8 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 let notificationId = 0;
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [userNotifications, setUserNotifications] = useState<Notification[]>([]);
+  const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     try {
         const storedNotifications = sessionStorage.getItem('userNotifications');
         if (storedNotifications) {
-            setNotifications(prev => [...JSON.parse(storedNotifications), ...prev.filter(n => n.id.startsWith('system-'))]);
+            setUserNotifications(JSON.parse(storedNotifications));
         }
     } catch (error) {
         console.error("Failed to parse notifications from sessionStorage", error);
@@ -41,14 +42,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
-    setNotifications(prev => {
+    setUserNotifications(prev => {
         const newNotif = { ...notification, id: `notif-${notificationId++}` };
         const updatedNotifications = [newNotif, ...prev];
         
         try {
-            // Persist only user-generated notifications
-            const userNotifications = updatedNotifications.filter(n => n.id.startsWith('notif-'));
-            sessionStorage.setItem('userNotifications', JSON.stringify(userNotifications));
+            sessionStorage.setItem('userNotifications', JSON.stringify(updatedNotifications));
         } catch (error) {
             console.error("Failed to save notifications to sessionStorage", error);
         }
@@ -58,7 +57,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const clearNotifications = useCallback(() => {
-    setNotifications(prev => prev.filter(n => n.id.startsWith('system-')));
+    setUserNotifications([]);
     try {
         sessionStorage.removeItem('userNotifications');
     } catch (error) {
@@ -85,7 +84,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const uniqueItems = new Set(snapshot.docs.map(doc => doc.data()[groupByField]));
         
-        setNotifications(prev => {
+        setSystemNotifications(prev => {
           const others = prev.filter(n => n.id !== `system-${notificationType}`);
           if (uniqueItems.size > 0) {
             return [{
@@ -104,7 +103,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
     const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
-        setNotifications(prev => {
+        setSystemNotifications(prev => {
             const others = prev.filter(n => n.id !== 'system-low_stock');
             if (!snapshot.empty) {
                 return [{
@@ -128,9 +127,14 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
     
   }, [isMounted]);
+  
+  const combinedNotifications = React.useMemo(() => {
+    if (!isMounted) return [];
+    return [...userNotifications, ...systemNotifications];
+  }, [isMounted, userNotifications, systemNotifications]);
 
   const value = { 
-    notifications: isMounted ? notifications : [],
+    notifications: combinedNotifications,
     addNotification, 
     clearNotifications 
   };
