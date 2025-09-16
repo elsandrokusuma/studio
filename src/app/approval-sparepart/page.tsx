@@ -1359,7 +1359,7 @@ export default function ApprovalSparepartPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="text-white" style={{ backgroundColor: 'hsl(var(--summary-card-1))' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t.totalPOs}</CardTitle>
@@ -1402,7 +1402,8 @@ export default function ApprovalSparepartPage() {
             />
           </div>
           
-          <div className="grid grid-cols-[1fr_1fr_auto] gap-2 md:flex md:items-center md:gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <div className="grid grid-cols-2 md:flex md:flex-1 gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t.allStatus} />
@@ -1436,9 +1437,10 @@ export default function ApprovalSparepartPage() {
                 <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus locale={currentLocale} />
               </PopoverContent>
             </Popover>
+           </div>
 
              {showClearOptions && (
-              <div className="col-span-3 flex items-center justify-between md:ml-auto md:w-auto md:justify-start md:gap-4">
+              <div className="flex items-center justify-between md:ml-auto md:w-auto md:justify-start md:gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-border">
                   <div className="flex items-center space-x-2">
                       <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
                       <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
