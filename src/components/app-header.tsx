@@ -187,6 +187,15 @@ function NotificationBell() {
   );
 }
 
+const ClientOnlyNotificationBell = () => {
+  const [isClient, setIsClient] = React.useState(false);
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient ? <NotificationBell /> : <Button variant="ghost" size="icon" className="relative"><Bell className="h-5 w-5" /></Button>;
+}
+
 
 export function AppHeader() {
   const pathname = usePathname();
@@ -254,7 +263,7 @@ export function AppHeader() {
         
         <div className="flex items-center">
             <div className="flex items-center gap-2">
-                <NotificationBell />
+                <ClientOnlyNotificationBell />
                 <Link href="/settings">
                     <Button variant="ghost" size="icon">
                         <Settings className="h-5 w-5" />
@@ -285,5 +294,3 @@ export function AppHeader() {
     </header>
   )
 }
-
-    
