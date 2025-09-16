@@ -1328,7 +1328,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             {canPerformWriteActions && (
               <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
                   <DialogTrigger asChild>
-                  <Button size="icon" className="md:hidden w-auto px-3">
+                    <Button size="icon" className="md:hidden w-auto px-3 h-10">
                       <PlusCircle className="h-4 w-4" />
                   </Button>
                   </DialogTrigger>
@@ -1405,28 +1405,28 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             )}
           </div>
 
-          <div className="hidden md:flex items-center gap-2">
+          <div className="flex w-full md:w-auto items-center justify-between md:justify-start gap-2">
             {selectedRows.length > 0 && (
-              <>
+              <div className="flex items-center gap-2">
                 {canPerformWriteActions && (
-                  <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
+                  <Button onClick={handleRequestApproval} disabled={!canRequestApproval} size="sm" className="md:size-auto">
                     <Send className="mr-2 h-4 w-4" />
-                    {t.requestApproval}
+                    <span className="hidden md:inline">{t.requestApproval}</span>
                   </Button>
                 )}
                 {(canExport || isHrdUser) && (
-                  <Button onClick={handleExportPdf}>
+                  <Button onClick={handleExportPdf} size="sm" className="md:size-auto">
                     <FileDown className="mr-2 h-4 w-4" />
-                    {t.export}
+                    <span className="hidden md:inline">{t.export}</span>
                   </Button>
                 )}
-              </>
+              </div>
             )}
 
             {canPerformWriteActions && (
               <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
                   <DialogTrigger asChild>
-                  <Button>
+                  <Button className={cn("hidden md:inline-flex", selectedRows.length > 0 && "flex-1 md:flex-initial")}>
                       <PlusCircle className="mr-2 h-4 w-4" />
                       {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
                   </Button>

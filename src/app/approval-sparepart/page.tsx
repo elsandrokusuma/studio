@@ -159,7 +159,6 @@ const translations = {
         pending: "Pending",
         searchPlaceholder: "Search PO or item...",
         allStatus: "All Status",
-        allTime: "All Time",
         pickDate: "Pick date",
         selectAll: "Select All",
         clearFilters: "Clear Filters",
@@ -228,7 +227,6 @@ const translations = {
         pending: "Tertunda",
         searchPlaceholder: "Cari PO atau item...",
         allStatus: "Semua Status",
-        allTime: "Semua Waktu",
         pickDate: "Pilih tanggal",
         selectAll: "Pilih Semua",
         clearFilters: "Hapus Filter",
@@ -297,7 +295,6 @@ const translations = {
         pending: "Pendiente",
         searchPlaceholder: "Buscar OC o artículo...",
         allStatus: "Todos los Estados",
-        allTime: "Todo el Tiempo",
         pickDate: "Seleccionar fecha",
         selectAll: "Seleccionar Todo",
         clearFilters: "Limpiar Filtros",
@@ -366,7 +363,6 @@ const translations = {
         pending: "En attente",
         searchPlaceholder: "Rechercher BC ou article...",
         allStatus: "Tous les Statuts",
-        allTime: "Toute la Période",
         pickDate: "Choisir une date",
         selectAll: "Tout Sélectionner",
         clearFilters: "Effacer les Filtres",
@@ -435,7 +431,6 @@ const translations = {
         pending: "Ausstehend",
         searchPlaceholder: "PO oder Artikel suchen...",
         allStatus: "Alle Status",
-        allTime: "Gesamter Zeitraum",
         pickDate: "Datum auswählen",
         selectAll: "Alle Auswählen",
         clearFilters: "Filter Löschen",
@@ -504,7 +499,6 @@ const translations = {
         pending: "保留中",
         searchPlaceholder: "POまたは品目を検索...",
         allStatus: "すべてのステータス",
-        allTime: "すべての期間",
         pickDate: "日付を選択",
         selectAll: "すべて選択",
         clearFilters: "フィルターをクリア",
@@ -573,7 +567,6 @@ const translations = {
         pending: "대기 중",
         searchPlaceholder: "PO 또는 항목 검색...",
         allStatus: "모든 상태",
-        allTime: "모든 시간",
         pickDate: "날짜 선택",
         selectAll: "모두 선택",
         clearFilters: "필터 지우기",
@@ -642,7 +635,6 @@ const translations = {
         pending: "待处理",
         searchPlaceholder: "搜索采购订单或项目...",
         allStatus: "所有状态",
-        allTime: "所有时间",
         pickDate: "选择日期",
         selectAll: "全选",
         clearFilters: "清除筛选",
@@ -1254,30 +1246,30 @@ export default function ApprovalSparepartPage() {
             {t.description(totalRequestsCount, totalLineItems)}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full md:w-auto items-center justify-between gap-2">
             {selectedRows.length > 0 && (
-                <>
-                <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
-                    <Send className="mr-2 h-4 w-4" />
-                    {t.requestApproval}
-                </Button>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                    <Button variant="outline">
-                        <FileDown className="mr-2 h-4 w-4" />
-                        {t.export}
+                <div className="flex items-center gap-2">
+                    <Button onClick={handleRequestApproval} disabled={!canRequestApproval} size="sm" className="md:size-auto">
+                        <Send className="mr-2 h-4 w-4" />
+                        <span className="hidden md:inline">{t.requestApproval}</span>
                     </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                    <DropdownMenuItem onSelect={handleExportCsv}>{t.exportCsv}</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleExportPdf}>{t.exportPdf}</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-                </>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="md:size-auto">
+                            <FileDown className="mr-2 h-4 w-4" />
+                            <span className="hidden md:inline">{t.export}</span>
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                        <DropdownMenuItem onSelect={handleExportCsv}>{t.exportCsv}</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={handleExportPdf}>{t.exportPdf}</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             )}
             <Dialog open={isCreatePoOpen} onOpenChange={setCreatePoOpen}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button className={cn(selectedRows.length > 0 && "flex-1 md:flex-initial")}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {t.createRequest}
                   </Button>
@@ -1404,7 +1396,7 @@ export default function ApprovalSparepartPage() {
                 </div>
                 <div className="grid grid-cols-[1fr_auto] md:flex md:items-center gap-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger>
                             <SelectValue placeholder={t.allStatus} />
                         </SelectTrigger>
                         <SelectContent>
