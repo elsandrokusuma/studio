@@ -1393,8 +1393,8 @@ export default function InventoryPage() {
             {t.description}
           </p>
         </div>
-        <div className="flex flex-col w-full md:w-auto md:items-center gap-2">
-           <div className="relative flex-grow w-full">
+        <div className="flex flex-col md:flex-row w-full md:w-auto md:items-center gap-2">
+           <div className="relative flex-grow w-full md:w-auto">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -1414,7 +1414,7 @@ export default function InventoryPage() {
                 </ToggleGroupItem>
             </ToggleGroup>
             
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex flex-grow items-center gap-2">
                 {!isHrdUser && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -1601,7 +1601,8 @@ export default function InventoryPage() {
                 </Dialog>
                 )}
             </div>
-            <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
+          </div>
+          <Dialog open={isImportOpen} onOpenChange={setImportOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t.importTitle}</DialogTitle>
@@ -1625,7 +1626,6 @@ export default function InventoryPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
         </div>
       </header>
       
