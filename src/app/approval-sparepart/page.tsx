@@ -1432,17 +1432,17 @@ export default function ApprovalSparepartPage() {
             </div>
 
              {showClearOptions && (
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                  <div className="flex items-center space-x-2">
-                      <Checkbox id="select-all" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
-                      <Label htmlFor="select-all" className="whitespace-nowrap">{t.selectAll}</Label>
-                  </div>
+              <div className="flex items-center justify-end pt-2 border-t border-border">
                   <Button variant="ghost" onClick={() => { setSearchQuery(""); setStatusFilter("all"); setDateFilter(undefined); setSelectedRows([]); }}>{t.clearFilters}</Button>
               </div>
             )}
         </CardContent>
       </Card>
-
+      
+      <div className="hidden sm:flex items-center space-x-2 px-4">
+        <Checkbox id="select-all-desktop" checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} />
+        <Label htmlFor="select-all-desktop">{t.selectAll}</Label>
+      </div>
 
       {filteredRequests.length > 0 ? (
         <Accordion type="single" collapsible className="w-full space-y-4" value={openAccordion} onValueChange={setOpenAccordion}>
@@ -1705,5 +1705,3 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
-
-    
