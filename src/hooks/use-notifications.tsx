@@ -24,49 +24,23 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 let notificationId = 0;
 
-const NOTIFICATION_STORAGE_KEY = 'app-notifications';
-
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Load notifications from sessionStorage on initial mount
   useEffect(() => {
     setIsMounted(true); // Component is now mounted on the client
-    try {
-      const storedNotifications = sessionStorage.getItem(NOTIFICATION_STORAGE_KEY);
-      if (storedNotifications) {
-        setNotifications(JSON.parse(storedNotifications));
-      }
-    } catch (error) {
-      console.error("Failed to parse notifications from sessionStorage", error);
-    }
   }, []);
   
-  // Save notifications to sessionStorage whenever they change
-  useEffect(() => {
-    if (!isMounted) return; // Only run on client after mount
-    try {
-      sessionStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifications));
-    } catch (error) {
-      console.error("Failed to save notifications to sessionStorage", error);
-    }
-  }, [notifications, isMounted]);
-
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
+    // User-generated notifications are only stored in local state and not persisted.
     setNotifications(prev => [{ ...notification, id: `notif-${notificationId++}` }, ...prev]);
   }, []);
 
   const clearNotifications = useCallback(() => {
+    // Only keep system notifications from Firestore
     setNotifications(prev => prev.filter(n => n.id.startsWith('system-')));
-    // Also clear the storage from non-system notifications
-    try {
-        const systemNotifications = notifications.filter(n => n.id.startsWith('system-'));
-        sessionStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(systemNotifications));
-    } catch (error) {
-        console.error("Failed to clear notifications from sessionStorage", error);
-    }
-  }, [notifications]);
+  }, []);
 
   useEffect(() => {
     if (!db || !isMounted) return; // Only run on client after mount
@@ -88,7 +62,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         const uniqueItems = new Set(snapshot.docs.map(doc => doc.data()[groupByField]));
         setNotifications(prev => {
           // Remove old notification of this type
-          const others = prev.filter(n => n.id !== `system-${notificationType}`);
+          const others = prev.filter(n => n.id !== `system-${notificationType}` && !n.id.startsWith('notif-'));
           if (uniqueItems.size > 0) {
             return [{
               id: `system-${notificationType}`,
@@ -107,17 +81,22 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
     const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
         setNotifications(prev => {
-            const others = prev.filter(n => n.id !== 'system-low_stock');
+            // Keep user-added notifications and filter out old system notifications
+            const userNotifications = prev.filter(n => n.id.startsWith('notif-'));
+            const otherSystemNotifications = prev.filter(n => n.id.startsWith('system-') && n.id !== 'system-low_stock');
+            
+            let newNotifications = [...userNotifications, ...otherSystemNotifications];
+
             if (!snapshot.empty) {
-                return [{
+                newNotifications.unshift({
                     id: 'system-low_stock',
                     title: 'Low Stock Items',
                     description: `You have ${snapshot.size} items with low stock.`,
                     href: '/inventory',
                     icon: AlertCircle,
-                }, ...others];
+                });
             }
-            return others;
+            return newNotifications;
         });
     });
     unsubs.push(unsubscribeLowStock);
