@@ -27,49 +27,33 @@ let notificationId = 0;
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [userNotifications, setUserNotifications] = useState<Notification[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    try {
-        const storedNotifications = sessionStorage.getItem('userNotifications');
-        if (storedNotifications) {
-            setUserNotifications(JSON.parse(storedNotifications));
-        }
-    } catch (error) {
-        console.error("Failed to parse notifications from sessionStorage", error);
-    }
-  }, []);
   
-  const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
-    setUserNotifications(prev => {
-        const newNotif = { ...notification, id: `notif-${notificationId++}` };
-        const updatedNotifications = [newNotif, ...prev];
-        
-        try {
-            sessionStorage.setItem('userNotifications', JSON.stringify(updatedNotifications));
-        } catch (error) {
-            console.error("Failed to save notifications to sessionStorage", error);
-        }
-        
-        return updatedNotifications;
-    });
-  }, []);
-
-  const clearNotifications = useCallback(() => {
-    setUserNotifications([]);
-    try {
-        sessionStorage.removeItem('userNotifications');
-    } catch (error) {
-        console.error("Failed to clear notifications from sessionStorage", error);
-    }
-  }, []);
-  
+  // This effect will run only once on the client side after the initial render.
   useEffect(() => {
-    if (!db || !isMounted) return;
+    if (!db) return;
 
     const unsubs: (() => void)[] = [];
 
+    // Listener for low stock items
+    const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
+    const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
+        setSystemNotifications(prev => {
+            const others = prev.filter(n => n.id !== 'system-low_stock');
+            if (!snapshot.empty) {
+                return [{
+                    id: 'system-low_stock',
+                    title: 'Low Stock Items',
+                    description: `You have ${snapshot.size} items with low stock.`,
+                    href: '/inventory',
+                    icon: AlertCircle,
+                }, ...others];
+            }
+            return others;
+        });
+    });
+    unsubs.push(unsubscribeLowStock);
+
+    // Generic listener setup function
     const setupListener = (
       collectionName: string,
       statusField: string,
@@ -101,37 +85,32 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       unsubs.push(unsubscribe);
     };
 
-    const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
-    const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
-        setSystemNotifications(prev => {
-            const others = prev.filter(n => n.id !== 'system-low_stock');
-            if (!snapshot.empty) {
-                return [{
-                    id: 'system-low_stock',
-                    title: 'Low Stock Items',
-                    description: `You have ${snapshot.size} items with low stock.`,
-                    href: '/inventory',
-                    icon: AlertCircle,
-                }, ...others];
-            }
-            return others;
-        });
-    });
-    unsubs.push(unsubscribeLowStock);
-
+    // Setting up listeners for approvals
     setupListener("pre-orders", "status", "Awaiting Approval", "poNumber", "stationery_approval", "Stationery Approvals", "/pre-orders", Clock);
     setupListener("sparepart-requests", "status", "Awaiting Approval", "requestNumber", "sparepart_approval", "Sparepart Approvals", "/approval-sparepart", Clock);
 
+    // Cleanup function
     return () => {
       unsubs.forEach(unsub => unsub());
     };
     
-  }, [isMounted]);
-  
+  }, []);
+
+  const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
+    // Add to a temporary, client-side only state. This will not persist across reloads.
+    const newNotif = { ...notification, id: `notif-${notificationId++}` };
+    setUserNotifications(prev => [newNotif, ...prev]);
+  }, []);
+
+  const clearNotifications = useCallback(() => {
+    // This will now only clear the temporary user notifications.
+    setUserNotifications([]);
+  }, []);
+
+  // Combine system notifications (persistent) and user notifications (temporary)
   const combinedNotifications = React.useMemo(() => {
-    if (!isMounted) return [];
     return [...userNotifications, ...systemNotifications];
-  }, [isMounted, userNotifications, systemNotifications]);
+  }, [userNotifications, systemNotifications]);
 
   const value = { 
     notifications: combinedNotifications,

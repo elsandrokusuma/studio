@@ -124,6 +124,7 @@ function NotificationBell() {
   const { language } = useTheme();
   const t = translations[language] || translations.en;
   const hasNotifications = notifications.length > 0;
+  const hasUserNotifications = notifications.some(n => n.id.startsWith('notif-'));
 
   return (
     <Popover>
@@ -141,7 +142,7 @@ function NotificationBell() {
       <PopoverContent className="w-80 p-0">
         <div className="flex items-center justify-between p-4 border-b">
             <h3 className="font-medium">{t.notifications}</h3>
-            {hasNotifications && (
+            {hasUserNotifications && (
               <Button variant="ghost" size="sm" onClick={clearNotifications}>
                 <Trash2 className="mr-2 h-4 w-4" />
                 {t.clearAll}
