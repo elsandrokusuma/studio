@@ -583,42 +583,42 @@ function AccountSettings({ onBack }: { onBack: () => void }) {
                     <CardDescription>{t.profileDesc}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 w-full">
                             {loading ? (
                                 <>
-                                    <Skeleton className="h-16 w-16 rounded-full" />
+                                    <Skeleton className="h-12 w-12 sm:h-16 sm:w-16 rounded-full" />
                                     <div className="space-y-2">
-                                        <Skeleton className="h-6 w-32" />
-                                        <Skeleton className="h-4 w-48" />
+                                        <Skeleton className="h-5 w-24 sm:h-6 sm:w-32" />
+                                        <Skeleton className="h-4 w-32 sm:w-48" />
                                     </div>
                                 </>
                             ) : user ? (
                                 <>
-                                    <Avatar className="h-16 w-16">
+                                    <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
                                         <AvatarImage src={user.photoURL || `https://robohash.org/${user.email}.png`} />
                                         <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
                                     </Avatar>
-                                    <div>
-                                        <p className="font-semibold text-lg">{user.displayName || user.email}</p>
-                                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-base sm:text-lg truncate">{user.displayName || user.email}</p>
+                                        <p className="text-sm text-muted-foreground truncate">{user.email}</p>
                                     </div>
                                 </>
                             ) : (
                                 <div className="flex items-center gap-4 text-muted-foreground">
-                                    <Avatar className="h-16 w-16 bg-muted">
+                                    <Avatar className="h-12 w-12 sm:h-16 sm:w-16 bg-muted">
                                         <AvatarFallback>
-                                            <User className="h-8 w-8 text-muted-foreground" />
+                                            <User className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                                         </AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <p className="font-semibold text-lg">{t.notSignedIn}</p>
+                                        <p className="font-semibold text-base sm:text-lg">{t.notSignedIn}</p>
                                         <p className="text-sm">{t.notSignedInDesc}</p>
                                     </div>
                                 </div>
                             )}
                         </div>
-                        {user && <Button variant="outline" onClick={signOut}>{t.signOut}</Button>}
+                        {user && <Button variant="outline" onClick={signOut} className="w-full sm:w-auto">{t.signOut}</Button>}
                     </div>
                 </CardContent>
             </Card>
