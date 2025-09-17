@@ -14,6 +14,8 @@ import {
   updateDoc,
   deleteDoc,
   orderBy,
+  FieldValue,
+  deleteField,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Papa from "papaparse";
@@ -49,6 +51,7 @@ import {
     Undo2,
     ChevronDown,
     Ban,
+    Eraser,
 } from "lucide-react";
 import {
   Table,
@@ -182,6 +185,7 @@ const translations = {
         editQtyDesc: "Revise the quantity for this item. The original request will be preserved.",
         revisedQtyLabel: "Revised Quantity",
         saveChanges: "Save Changes",
+        clearRevision: "Clear Revision",
         areYouSure: "Are you sure?",
         deleteWarning: (po: string) => `This action cannot be undone. This will permanently delete the request ${po} and all its items.`,
         accessDenied: "Access Denied",
@@ -250,6 +254,7 @@ const translations = {
         editQtyDesc: "Revisi jumlah untuk item ini. Permintaan asli akan tetap tersimpan.",
         revisedQtyLabel: "Jumlah Revisi",
         saveChanges: "Simpan Perubahan",
+        clearRevision: "Hapus Revisi",
         areYouSure: "Apakah Anda yakin?",
         deleteWarning: (po: string) => `Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen permintaan ${po} dan semua itemnya.`,
         accessDenied: "Akses Ditolak",
@@ -318,6 +323,7 @@ const translations = {
         editQtyDesc: "Revise la cantidad para este artículo. La solicitud original se conservará.",
         revisedQtyLabel: "Cantidad Revisada",
         saveChanges: "Guardar Cambios",
+        clearRevision: "Limpiar Revisión",
         areYouSure: "¿Está seguro?",
         deleteWarning: (po: string) => `Esta acción no se puede deshacer. Esto eliminará permanentemente la solicitud ${po} y todos sus artículos.`,
         accessDenied: "Acceso Denegado",
@@ -386,6 +392,7 @@ const translations = {
         editQtyDesc: "Révisez la quantité pour cet article. La demande originale sera conservée.",
         revisedQtyLabel: "Quantité Révisée",
         saveChanges: "Enregistrer les Modifications",
+        clearRevision: "Effacer la révision",
         areYouSure: "Êtes-vous sûr ?",
         deleteWarning: (po: string) => `Cette action est irréversible. Elle supprimera définitivement la demande ${po} et tous ses articles.`,
         accessDenied: "Accès Refusé",
@@ -454,6 +461,7 @@ const translations = {
         editQtyDesc: "Überarbeiten Sie die Menge für diesen Artikel. Die ursprüngliche Anfrage bleibt erhalten.",
         revisedQtyLabel: "Überarbeitete Menge",
         saveChanges: "Änderungen Speichern",
+        clearRevision: "Überarbeitung löschen",
         areYouSure: "Sind Sie sicher?",
         deleteWarning: (po: string) => `Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Anfrage ${po} und alle ihre Artikel dauerhaft gelöscht.`,
         accessDenied: "Zugriff Verweigert",
@@ -522,6 +530,7 @@ const translations = {
         editQtyDesc: "この品目の数量を修正します。元のリクエストは保持されます。",
         revisedQtyLabel: "修正数量",
         saveChanges: "変更を保存",
+        clearRevision: "修正をクリア",
         areYouSure: "よろしいですか？",
         deleteWarning: (po: string) => `この操作は元に戻せません。これにより、リクエスト ${po} とそのすべての品目が完全に削除されます。`,
         accessDenied: "アクセスが拒否されました",
@@ -590,6 +599,7 @@ const translations = {
         editQtyDesc: "이 항목의 수량을 수정합니다. 원래 요청은 보존됩니다.",
         revisedQtyLabel: "수정된 수량",
         saveChanges: "변경 사항 저장",
+        clearRevision: "수정 사항 지우기",
         areYouSure: "확실합니까?",
         deleteWarning: (po: string) => `이 작업은 되돌릴 수 없습니다. 요청 ${po}와 모든 항목이 영구적으로 삭제됩니다.`,
         accessDenied: "접근 거부됨",
@@ -658,6 +668,7 @@ const translations = {
         editQtyDesc: "修改此项目的数量。原始请求将被保留。",
         revisedQtyLabel: "修订数量",
         saveChanges: "保存更改",
+        clearRevision: "清除修订",
         areYouSure: "您确定吗？",
         deleteWarning: (po: string) => `此操作无法撤销。这将永久删除请求 ${po} 及其所有项目。`,
         accessDenied: "访问被拒绝",
@@ -863,7 +874,7 @@ export default function ApprovalSparepartPage() {
 
   const handleEditItem = (item: SparepartRequest) => {
     setSelectedOrderItem(item);
-    setRevisedQuantity(item.revisedQuantity || item.quantity);
+    setRevisedQuantity(item.revisedQuantity ?? item.quantity);
     setEditItemOpen(true);
   };
   
@@ -888,6 +899,25 @@ export default function ApprovalSparepartPage() {
     } catch (error) {
       console.error("Failed to revise quantity", error);
       toast({ variant: "destructive", title: "Error revising quantity" });
+    }
+  };
+
+  const handleClearRevision = async () => {
+    if (!selectedOrderItem || !db) return;
+    try {
+        const itemRef = doc(db, "sparepart-requests", selectedOrderItem.id);
+        await updateDoc(itemRef, {
+            revisedQuantity: deleteField()
+        });
+        addNotification({
+            title: "Revision Cleared",
+            description: `Revised quantity for ${selectedOrderItem.itemName} has been cleared.`,
+            icon: Eraser,
+        });
+        setEditItemOpen(false);
+    } catch (error) {
+        console.error("Failed to clear revision", error);
+        toast({ variant: "destructive", title: "Error clearing revision" });
     }
   };
 
@@ -1647,26 +1677,30 @@ export default function ApprovalSparepartPage() {
             </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSaveRevisedQuantity}>
-            <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="revised-quantity" className="text-right">
-                    {t.revisedQtyLabel}
-                </Label>
-                <Input
-                    id="revised-quantity"
-                    type="number"
-                    min="0"
-                    className="col-span-3"
-                    value={revisedQuantity}
-                    onChange={(e) => setRevisedQuantity(e.target.value)}
-                    required
-                />
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="revised-quantity" className="text-right">
+                        {t.revisedQtyLabel}
+                    </Label>
+                    <Input
+                        id="revised-quantity"
+                        type="number"
+                        min="0"
+                        className="col-span-3"
+                        value={revisedQuantity}
+                        onChange={(e) => setRevisedQuantity(e.target.value)}
+                        required
+                    />
+                    </div>
                 </div>
-            </div>
-            <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setEditItemOpen(false)}>{t.cancel}</Button>
-                <Button type="submit">{t.saveChanges}</Button>
-            </DialogFooter>
+                <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setEditItemOpen(false)}>{t.cancel}</Button>
+                    <Button type="button" variant="outline" onClick={handleClearRevision}>
+                        <Eraser className="mr-2 h-4 w-4" />
+                        {t.clearRevision}
+                    </Button>
+                    <Button type="submit">{t.saveChanges}</Button>
+                </DialogFooter>
             </form>
         </DialogContent>
       </Dialog>
