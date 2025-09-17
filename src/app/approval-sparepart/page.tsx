@@ -926,7 +926,11 @@ export default function ApprovalSparepartPage() {
     const batch = writeBatch(db);
     po.requests.forEach(request => {
         const docRef = doc(db, "sparepart-requests", request.id);
-        batch.update(docRef, { status, approver: '' }); // Clear approver on undo
+        batch.update(docRef, { 
+          status, 
+          itemStatus: 'Pending', // Reset item status on any group-level status change
+          approver: '' 
+        });
     });
     await batch.commit();
     addNotification({
