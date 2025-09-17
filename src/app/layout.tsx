@@ -41,8 +41,8 @@ export default function RootLayout({
       </head>
       <body className={cn("no-scrollbar")}>
         <ThemeProvider>
-          <NotificationProvider>
-            <AuthProvider>
+          <AuthProvider>
+            <NotificationProvider>
               <div className="flex flex-col min-h-screen">
                 <AppHeader />
                 <main className="flex-grow p-4 md:p-8">
@@ -50,10 +50,10 @@ export default function RootLayout({
                     {children}
                   </div>
                 </main>
+                <Toaster />
               </div>
-              <Toaster />
-            </AuthProvider>
-          </NotificationProvider>
+            </NotificationProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
