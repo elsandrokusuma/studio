@@ -1246,16 +1246,16 @@ export default function ApprovalSparepartPage() {
             {t.description(totalRequestsCount, totalLineItems)}
           </p>
         </div>
-        <div className="flex w-full md:w-auto items-center justify-between md:justify-start gap-2">
+        <div className="flex w-full md:w-auto items-center justify-end gap-2">
             {selectedRows.length > 0 && (
                 <div className="flex items-center gap-2">
-                    <Button onClick={handleRequestApproval} disabled={!canRequestApproval} size="sm" className="md:size-auto">
+                    <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
                         <Send className="mr-2 h-4 w-4" />
                         <span className="hidden md:inline">{t.requestApproval}</span>
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="md:size-auto">
+                        <Button variant="outline">
                             <FileDown className="mr-2 h-4 w-4" />
                             <span className="hidden md:inline">{t.export}</span>
                         </Button>
