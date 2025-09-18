@@ -133,7 +133,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     <NotificationContext.Provider value={value}>
         {children}
         {typeof window !== 'undefined' && (
-          <audio ref={audioRef} src="/notification.mp3" preload="auto" />
+          <audio ref={audioRef} src="/nada-dering-mainan-tembakan-363154.mp3" preload="auto" />
         )}
     </NotificationContext.Provider>
   );
