@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { AlertCircle, Clock } from 'lucide-react';
@@ -27,7 +27,9 @@ let notificationId = 0;
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [userNotifications, setUserNotifications] = useState<Notification[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
-  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const prevNotificationCount = useRef(0);
+
   // This effect will run only once on the client side after the initial render.
   useEffect(() => {
     if (!db) return;
@@ -95,6 +97,20 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
     
   }, []);
+  
+  // Combine system notifications (persistent) and user notifications (temporary)
+  const combinedNotifications = React.useMemo(() => {
+    return [...userNotifications, ...systemNotifications];
+  }, [userNotifications, systemNotifications]);
+
+  // Effect to play sound on new notification
+  useEffect(() => {
+      if (combinedNotifications.length > prevNotificationCount.current) {
+          audioRef.current?.play().catch(error => console.error("Audio play failed:", error));
+      }
+      prevNotificationCount.current = combinedNotifications.length;
+  }, [combinedNotifications]);
+
 
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
     // Add to a temporary, client-side only state. This will not persist across reloads.
@@ -107,18 +123,20 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     setUserNotifications([]);
   }, []);
 
-  // Combine system notifications (persistent) and user notifications (temporary)
-  const combinedNotifications = React.useMemo(() => {
-    return [...userNotifications, ...systemNotifications];
-  }, [userNotifications, systemNotifications]);
-
   const value = { 
     notifications: combinedNotifications,
     addNotification, 
     clearNotifications 
   };
 
-  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
+  return (
+    <NotificationContext.Provider value={value}>
+        {children}
+        {typeof window !== 'undefined' && (
+          <audio ref={audioRef} src="/notification.mp3" preload="auto" />
+        )}
+    </NotificationContext.Provider>
+  );
 };
 
 export const useNotifications = () => {
