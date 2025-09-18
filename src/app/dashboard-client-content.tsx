@@ -824,7 +824,7 @@ export function DashboardClientContent({
   const [timePeriod, setTimePeriod] = React.useState<'monthly' | 'daily'>('daily');
 
   // Set up real-time listeners
-  useEffect(() => {
+  React.useEffect(() => {
     if (!db) return;
 
     const unsubs: (() => void)[] = [];
