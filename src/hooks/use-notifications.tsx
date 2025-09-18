@@ -33,30 +33,39 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     setIsMounted(true);
-    if (typeof window !== 'undefined') {
-      const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
-      audio.preload = 'auto';
-      audioRef.current = audio;
+    // Initialize audio element here to ensure it's created on the client side.
+    if (typeof window !== 'undefined' && !audioRef.current) {
+      audioRef.current = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+      audioRef.current.preload = 'auto';
 
+      // This is the key part to unlock audio autoplay in browsers.
+      // We need to play the audio in response to a direct user interaction.
       const unlockAudio = () => {
-        audio.play().then(() => {
-          audio.pause();
-          audio.currentTime = 0;
-        }).catch(error => {
-          console.error("Audio unlock failed:", error);
-        });
-        // Remove the event listener after the first interaction
-        document.removeEventListener('click', unlockAudio);
-        document.removeEventListener('touchstart', unlockAudio);
+        if (audioRef.current) {
+          audioRef.current.play().then(() => {
+            // Immediately pause it. We just want the browser's permission.
+            audioRef.current?.pause();
+            audioRef.current!.currentTime = 0;
+            console.log("Audio unlocked successfully.");
+          }).catch(error => {
+            // Autoplay was prevented. This is expected if user hasn't interacted.
+            console.error("Audio unlock failed initially:", error);
+          });
+          // Remove the event listeners after the first interaction.
+          document.removeEventListener('click', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
+          document.removeEventListener('keydown', unlockAudio);
+        }
       };
 
-      // Add event listeners for the first user interaction
       document.addEventListener('click', unlockAudio);
       document.addEventListener('touchstart', unlockAudio);
+      document.addEventListener('keydown', unlockAudio);
 
       return () => {
         document.removeEventListener('click', unlockAudio);
         document.removeEventListener('touchstart', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
       };
     }
   }, []);
@@ -131,6 +140,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (isMounted && combinedNotifications.length > prevNotificationCount.current) {
         if (audioRef.current) {
+          audioRef.current.currentTime = 0; // Rewind to start before playing
           audioRef.current.play().catch(error => {
               console.error("Audio play failed:", error);
           });
