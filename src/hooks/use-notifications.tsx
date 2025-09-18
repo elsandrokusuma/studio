@@ -31,19 +31,41 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const prevNotificationCount = useRef(0);
   const [isMounted, setIsMounted] = useState(false);
 
-  // This effect will run only once on the client side after the initial render.
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== 'undefined') {
-        audioRef.current = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
-        audioRef.current.preload = 'auto';
-    }
+      const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+      audio.preload = 'auto';
+      audioRef.current = audio;
 
-    if (!db) return;
+      const unlockAudio = () => {
+        audio.play().then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+        }).catch(error => {
+          console.error("Audio unlock failed:", error);
+        });
+        // Remove the event listener after the first interaction
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+      };
+
+      // Add event listeners for the first user interaction
+      document.addEventListener('click', unlockAudio);
+      document.addEventListener('touchstart', unlockAudio);
+
+      return () => {
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!db || !isMounted) return;
 
     const unsubs: (() => void)[] = [];
 
-    // Listener for low stock items
     const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
     const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
         setSystemNotifications(prev => {
@@ -62,7 +84,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     });
     unsubs.push(unsubscribeLowStock);
 
-    // Generic listener setup function
     const setupListener = (
       collectionName: string,
       statusField: string,
@@ -94,42 +115,37 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       unsubs.push(unsubscribe);
     };
 
-    // Setting up listeners for approvals
     setupListener("pre-orders", "status", "Awaiting Approval", "poNumber", "stationery_approval", "Stationery Approvals", "/pre-orders", Clock);
     setupListener("sparepart-requests", "status", "Awaiting Approval", "requestNumber", "sparepart_approval", "Sparepart Approvals", "/approval-sparepart", Clock);
 
-    // Cleanup function
     return () => {
       unsubs.forEach(unsub => unsub());
     };
     
-  }, []);
+  }, [isMounted]);
   
-  // Combine system notifications (persistent) and user notifications (temporary)
   const combinedNotifications = React.useMemo(() => {
-    return [...userNotifications, ...systemNotifications];
+    return [...userNotifications, ...systemNotifications].sort((a, b) => (a.id < b.id ? 1 : -1));
   }, [userNotifications, systemNotifications]);
 
-  // Effect to play sound on new notification
   useEffect(() => {
-    // Only run this effect on the client and after the initial mount
     if (isMounted && combinedNotifications.length > prevNotificationCount.current) {
-        audioRef.current?.play().catch(error => {
-            console.error("Audio play failed. This might be due to browser restrictions on autoplay.", error);
-        });
+        if (audioRef.current) {
+          audioRef.current.play().catch(error => {
+              console.error("Audio play failed:", error);
+          });
+        }
     }
     prevNotificationCount.current = combinedNotifications.length;
   }, [combinedNotifications, isMounted]);
 
 
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
-    // Add to a temporary, client-side only state. This will not persist across reloads.
     const newNotif = { ...notification, id: `notif-${notificationId++}` };
     setUserNotifications(prev => [newNotif, ...prev]);
   }, []);
 
   const clearNotifications = useCallback(() => {
-    // This will now only clear the temporary user notifications.
     setUserNotifications([]);
   }, []);
 
