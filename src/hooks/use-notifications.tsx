@@ -29,9 +29,16 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prevNotificationCount = useRef(0);
+  const [isMounted, setIsMounted] = useState(false);
 
   // This effect will run only once on the client side after the initial render.
   useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== 'undefined') {
+        audioRef.current = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+        audioRef.current.preload = 'auto';
+    }
+
     if (!db) return;
 
     const unsubs: (() => void)[] = [];
@@ -105,11 +112,14 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
   // Effect to play sound on new notification
   useEffect(() => {
-      if (combinedNotifications.length > prevNotificationCount.current) {
-          audioRef.current?.play().catch(error => console.error("Audio play failed:", error));
-      }
-      prevNotificationCount.current = combinedNotifications.length;
-  }, [combinedNotifications]);
+    // Only run this effect on the client and after the initial mount
+    if (isMounted && combinedNotifications.length > prevNotificationCount.current) {
+        audioRef.current?.play().catch(error => {
+            console.error("Audio play failed. This might be due to browser restrictions on autoplay.", error);
+        });
+    }
+    prevNotificationCount.current = combinedNotifications.length;
+  }, [combinedNotifications, isMounted]);
 
 
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
@@ -132,9 +142,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   return (
     <NotificationContext.Provider value={value}>
         {children}
-        {typeof window !== 'undefined' && (
-          <audio ref={audioRef} src="/nada-dering-mainan-tembakan-363154.mp3" preload="auto" />
-        )}
     </NotificationContext.Provider>
   );
 };
