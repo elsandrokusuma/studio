@@ -110,7 +110,7 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import { useNotifications } from "@/hooks/use-notifications";
+import { useNotifications, playNotificationSound } from "@/hooks/use-notifications";
 import { useTheme } from "@/hooks/use-theme";
 
 
@@ -846,6 +846,8 @@ export default function ApprovalSparepartPage() {
       });
 
       await batch.commit();
+
+      playNotificationSound();
 
       addNotification({
         title: 'Approval Requested',

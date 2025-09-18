@@ -14,6 +14,15 @@ export type Notification = {
   href?: string;
 };
 
+// Helper function to play the notification sound, exported for use in other components
+export const playNotificationSound = () => {
+  const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+  audio.play().catch(error => {
+    console.error("Audio play failed:", error);
+  });
+};
+
+
 interface NotificationContextType {
   notifications: Notification[];
   addNotification: (notification: Omit<Notification, 'id'>) => void;
@@ -27,47 +36,10 @@ let notificationId = 0;
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [userNotifications, setUserNotifications] = useState<Notification[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const prevNotificationCount = useRef(0);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    // Initialize audio element here to ensure it's created on the client side.
-    if (typeof window !== 'undefined' && !audioRef.current) {
-      audioRef.current = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
-      audioRef.current.preload = 'auto';
-
-      // This is the key part to unlock audio autoplay in browsers.
-      // We need to play the audio in response to a direct user interaction.
-      const unlockAudio = () => {
-        if (audioRef.current) {
-          audioRef.current.play().then(() => {
-            // Immediately pause it. We just want the browser's permission.
-            audioRef.current?.pause();
-            audioRef.current!.currentTime = 0;
-            console.log("Audio unlocked successfully.");
-          }).catch(error => {
-            // Autoplay was prevented. This is expected if user hasn't interacted.
-            console.error("Audio unlock failed initially:", error);
-          });
-          // Remove the event listeners after the first interaction.
-          document.removeEventListener('click', unlockAudio);
-          document.removeEventListener('touchstart', unlockAudio);
-          document.removeEventListener('keydown', unlockAudio);
-        }
-      };
-
-      document.addEventListener('click', unlockAudio);
-      document.addEventListener('touchstart', unlockAudio);
-      document.addEventListener('keydown', unlockAudio);
-
-      return () => {
-        document.removeEventListener('click', unlockAudio);
-        document.removeEventListener('touchstart', unlockAudio);
-        document.removeEventListener('keydown', unlockAudio);
-      };
-    }
   }, []);
 
   useEffect(() => {
@@ -136,19 +108,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const combinedNotifications = React.useMemo(() => {
     return [...userNotifications, ...systemNotifications].sort((a, b) => (a.id < b.id ? 1 : -1));
   }, [userNotifications, systemNotifications]);
-
-  useEffect(() => {
-    if (isMounted && combinedNotifications.length > prevNotificationCount.current) {
-        if (audioRef.current) {
-          audioRef.current.currentTime = 0; // Rewind to start before playing
-          audioRef.current.play().catch(error => {
-              console.error("Audio play failed:", error);
-          });
-        }
-    }
-    prevNotificationCount.current = combinedNotifications.length;
-  }, [combinedNotifications, isMounted]);
-
 
   const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
     const newNotif = { ...notification, id: `notif-${notificationId++}` };
