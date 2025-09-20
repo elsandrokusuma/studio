@@ -83,7 +83,7 @@ import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
-import { useNotifications } from "@/hooks/use-notifications";
+import { useNotifications, playNotificationSound } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -1079,6 +1079,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
   const handleRequestApproval = async () => {
     if (!db) return;
+    playNotificationSound(); // Play sound on user interaction to unlock audio
     const posToApprove = groupedPreOrders.filter(po => selectedRows.includes(po.poNumber) && po.status === 'Pending');
 
     if (posToApprove.length === 0) {

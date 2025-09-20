@@ -17,7 +17,7 @@ export type Notification = {
 
 // Helper function to play the notification sound, exported for use in other components
 export const playNotificationSound = () => {
-  const audio = new Audio("https://www.myinstants.com/media/sounds/pop-cat.mp3");
+  const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
   audio.play().catch(error => {
     // Autoplay was prevented. This is a common browser restriction.
     // We can ignore this error as we have other mechanisms to unlock audio.
