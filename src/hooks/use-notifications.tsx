@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode, use
 import { collection, onSnapshot, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { AlertCircle, Clock } from 'lucide-react';
+import type { Transaction } from '@/lib/types';
 
 export type Notification = {
   id: string;
@@ -61,8 +62,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
       snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
-          console.log("New transaction added, playing sound:", change.doc.data());
-          playNotificationSound();
+          const data = change.doc.data() as Transaction;
+          const validTypes = ['add', 'edit', 'out', 'in', 'delete'];
+          if (validTypes.includes(data.type)) {
+            console.log(`New transaction of type '${data.type}' detected, playing sound:`, data);
+            playNotificationSound();
+          }
         }
       });
     });
