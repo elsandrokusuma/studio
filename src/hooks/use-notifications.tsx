@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { AlertCircle, Clock } from 'lucide-react';
 
@@ -16,9 +16,11 @@ export type Notification = {
 
 // Helper function to play the notification sound, exported for use in other components
 export const playNotificationSound = () => {
-  const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+  const audio = new Audio("https://www.myinstants.com/media/sounds/pop-cat.mp3");
   audio.play().catch(error => {
-    console.error("Audio play failed:", error);
+    // Autoplay was prevented. This is a common browser restriction.
+    // We can ignore this error as we have other mechanisms to unlock audio.
+    console.warn("Audio play failed silently:", error.message);
   });
 };
 
@@ -37,10 +39,37 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [userNotifications, setUserNotifications] = useState<Notification[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Real-time listener for new transactions to play sound
+  useEffect(() => {
+    if (!db) return;
+
+    const transactionsRef = collection(db, "transactions");
+    const q = query(transactionsRef);
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      // To prevent playing sound on initial page load
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          console.log("New transaction added, playing sound:", change.doc.data());
+          playNotificationSound();
+        }
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
+
 
   useEffect(() => {
     if (!db || !isMounted) return;
