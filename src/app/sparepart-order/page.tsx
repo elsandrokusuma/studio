@@ -35,12 +35,18 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
         const querySnapshot = await getDocs(q);
         const selectedOrders: SparepartRequest[] = [];
         querySnapshot.forEach((doc) => {
-            // We only want to print approved items or items with revised quantities
             const data = doc.data() as SparepartRequest;
-            if(data.status === 'Approved') {
-               selectedOrders.push({ id: doc.id, ...data });
+            // Fetch all items for the approved PO, regardless of individual item status,
+            // as the approval is at the PO level. This ensures revised items are included.
+             if (data.status === 'Approved') {
+                selectedOrders.push({ id: doc.id, ...data });
             }
         });
+
+        if (selectedOrders.length === 0) {
+          // This can happen if the PO numbers exist but none are in 'Approved' state.
+          console.warn(`No 'Approved' items found for POs: ${poNumbers.join(', ')}`);
+        }
         
         const groups: { [key: string]: SparepartRequest[] } = {};
         selectedOrders.forEach(order => {
