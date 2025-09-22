@@ -26,14 +26,18 @@ export type GroupedOrders = {
 
 export function SparepartOrderClientContent({ groupedOrders }: { groupedOrders: GroupedOrders[] }) {
   const { componentOpacity } = useTheme();
+  const [today, setToday] = React.useState('');
+
+  React.useEffect(() => {
+    // Generate date string on the client side to avoid hydration mismatch
+    setToday(new Date().toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    }));
+  }, []);
 
   const handlePrint = () => {
     window.print();
   };
-
-  const today = new Date().toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  });
 
   if (groupedOrders.length === 0) {
     return (
