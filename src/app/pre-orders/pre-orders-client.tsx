@@ -725,6 +725,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [preOrders, setPreOrders] = React.useState<PreOrder[]>([]);
   const [inventoryItems, setInventoryItems] = React.useState<InventoryItem[]>([]);
   const [isCreateOpen, setCreateOpen] = React.useState(false);
+  const [isAddItemOpen, setAddItemOpen] = React.useState(false);
   const [isDeleteOpen, setDeleteOpen] = React.useState(false);
   const [selectedPo, setSelectedPo] = React.useState<GroupedPO | null>(null);
   const { toast } = useToast();
@@ -760,7 +761,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [poToApprove, setPoToApprove] = React.useState<GroupedPO | null>(null);
   const [approverName, setApproverName] = React.useState('');
 
-  // State for viewing details
+  // States for viewing details
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
 
 
@@ -869,6 +870,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       icon: PlusCircle,
     });
     setCreateOpen(false);
+    setAddItemOpen(false);
     setSelectedUnit(undefined);
     setSelectedItemId(undefined);
     setSelectedItemName(t.selectItem);
@@ -1252,6 +1254,19 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const isHrdUser = user && user.email === 'krezthrd@gmail.com';
   const canApprove = isAdminUser || isHrdUser;
   const canPerformWriteActions = user && user.email !== 'krezthrd@gmail.com';
+
+  const ActionDialog = isCreatingNewPo ? Dialog : React.Fragment;
+  const actionDialogProps = isCreatingNewPo ? {
+    open: isCreateOpen,
+    onOpenChange: (isOpen: boolean) => {
+      setCreateOpen(isOpen);
+      if (!isOpen) {
+        setSelectedItemId(undefined);
+        setSelectedItemName(t.selectItem);
+        setPoPrice("");
+      }
+    }
+  } : {};
   
   if (loading || authLoading) {
     return <FullPageSpinner />;
@@ -1327,82 +1342,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                 </Button>
             )}
             {canPerformWriteActions && (
-              <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
-                  <DialogTrigger asChild>
-                    <Button size="icon" className="md:hidden w-auto px-3 h-10">
-                      <PlusCircle className="h-4 w-4" />
-                  </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                  <DialogHeader>
-                      <DialogTitle>{isCreatingNewPo ? t.createNewPOTitle : t.addItemTitle(activePoNumber)}</DialogTitle>
-                      <DialogDescription>
-                      {isCreatingNewPo ? t.createNewPODesc : t.addItemDesc}
-                      </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="poNumber" className="text-right">{t.poNumber}</Label>
-                      <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="item" className="text-right">{t.item}</Label>
-                      <div className="col-span-3">
-                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
-                          <PopoverTrigger asChild>
-                              <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
-                              {selectedItemName}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[300px] p-0">
-                              <Command>
-                              <CommandInput placeholder={t.searchItem} />
-                              <CommandList>
-                                  <CommandEmpty>{t.noItemFound}</CommandEmpty>
-                                  <CommandGroup>
-                                  {inventoryItems.map((item) => (
-                                      <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
-                                      <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
-                                      {item.name}
-                                      </CommandItem>
-                                  ))}
-                                  </CommandGroup>
-                              </CommandList>
-                              </Command>
-                          </PopoverContent>
-                          </Popover>
-                      </div>
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="price" className="text-right">{t.price}</Label>
-                      <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="unit" className="text-right">{t.unit}</Label>
-                      <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
-                          <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(t.unitsFull).map(([key, value]) => (
-                              <SelectItem key={key} value={key}>{value}</SelectItem>
-                            ))}
-                          </SelectContent>
-                      </Select>
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
-                      <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
-                      <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
-                      </div>
-                      <DialogFooter>
-                      <Button type="submit">{t.addItemBtn}</Button>
-                      </DialogFooter>
-                  </form>
-                  </DialogContent>
-              </Dialog>
+              <Button size="icon" className="md:hidden w-auto px-3 h-10" onClick={() => isCreatingNewPo ? setCreateOpen(true) : setAddItemOpen(true)}>
+                <PlusCircle className="h-4 w-4" />
+              </Button>
             )}
           </div>
 
@@ -1425,88 +1367,154 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             )}
 
             {canPerformWriteActions && (
-              <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if(!isOpen) {setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice("")} }}>
-                  <DialogTrigger asChild>
-                  <Button className={cn("hidden md:inline-flex", selectedRows.length > 0 && "flex-1 md:flex-initial")}>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
-                  </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                  <DialogHeader>
-                      <DialogTitle>{isCreatingNewPo ? t.createNewPOTitle : t.addItemTitle(activePoNumber)}</DialogTitle>
-                      <DialogDescription>
-                      {isCreatingNewPo ? t.createNewPODesc : t.addItemDesc}
-                      </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="poNumber" className="text-right">{t.poNumber}</Label>
-                      <Input id="poNumber" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="item" className="text-right">{t.item}</Label>
-                      <div className="col-span-3">
-                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
-                          <PopoverTrigger asChild>
-                              <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
-                              {selectedItemName}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[300px] p-0">
-                              <Command>
-                              <CommandInput placeholder={t.searchItem} />
-                              <CommandList>
-                                  <CommandEmpty>{t.noItemFound}</CommandEmpty>
-                                  <CommandGroup>
-                                  {inventoryItems.map((item) => (
-                                      <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
-                                      <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
-                                      {item.name}
-                                      </CommandItem>
-                                  ))}
-                                  </CommandGroup>
-                              </CommandList>
-                              </Command>
-                          </PopoverContent>
-                          </Popover>
-                      </div>
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="price" className="text-right">{t.price}</Label>
-                      <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="unit" className="text-right">{t.unit}</Label>
-                      <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
-                          <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(t.unitsFull).map(([key, value]) => (
-                              <SelectItem key={key} value={key}>{value}</SelectItem>
-                            ))}
-                          </SelectContent>
-                      </Select>
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
-                      <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
-                      <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
-                      </div>
-                      <DialogFooter>
-                      <Button type="submit">{t.addItemBtn}</Button>
-                      </DialogFooter>
-                  </form>
-                  </DialogContent>
-              </Dialog>
+              <Button className={cn("hidden md:inline-flex", selectedRows.length > 0 && "flex-1 md:flex-initial")} onClick={() => isCreatingNewPo ? setCreateOpen(true) : setAddItemOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
+              </Button>
             )}
           </div>
         </div>
       </header>
       
+      {/* Create New PO Dialog */}
+      <Dialog open={isCreateOpen} onOpenChange={(isOpen) => { setCreateOpen(isOpen); if (!isOpen) { setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice(""); } }}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>{t.createNewPOTitle}</DialogTitle>
+                  <DialogDescription>{t.createNewPODesc}</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="poNumber-create" className="text-right">{t.poNumber}</Label>
+                      <Input id="poNumber-create" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="item-create" className="text-right">{t.item}</Label>
+                      <div className="col-span-3">
+                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                              <PopoverTrigger asChild>
+                                  <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
+                                      {selectedItemName}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[300px] p-0">
+                                  <Command>
+                                      <CommandInput placeholder={t.searchItem} />
+                                      <CommandList>
+                                          <CommandEmpty>{t.noItemFound}</CommandEmpty>
+                                          <CommandGroup>
+                                              {inventoryItems.map((item) => (
+                                                  <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                                      <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
+                                                      {item.name}
+                                                  </CommandItem>
+                                              ))}
+                                          </CommandGroup>
+                                      </CommandList>
+                                  </Command>
+                              </PopoverContent>
+                          </Popover>
+                      </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="price-create" className="text-right">{t.price}</Label>
+                      <Input id="price-create" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="unit-create" className="text-right">{t.unit}</Label>
+                      <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
+                          <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
+                          <SelectContent>
+                              {Object.entries(t.unitsFull).map(([key, value]) => (<SelectItem key={key} value={key}>{value}</SelectItem>))}
+                          </SelectContent>
+                      </Select>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="quantity-create" className="text-right">{t.qty}</Label>
+                      <Input id="quantity-create" name="quantity" type="number" min="1" className="col-span-3" required />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="expectedDate-create" className="text-right">{t.expectedDate}</Label>
+                      <Input id="expectedDate-create" name="expectedDate" type="date" className="col-span-3" required />
+                  </div>
+                  <DialogFooter>
+                      <Button type="submit">{t.addItemBtn}</Button>
+                  </DialogFooter>
+              </form>
+          </DialogContent>
+      </Dialog>
+
+      {/* Add Item to Existing PO Dialog */}
+      <Dialog open={isAddItemOpen} onOpenChange={(isOpen) => { setAddItemOpen(isOpen); if (!isOpen) { setSelectedItemId(undefined); setSelectedItemName(t.selectItem); setPoPrice(""); } }}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>{t.addItemTitle(activePoNumber)}</DialogTitle>
+                  <DialogDescription>{t.addItemDesc}</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="poNumber-add" className="text-right">{t.poNumber}</Label>
+                      <Input id="poNumber-add" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="item-add" className="text-right">{t.item}</Label>
+                      <div className="col-span-3">
+                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                              <PopoverTrigger asChild>
+                                  <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
+                                      {selectedItemName}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[300px] p-0">
+                                  <Command>
+                                      <CommandInput placeholder={t.searchItem} />
+                                      <CommandList>
+                                          <CommandEmpty>{t.noItemFound}</CommandEmpty>
+                                          <CommandGroup>
+                                              {inventoryItems.map((item) => (
+                                                  <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                                      <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
+                                                      {item.name}
+                                                  </CommandItem>
+                                              ))}
+                                          </CommandGroup>
+                                      </CommandList>
+                                  </Command>
+                              </PopoverContent>
+                          </Popover>
+                      </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="price-add" className="text-right">{t.price}</Label>
+                      <Input id="price-add" name="price" type="number" min="0" className="col-span-3" required value={poPrice} onChange={(e) => setPoPrice(e.target.value)} />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="unit-add" className="text-right">{t.unit}</Label>
+                      <Select name="unit" required onValueChange={setSelectedUnit} value={selectedUnit}>
+                          <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
+                          <SelectContent>
+                              {Object.entries(t.unitsFull).map(([key, value]) => (<SelectItem key={key} value={key}>{value}</SelectItem>))}
+                          </SelectContent>
+                      </Select>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="quantity-add" className="text-right">{t.qty}</Label>
+                      <Input id="quantity-add" name="quantity" type="number" min="1" className="col-span-3" required />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="expectedDate-add" className="text-right">{t.expectedDate}</Label>
+                      <Input id="expectedDate-add" name="expectedDate" type="date" className="col-span-3" required />
+                  </div>
+                  <DialogFooter>
+                      <Button type="submit">{t.addItemBtn}</Button>
+                  </DialogFooter>
+              </form>
+          </DialogContent>
+      </Dialog>
+
+
       <div className="space-y-4">
         <div className="px-4 hidden sm:flex">
             <Checkbox checked={isAllSelected} onCheckedChange={(checked) => handleSelectAll(Boolean(checked))} aria-label="Select all" disabled={selectableRowCount === 0} className="mr-4" />
