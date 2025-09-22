@@ -784,7 +784,7 @@ export function DashboardClientContent({
   const [dailyQuote, setDailyQuote] = React.useState("");
   const router = useRouter();
   const { toast } = useToast();
-  const { addNotification } = useNotifications();
+  const { addNotification, playNotificationSound } = useNotifications();
   const { user, loading: authLoading } = useAuth();
   const [showLogin, setShowLogin] = React.useState(false);
   const { language } = useTheme();
@@ -1015,7 +1015,7 @@ export function DashboardClientContent({
         });
         return;
     }
-
+    playNotificationSound();
     const docRef = await addDoc(collection(db, "inventory"), newItemData);
 
     manageTransaction({
@@ -1078,7 +1078,7 @@ export function DashboardClientContent({
           });
           return;
         }
-
+        playNotificationSound();
         await updateDoc(itemRef, { quantity: newQuantity });
         await manageTransaction({
           itemId: selectedItem.id,
@@ -1117,6 +1117,8 @@ export function DashboardClientContent({
       toast({ variant: "destructive", title: t.itemRequired });
       return;
     }
+    
+    playNotificationSound();
 
     const newPreOrderData: Omit<PreOrder, "id"> = {
       poNumber: activePoNumber,
