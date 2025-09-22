@@ -1799,5 +1799,3 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     </div>
   );
 }
-
-    
