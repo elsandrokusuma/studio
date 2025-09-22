@@ -105,6 +105,7 @@ import { LoginForm } from "@/components/login-form";
 import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
 import { useTheme } from "@/hooks/use-theme";
+import { useAudio } from "@/hooks/use-audio";
 
 
 const chartConfig = {
@@ -784,10 +785,11 @@ export function DashboardClientContent({
   const [dailyQuote, setDailyQuote] = React.useState("");
   const router = useRouter();
   const { toast } = useToast();
-  const { addNotification, playNotificationSound } = useNotifications();
+  const { addNotification } = useNotifications();
   const { user, loading: authLoading } = useAuth();
   const [showLogin, setShowLogin] = React.useState(false);
   const { language } = useTheme();
+  const { playNotificationSound } = useAudio();
 
   const t = translations[language] || translations.en;
 
@@ -823,39 +825,37 @@ export function DashboardClientContent({
   const [chartType, setChartType] = React.useState<'bar' | 'line' | 'area'>('area');
   const [timePeriod, setTimePeriod] = React.useState<'monthly' | 'daily'>('daily');
 
-  // Set up real-time listeners
+  // Set up real-time listeners for data that needs to be fresh
   React.useEffect(() => {
     if (!db) return;
 
     const unsubs: (() => void)[] = [];
 
+    // Only listen to inventory for real-time updates.
+    // Transactions are handled by the notification hook for sounds.
+    // The main list is passed as initial data.
     const qInventory = query(collection(db, "inventory"), orderBy("name"));
     unsubs.push(onSnapshot(qInventory, (snapshot) => {
       const items: InventoryItem[] = [];
       snapshot.forEach((doc) => items.push({ id: doc.id, ...doc.data() } as InventoryItem));
       setInventoryItems(items);
     }));
-
-    const qTransactions = query(collection(db, "transactions"), orderBy("date", "desc"));
-     unsubs.push(onSnapshot(qTransactions, (snapshot) => {
-      const trans: Transaction[] = [];
-      snapshot.forEach((doc) => trans.push({ id: doc.id, ...doc.data() } as Transaction));
-      setTransactions(trans);
-    }));
-
-    const qRecentTransactions = query(collection(db, "transactions"), orderBy("date", "desc"), limit(5));
-     unsubs.push(onSnapshot(qRecentTransactions, (snapshot) => {
-      const recentTrans: Transaction[] = [];
-      snapshot.forEach((doc) => recentTrans.push({ id: doc.id, ...doc.data() } as Transaction));
-      setRecentTransactions(recentTrans);
-    }));
-
-    const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
+    
+    // We still need to listen to pre-orders to get the awaiting approval count
+     const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
     unsubs.push(onSnapshot(qPreOrders, (snapshot) => {
         const orders: PreOrder[] = [];
         snapshot.forEach((doc) => orders.push({ id: doc.id, ...doc.data() } as PreOrder));
         setPreOrders(orders);
     }));
+
+    // This listener is for the chart data, to keep it reasonably fresh
+    const qTransactions = query(collection(db, "transactions"), orderBy("date", "desc"));
+    unsubs.push(onSnapshot(qTransactions, (snapshot) => {
+     const trans: Transaction[] = [];
+     snapshot.forEach((doc) => trans.push({ id: doc.id, ...doc.data() } as Transaction));
+     setTransactions(trans);
+   }));
 
     return () => unsubs.forEach(unsub => unsub());
   }, []);
@@ -1015,7 +1015,7 @@ export function DashboardClientContent({
         });
         return;
     }
-    playNotificationSound();
+    
     const docRef = await addDoc(collection(db, "inventory"), newItemData);
 
     manageTransaction({
@@ -1042,6 +1042,7 @@ export function DashboardClientContent({
       if (!db || isSubmitting) return;
       
       setIsSubmitting(true);
+      playNotificationSound();
       
       try {
         const selectedItem = inventoryItems.find((i) => i.id === selectedItemId);
@@ -1078,7 +1079,7 @@ export function DashboardClientContent({
           });
           return;
         }
-        playNotificationSound();
+        
         await updateDoc(itemRef, { quantity: newQuantity });
         await manageTransaction({
           itemId: selectedItem.id,
