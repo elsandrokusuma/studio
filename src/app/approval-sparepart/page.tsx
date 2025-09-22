@@ -1186,22 +1186,24 @@ export default function ApprovalSparepartPage() {
       toast({ variant: 'destructive', title: 'No POs selected to export' });
       return;
     }
-
-    const approvedPOs = filteredRequests
-      .filter(po => selectedRows.includes(po.requestNumber) && po.status === 'Approved');
-
-    if (approvedPOs.length === 0) {
+  
+    const poToExport = filteredRequests
+      .filter(po => selectedRows.includes(po.requestNumber))
+      .filter(po => po.status === 'Approved' || po.status === 'Awaiting Approval');
+  
+    if (poToExport.length === 0) {
       toast({
         variant: 'destructive',
-        title: 'No approved POs selected',
-        description: "Please select POs that have been marked as 'Approved' to export.",
+        title: 'No approved or pending POs selected',
+        description: "Please select POs that are 'Approved' or 'Awaiting Approval' to export.",
       });
       return;
     }
-
-    const poNumbers = approvedPOs.map(po => po.requestNumber).join(',');
+  
+    const poNumbers = poToExport.map(po => po.requestNumber).join(',');
     router.push(`/sparepart-order?poNumbers=${poNumbers}`);
   };
+  
 
   const handleExportCsv = () => {
     if (selectedRows.length === 0) {
@@ -1756,3 +1758,5 @@ export default function ApprovalSparepartPage() {
     </div>
   );
 }
+
+    

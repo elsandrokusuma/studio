@@ -36,8 +36,6 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
         const selectedOrders: SparepartRequest[] = [];
         querySnapshot.forEach((doc) => {
             const data = doc.data() as SparepartRequest;
-            // Fetch all items for the approved PO. The approval is at the PO level.
-            // This ensures all items, including those with revised quantities, are included.
             selectedOrders.push({ id: doc.id, ...data });
         });
 
@@ -90,3 +88,5 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
     </React.Suspense>
   )
 }
+
+    
