@@ -41,10 +41,15 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
             chunks.push(poNumbers.slice(i, i + chunkSize));
         }
 
-        // Execute queries for each chunk and collect all results.
-        for (const chunk of chunks) {
+        // Execute queries for each chunk in parallel and collect all results.
+        const queryPromises = chunks.map(chunk => {
             const q = query(collection(db, "sparepart-requests"), where("requestNumber", "in", chunk));
-            const querySnapshot = await getDocs(q);
+            return getDocs(q);
+        });
+
+        const querySnapshots = await Promise.all(queryPromises);
+
+        for (const querySnapshot of querySnapshots) {
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Omit<SparepartRequest, 'id'>;
                 allSelectedOrders.push({ id: doc.id, ...data });
