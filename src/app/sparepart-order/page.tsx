@@ -24,9 +24,9 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
     }
 
     const poNumbersParam = searchParams?.poNumbers;
-    const poNumbers = typeof poNumbersParam === 'string' ? poNumbersParam.split(",") : [];
+    const poNumbers = typeof poNumbersParam === 'string' ? poNumbersParam.split(",").filter(Boolean) : [];
 
-    if (!poNumbers || poNumbers.length === 0) {
+    if (poNumbers.length === 0) {
         return [];
     };
 
@@ -34,9 +34,12 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
         const allSelectedOrders: SparepartRequest[] = [];
         
         // Firestore 'in' query is limited to 30 items.
-        // To overcome this, we fetch orders for each PO number individually.
-        for (const poNumber of poNumbers) {
-            const q = query(collection(db, "sparepart-requests"), where("requestNumber", "==", poNumber));
+        // We chunk the poNumbers array to handle more than 30 POs if needed.
+        const chunkSize = 30;
+        for (let i = 0; i < poNumbers.length; i += chunkSize) {
+            const chunk = poNumbers.slice(i, i + chunkSize);
+            // This is the correct query: filtering by the 'requestNumber' field.
+            const q = query(collection(db, "sparepart-requests"), where("requestNumber", "in", chunk));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
                 const data = doc.data() as Omit<SparepartRequest, 'id'>;
