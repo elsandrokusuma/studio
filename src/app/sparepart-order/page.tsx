@@ -31,20 +31,25 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
     };
 
     try {
-        const q = query(collection(db, "sparepart-requests"), where("requestNumber", "in", poNumbers));
-        const querySnapshot = await getDocs(q);
-        const selectedOrders: SparepartRequest[] = [];
-        querySnapshot.forEach((doc) => {
-            const data = doc.data() as SparepartRequest;
-            selectedOrders.push({ id: doc.id, ...data });
-        });
+        const allSelectedOrders: SparepartRequest[] = [];
+        
+        // Firestore 'in' query is limited to 30 items.
+        // To overcome this, we fetch orders for each PO number individually.
+        for (const poNumber of poNumbers) {
+            const q = query(collection(db, "sparepart-requests"), where("requestNumber", "==", poNumber));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                const data = doc.data() as Omit<SparepartRequest, 'id'>;
+                allSelectedOrders.push({ id: doc.id, ...data });
+            });
+        }
 
-        if (selectedOrders.length === 0) {
+        if (allSelectedOrders.length === 0) {
           console.warn(`No items found for POs: ${poNumbers.join(', ')}`);
         }
         
         const groups: { [key: string]: SparepartRequest[] } = {};
-        selectedOrders.forEach(order => {
+        allSelectedOrders.forEach(order => {
             if (!groups[order.requestNumber]) {
                 groups[order.requestNumber] = [];
             }
@@ -88,5 +93,3 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
     </React.Suspense>
   )
 }
-
-    
