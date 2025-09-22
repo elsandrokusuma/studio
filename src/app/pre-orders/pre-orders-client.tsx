@@ -766,7 +766,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
 
   // State for combobox
-  const [comboPoOpen, setComboPoOpen] = React.useState(false);
+  const [isCreateComboOpen, setCreateComboOpen] = React.useState(false);
+  const [isAddComboOpen, setAddComboOpen] = React.useState(false);
   const [selectedItemId, setSelectedItemId] = React.useState<string | undefined>();
   const [selectedItemName, setSelectedItemName] = React.useState<string>(t.selectItem);
   
@@ -1172,7 +1173,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     );
   };
   
-  const handleItemSelectForPo = (itemId: string) => {
+  const handleItemSelectForPo = (itemId: string, forDialog: 'create' | 'add') => {
     const item = inventoryItems.find(i => i.id === itemId);
     if(item) {
       setSelectedItemName(item.name)
@@ -1185,7 +1186,11 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       setPoPrice("");
       setSelectedUnit(undefined);
     }
-    setComboPoOpen(false);
+    if (forDialog === 'create') {
+        setCreateComboOpen(false);
+    } else {
+        setAddComboOpen(false);
+    }
   };
 
   const getStatusText = (status: PreOrder['status']) => {
@@ -1254,19 +1259,6 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const isHrdUser = user && user.email === 'krezthrd@gmail.com';
   const canApprove = isAdminUser || isHrdUser;
   const canPerformWriteActions = user && user.email !== 'krezthrd@gmail.com';
-
-  const ActionDialog = isCreatingNewPo ? Dialog : React.Fragment;
-  const actionDialogProps = isCreatingNewPo ? {
-    open: isCreateOpen,
-    onOpenChange: (isOpen: boolean) => {
-      setCreateOpen(isOpen);
-      if (!isOpen) {
-        setSelectedItemId(undefined);
-        setSelectedItemName(t.selectItem);
-        setPoPrice("");
-      }
-    }
-  } : {};
   
   if (loading || authLoading) {
     return <FullPageSpinner />;
@@ -1391,9 +1383,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="item-create" className="text-right">{t.item}</Label>
                       <div className="col-span-3">
-                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                          <Popover open={isCreateComboOpen} onOpenChange={setCreateComboOpen}>
                               <PopoverTrigger asChild>
-                                  <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
+                                  <Button variant="outline" role="combobox" aria-expanded={isCreateComboOpen} className="w-full justify-between">
                                       {selectedItemName}
                                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
@@ -1405,7 +1397,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                           <CommandEmpty>{t.noItemFound}</CommandEmpty>
                                           <CommandGroup>
                                               {inventoryItems.map((item) => (
-                                                  <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                                  <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id, 'create')}>
                                                       <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
                                                       {item.name}
                                                   </CommandItem>
@@ -1460,9 +1452,9 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="item-add" className="text-right">{t.item}</Label>
                       <div className="col-span-3">
-                          <Popover open={comboPoOpen} onOpenChange={setComboPoOpen}>
+                          <Popover open={isAddComboOpen} onOpenChange={setAddComboOpen}>
                               <PopoverTrigger asChild>
-                                  <Button variant="outline" role="combobox" aria-expanded={comboPoOpen} className="w-full justify-between">
+                                  <Button variant="outline" role="combobox" aria-expanded={isAddComboOpen} className="w-full justify-between">
                                       {selectedItemName}
                                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
@@ -1474,7 +1466,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                           <CommandEmpty>{t.noItemFound}</CommandEmpty>
                                           <CommandGroup>
                                               {inventoryItems.map((item) => (
-                                                  <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id)}>
+                                                  <CommandItem key={item.id} value={item.name} onSelect={() => handleItemSelectForPo(item.id, 'add')}>
                                                       <Check className={cn("mr-2 h-4 w-4", selectedItemId === item.id ? "opacity-100" : "opacity-0")} />
                                                       {item.name}
                                                   </CommandItem>
