@@ -36,9 +36,13 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
         // Firestore 'in' query is limited to 30 items.
         // We chunk the poNumbers array to handle more than 30 POs if needed.
         const chunkSize = 30;
+        const chunks: string[][] = [];
         for (let i = 0; i < poNumbers.length; i += chunkSize) {
-            const chunk = poNumbers.slice(i, i + chunkSize);
-            // This is the correct query: filtering by the 'requestNumber' field.
+            chunks.push(poNumbers.slice(i, i + chunkSize));
+        }
+
+        // Execute queries for each chunk and collect all results.
+        for (const chunk of chunks) {
             const q = query(collection(db, "sparepart-requests"), where("requestNumber", "in", chunk));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
