@@ -743,6 +743,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const { user, loading: authLoading } = useAuth();
   const { language } = useTheme();
   
+  const [isClient, setIsClient] = React.useState(false);
+  
   const t = translations[language] || translations.en;
   const currentLocale = dateLocales[language] || enUS;
 
@@ -770,6 +772,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [isAddComboOpen, setAddComboOpen] = React.useState(false);
   const [selectedItemId, setSelectedItemId] = React.useState<string | undefined>();
   const [selectedItemName, setSelectedItemName] = React.useState<string>(t.selectItem);
+  
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   React.useEffect(() => {
     if (!db) {
@@ -819,22 +825,26 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   }, [searchParams, router, inventoryItems]);
 
   React.useEffect(() => {
-    const pendingPO = preOrders.find(po => po.status === 'Pending');
-    
-    if (pendingPO) {
-        setActivePoNumber(pendingPO.poNumber);
-        setIsCreatingNewPo(false);
-    } else {
-        const highestPoNum = preOrders
-          .map(po => parseInt(po.poNumber.replace('POATK-', ''), 10))
-          .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
-        
-        const newPoNum = highestPoNum + 1;
-        const formattedPoNum = `POATK-${String(newPoNum).padStart(3, '0')}`;
-        setActivePoNumber(formattedPoNum);
-        setIsCreatingNewPo(true);
+    // This logic depends on preOrders which is fetched client-side.
+    // Deferring this logic until the client is mounted prevents hydration errors.
+    if(isClient) {
+      const pendingPO = preOrders.find(po => po.status === 'Pending');
+      
+      if (pendingPO) {
+          setActivePoNumber(pendingPO.poNumber);
+          setIsCreatingNewPo(false);
+      } else {
+          const highestPoNum = preOrders
+            .map(po => parseInt(po.poNumber.replace('POATK-', ''), 10))
+            .reduce((max, num) => isNaN(num) ? max : Math.max(max, num), 0);
+          
+          const newPoNum = highestPoNum + 1;
+          const formattedPoNum = `POATK-${String(newPoNum).padStart(3, '0')}`;
+          setActivePoNumber(formattedPoNum);
+          setIsCreatingNewPo(true);
+      }
     }
-  }, [preOrders]);
+  }, [preOrders, isClient]);
 
   React.useEffect(() => {
     setSelectedItemName(t.selectItem);
@@ -1377,7 +1387,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     <X className="h-4 w-4" />
                 </Button>
             )}
-            {canPerformWriteActions && (
+            {isClient && canPerformWriteActions && (
               <Button size="icon" className="md:hidden w-auto px-3 h-10" onClick={() => isCreatingNewPo ? setCreateOpen(true) : setAddItemOpen(true)}>
                 <PlusCircle className="h-4 w-4" />
               </Button>
@@ -1402,7 +1412,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
               </div>
             )}
 
-            {canPerformWriteActions && (
+            {isClient && canPerformWriteActions && (
               <Button className={cn("hidden md:inline-flex", selectedRows.length > 0 && "flex-1 md:flex-initial")} onClick={() => isCreatingNewPo ? setCreateOpen(true) : setAddItemOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 {isCreatingNewPo ? t.createNewPO : t.addItemToPO}
@@ -1789,3 +1799,5 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     </div>
   );
 }
+
+    
