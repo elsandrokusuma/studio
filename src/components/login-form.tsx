@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
+import { useAudio } from '@/hooks/use-audio';
 
 const translations = {
     en: {
@@ -77,10 +78,12 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = React.useState(false);
   const { language } = useTheme();
   const t = translations[language] || translations.en;
+  const { unlockAudio } = useAudio();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    unlockAudio();
     try {
       await signIn(email, password);
     } catch (error) {

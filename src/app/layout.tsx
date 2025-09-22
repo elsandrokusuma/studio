@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/hooks/use-auth';
 import { NotificationProvider } from '@/hooks/use-notifications';
 import { cn } from '@/lib/utils';
+import { AudioProvider } from '@/hooks/use-audio';
 
 export const metadata: Metadata = {
   title: 'Stationery Inventory',
@@ -41,19 +42,21 @@ export default function RootLayout({
       </head>
       <body className={cn("no-scrollbar")}>
         <ThemeProvider>
-          <NotificationProvider>
-            <AuthProvider>
-              <div className="flex flex-col min-h-screen">
-                <AppHeader />
-                <main className="flex-grow p-4 md:p-8">
-                  <div className="mx-auto w-full max-w-full">
-                    {children}
-                  </div>
-                </main>
-                <Toaster />
-              </div>
-            </AuthProvider>
-          </NotificationProvider>
+          <AudioProvider>
+            <NotificationProvider>
+              <AuthProvider>
+                <div className="flex flex-col min-h-screen">
+                  <AppHeader />
+                  <main className="flex-grow p-4 md:p-8">
+                    <div className="mx-auto w-full max-w-full">
+                      {children}
+                    </div>
+                  </main>
+                  <Toaster />
+                </div>
+              </AuthProvider>
+            </NotificationProvider>
+          </AudioProvider>
         </ThemeProvider>
       </body>
     </html>

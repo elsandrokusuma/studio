@@ -2,10 +2,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
-import { collection, onSnapshot, query, where, Timestamp } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { AlertCircle, Clock } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
+import { useAudio } from './use-audio';
 
 export type Notification = {
   id: string;
@@ -14,17 +15,6 @@ export type Notification = {
   icon: React.ElementType;
   href?: string;
 };
-
-// Helper function to play the notification sound, exported for use in other components
-export const playNotificationSound = () => {
-  const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
-  audio.play().catch(error => {
-    // Autoplay was prevented. This is a common browser restriction.
-    // We can ignore this error as we have other mechanisms to unlock audio.
-    console.warn("Audio play failed silently:", error.message);
-  });
-};
-
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -41,6 +31,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const isInitialLoad = useRef(true);
+  const { playNotificationSound } = useAudio();
 
   useEffect(() => {
     setIsMounted(true);
@@ -65,7 +56,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
           const data = change.doc.data() as Transaction;
           const validTypes = ['add', 'edit', 'out', 'in', 'delete'];
           if (validTypes.includes(data.type)) {
-            console.log(`New transaction of type '${data.type}' detected, playing sound:`, data);
             playNotificationSound();
           }
         }
@@ -73,7 +63,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [playNotificationSound]);
 
 
   useEffect(() => {
