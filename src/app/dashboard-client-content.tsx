@@ -102,7 +102,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format, subDays } from 'date-fns';
 import { useAuth } from "@/hooks/use-auth";
 import { LoginForm } from "@/components/login-form";
-import { useNotifications } from "@/hooks/use-notifications";
+import { useNotifications, playNotificationSound } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
 import { useTheme } from "@/hooks/use-theme";
 import { useAudio } from "@/hooks/use-audio";
@@ -130,7 +130,7 @@ const motivationalQuotes = {
     "Cada pequeño paso es un progreso.", "Enfócate en el progreso, no en la perfección.", "Hoy es una nueva oportunidad para crecer.", "El trabajo duro de hoy es la victoria de mañana.", "No te detengas cuando estés cansado, detente cuando hayas terminado.", "Empieza donde estás. Usa lo que tienes.", "El éxito es la suma de pequeños esfuerzos.", "Haz de cada día tu obra maestra.", "Confía en el proceso.", "El único límite es tu mente.", "Sigue avanzando, no mires atrás.", "La acción es la clave fundamental de todo éxito.", "Tu pasión es tu fuego. Mantenlo encendido.", "Cada logro comienza con la decisión de intentarlo.", "No tengas miedo de fallar, ten miedo de no intentarlo.", "Eres más fuerte de lo que crees.", "Haz lo mejor que puedas y olvida el resto.", "Los grandes sueños comienzan con un solo paso.", "Sé la mejor versión de ti mismo hoy.", "Los desafíos hacen la vida interesante.", "La constancia es más importante que la perfección.", "Concéntrate en la meta, no en los obstáculos.", "La paciencia es la clave de la victoria.", "Cada día es una nueva página en tu historia.", "No esperes la oportunidad, créala.", "Mantente positivo, trabaja duro y haz que suceda.", "Aprende de ayer, vive para hoy.", "La fuerza no viene de la victoria, sino de la lucha.", "Los milagros ocurren cuando no te rindes.", "Haz algo hoy por lo que tu yo futuro te lo agradecerá.", "Cae siete veces, levántate ocho."
   ],
   fr: [
-    "Chaque petit pas est un progrès.", "Concentrez-vous sur le progrès, pas sur la perfection.", "Aujourd'hui est une nouvelle opportunité de grandir.", "Le travail acharné d'aujourd'hui est la victoire de demain.", "Ne vous arrêtez pas lorsque vous êtes fatigué, arrêtez-vous lorsque vous avez terminé.", "Commencez là où vous êtes. Utilisez ce que vous avez.", "Le succès est la somme de petits efforts.", "Faites de chaque jour votre chef-d'œuvre.", "Faites confiance au processus.", "La seule limite est votre esprit.", "Continuez d'avancer, ne regardez pas en arrière.", "L'action est la clé fondamentale de tout succès.", "Votre passion est votre feu. Maintenez-le allumé.", "Chaque accomplissement commence par la décision d'essayer.", "N'ayez pas peur d'échouer, ayez peur de ne pas essayer.", "Vous êtes plus fort que vous ne le pensez.", "Faites de votre mieux et oubliez le reste.", "Les grands rêves commencent par un pas.", "Soyez la meilleure version de vous-même aujourd'hui.", "Les défis rendent la vie intéressante.", "La constance est plus importante que la perfection.", "Concentrez-vous sur l'objectif, pas sur les obstacles.", "La patience est la clé de la victoire.", "Chaque jour est une nouvelle page de votre histoire.", "N'attendez pas l'opportunité, créez-la.", "Restez positif, travaillez dur et réalisez-le.", "Apprenez d'hier, vivez pour aujourd'hui.", "La force ne vient pas de la victoire, mais de la lutte.", "Les miracles se produisent lorsque vous n'abandonnez pas.", "Faites quelque chose aujourd'hui que votre futur vous remerciera.", "Tombez sept fois, relevez-vous huit fois."
+    "Chaque petit pas est un progrès.", "Concentrez-vous sur le progrès, pas sur la perfection.", "Aujourd'hui est une nouvelle opportunité de grandir.", "Le travail acharné d'aujourd'hui est la victoire de demain.", "Ne vous arrêtez pas lorsque vous êtes fatigué, arrêtez-vous lorsque vous avez terminé.", "Commencez là où vous êtes. Utilisez ce que vous avez.", "Le succès est la somme de petits efforts.", "Faites de chaque jour votre chef-d'œuvre.", "Faites confiance au processus.", "La seule limite est votre esprit.", "Continuez d'avancer, ne regardez pas en arrière.", "L'action est la clé fondamentale de tout succès.", "Votre passion est votre feu. Maintenez-le allumé.", "Chaque accomplissement commence par la decisión d'essayer.", "N'ayez pas peur d'échouer, ayez peur de ne pas essayer.", "Vous êtes plus fort que vous ne le pensez.", "Faites de votre mieux et oubliez le reste.", "Les grands rêves commencent par un pas.", "Soyez la meilleure version de vous-même aujourd'hui.", "Les défis rendent la vie intéressante.", "La constance est plus importante que la perfection.", "Concentrez-vous sur l'objectif, pas sur les obstacles.", "La patience est la clé de la victoire.", "Chaque jour est une nouvelle page de votre histoire.", "N'attendez pas l'opportunité, créez-la.", "Restez positif, travaillez dur et réalisez-le.", "Apprenez d'hier, vivez pour aujourd'hui.", "La force ne vient pas de la victoire, mais de la lutte.", "Les miracles se produisent lorsque vous n'abandonnez pas.", "Faites quelque chose aujourd'hui que votre futur vous remerciera.", "Tombez sept fois, relevez-vous huit fois."
   ],
   de: [
     "Jeder kleine Schritt ist ein Fortschritt.", "Konzentriere dich auf den Fortschritt, nicht auf die Perfektion.", "Heute ist eine neue Gelegenheit zu wachsen.", "Harte Arbeit heute ist der Sieg von morgen.", "Höre nicht auf, wenn du müde bist, sondern wenn du fertig bist.", "Beginne dort, wo du bist. Nutze, was du hast.", "Erfolg ist die Summe kleiner Anstrengungen.", "Mache jeden Tag zu deinem Meisterwerk.", "Vertraue dem Prozess.", "Die einzige Grenze ist dein Verstand.", "Gehe weiter vorwärts, schaue nicht zurück.", "Handeln ist der grundlegende Schlüssel zu jedem Erfolg.", "Deine Leidenschaft ist dein Feuer. Halte es am Brennen.", "Jede Errungenschaft beginnt mit der Entscheidung, es zu versuchen.", "Habe keine Angst zu scheitern, habe Angst, es nicht zu versuchen.", "Du bist stärker, als du denkst.", "Gib dein Bestes und vergiss den Rest.", "Große Träume beginnen mit einem Schritt.", "Sei heute die beste Version von dir.", "Herausforderungen machen das Leben interessant.", "Beständigkeit ist wichtiger als Perfektion.", "Konzentriere dich auf das Ziel, nicht auf die Hindernisse.", "Geduld ist der Schlüssel zum Sieg.", "Jeder Tag ist eine neue Seite in deiner Geschichte.", "Warte nicht auf die Gelegenheit, schaffe sie.", "Bleib positiv, arbeite hart und verwirkliche es.", "Lerne von gestern, lebe für heute.", "Stärke kommt nicht vom Gewinnen, sondern vom Kämpfen.", "Wunder geschehen, wenn du nicht aufgibst.", "Tue heute etwas, wofür dir dein zukünftiges Ich danken wird.", "Falle siebenmal hin, stehe achtmal auf."
@@ -624,13 +624,13 @@ const translations = {
         monthly: "매월",
         allitems: "모든 품목",
         recentTransactions: "최근 거래",
-        recentTransactionsDesc: "재고의 최신 재고 이동 내역입니다.",
+        recentTransactionsDesc: "재고의 최신 재고 이동 내역입니다。",
         item: "품목",
         qty: "수량",
         type: "유형",
         noTransactions: "아직 기록된 거래가 없습니다.",
         transactionDetails: "거래 세부 정보",
-        transactionDetailsDesc: "재고 이동에 대한 자세한 정보입니다.",
+        transactionDetailsDesc: "재고 이동에 대한 자세한 정보입니다。",
         date: "날짜",
         itemName: "품목명",
         quantity: "수량",
@@ -855,6 +855,7 @@ export function DashboardClientContent({
      const trans: Transaction[] = [];
      snapshot.forEach((doc) => trans.push({ id: doc.id, ...doc.data() } as Transaction));
      setTransactions(trans);
+     setRecentTransactions(trans.slice(0, 5));
    }));
 
     return () => unsubs.forEach(unsub => unsub());

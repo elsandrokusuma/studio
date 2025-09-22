@@ -8,6 +8,13 @@ import { AlertCircle, Clock } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
 import { useAudio } from './use-audio';
 
+// Export the function so it can be used anywhere
+export function playNotificationSound() {
+  const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+  audio.play().catch(error => console.error("Error playing sound:", error));
+}
+
+
 export type Notification = {
   id: string;
   title: string;
@@ -30,8 +37,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [userNotifications, setUserNotifications] = useState<Notification[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
   const [isMounted, setIsMounted] = useState(false);
-  const isInitialLoad = useRef(true);
-  const { playNotificationSound } = useAudio();
+  const { playNotificationSound: playAudio } = useAudio();
 
   useEffect(() => {
     setIsMounted(true);
@@ -43,11 +49,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     const transactionsRef = collection(db, "transactions");
     const q = query(transactionsRef);
+    let isInitialLoad = true;
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       // To prevent playing sound on initial page load
-      if (isInitialLoad.current) {
-        isInitialLoad.current = false;
+      if (isInitialLoad) {
+        isInitialLoad = false;
         return;
       }
 
@@ -56,14 +63,15 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
           const data = change.doc.data() as Transaction;
           const validTypes = ['add', 'edit', 'out', 'in', 'delete'];
           if (validTypes.includes(data.type)) {
-            playNotificationSound();
+             // This logic is now handled by direct calls in components
+             // playAudio();
           }
         }
       });
     });
 
     return () => unsubscribe();
-  }, [playNotificationSound]);
+  }, [playAudio]);
 
 
   useEffect(() => {
