@@ -839,6 +839,16 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   React.useEffect(() => {
     setSelectedItemName(t.selectItem);
   }, [t.selectItem]);
+  
+  const resetAndCloseForms = (formType: 'create' | 'add', formElement: HTMLFormElement) => {
+    if (formType === 'create') setCreateOpen(false);
+    if (formType === 'add') setAddItemOpen(false);
+    setSelectedUnit(undefined);
+    setSelectedItemId(undefined);
+    setSelectedItemName(t.selectItem);
+    setPoPrice("");
+    formElement.reset();
+  };
 
   const handleCreatePreOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -866,19 +876,53 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     await addDoc(collection(db, "pre-orders"), newPreOrderData);
     
     addNotification({
-      title: isCreatingNewPo ? "Pre-Order Created" : "Item Added to PO",
+      title: "Pre-Order Created",
       description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
       icon: PlusCircle,
     });
-    setCreateOpen(false);
-    setAddItemOpen(false);
-    setSelectedUnit(undefined);
-    setSelectedItemId(undefined);
-    setSelectedItemName(t.selectItem);
-    setPoPrice("");
-    (e.target as HTMLFormElement).reset();
+    
+    resetAndCloseForms('create', e.currentTarget);
   };
   
+  const handleAddItemToPo = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!db) return;
+    const formData = new FormData(e.currentTarget);
+    const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
+
+    if (!selectedItem) {
+        toast({ variant: "destructive", title: "Please select an item." });
+        return;
+    };
+    
+    // Find expectedDate from an existing item in the same PO
+    const existingPoItem = preOrders.find(po => po.poNumber === activePoNumber);
+    const expectedDate = existingPoItem ? existingPoItem.expectedDate : new Date().toISOString();
+
+
+    const newPreOrderData: Omit<PreOrder, 'id'> = {
+      poNumber: activePoNumber,
+      itemId: selectedItem.id,
+      itemName: selectedItem.name,
+      price: Number(formData.get("price")),
+      unit: selectedUnit || selectedItem.unit || "Pcs",
+      quantity: Number(formData.get("quantity")),
+      orderDate: new Date().toISOString(),
+      expectedDate: expectedDate,
+      status: "Pending",
+    };
+    
+    await addDoc(collection(db, "pre-orders"), newPreOrderData);
+    
+    addNotification({
+      title: "Item Added to PO",
+      description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
+      icon: PlusCircle,
+    });
+    
+    resetAndCloseForms('add', e.currentTarget);
+  };
+
   const handleEditOrderItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedOrderItem || !db) return;
@@ -1444,7 +1488,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   <DialogTitle>{t.addItemTitle(activePoNumber)}</DialogTitle>
                   <DialogDescription>{t.addItemDesc}</DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleCreatePreOrder} className="grid gap-4 py-4">
+              <form onSubmit={handleAddItemToPo} className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="poNumber-add" className="text-right">{t.poNumber}</Label>
                       <Input id="poNumber-add" name="poNumber" className="col-span-3" value={activePoNumber} readOnly disabled />
@@ -1494,10 +1538,6 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="quantity-add" className="text-right">{t.qty}</Label>
                       <Input id="quantity-add" name="quantity" type="number" min="1" className="col-span-3" required />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="expectedDate-add" className="text-right">{t.expectedDate}</Label>
-                      <Input id="expectedDate-add" name="expectedDate" type="date" className="col-span-3" required />
                   </div>
                   <DialogFooter>
                       <Button type="submit">{t.addItemBtn}</Button>
