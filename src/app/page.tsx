@@ -1,4 +1,6 @@
+
 import * as React from "react";
+import dynamic from 'next/dynamic';
 import {
   collection,
   query,
@@ -9,8 +11,17 @@ import {
 import { db } from "@/lib/firebase";
 import type { InventoryItem, Transaction, PreOrder } from "@/lib/types";
 import { FullPageSpinner } from "@/components/full-page-spinner";
-import { DashboardClientContent } from "./dashboard-client-content";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+// Dynamically import the client component
+const DashboardClientContent = dynamic(() =>
+  import('./dashboard-client-content').then(mod => mod.DashboardClientContent),
+  {
+    ssr: false, // This component is interactive and depends on client-side state/APIs
+    loading: () => <FullPageSpinner />,
+  }
+);
+
 
 async function getDashboardData() {
   if (!db) {
@@ -90,13 +101,11 @@ export default async function DashboardPage() {
   }
 
   return (
-    <React.Suspense fallback={<FullPageSpinner />}>
-      <DashboardClientContent
-        initialInventoryItems={data.inventoryItems}
-        initialTransactions={data.transactions}
-        initialRecentTransactions={data.recentTransactions}
-        initialPreOrders={data.preOrders}
-      />
-    </React.Suspense>
+    <DashboardClientContent
+      initialInventoryItems={data.inventoryItems}
+      initialTransactions={data.transactions}
+      initialRecentTransactions={data.recentTransactions}
+      initialPreOrders={data.preOrders}
+    />
   );
 }
