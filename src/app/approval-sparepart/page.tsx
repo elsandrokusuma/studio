@@ -1183,25 +1183,24 @@ export default function ApprovalSparepartPage() {
 
   const handleExportPdf = () => {
     if (selectedRows.length === 0) {
-        toast({ variant: 'destructive', title: 'No POs selected to export' });
-        return;
+      toast({ variant: 'destructive', title: 'No POs selected to export' });
+      return;
     }
 
-    const allItemsToExport = filteredRequests
-        .filter(po => selectedRows.includes(po.requestNumber) && po.status === 'Approved')
-        .flatMap(po => po.requests);
+    const approvedPOs = filteredRequests
+      .filter(po => selectedRows.includes(po.requestNumber) && po.status === 'Approved');
 
-    if (allItemsToExport.length === 0) {
-        toast({
-            variant: 'destructive',
-            title: 'No approved items in selected POs',
-            description: "Please select POs that have been marked as 'Approved' to export.",
-        });
-        return;
+    if (approvedPOs.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No approved POs selected',
+        description: "Please select POs that have been marked as 'Approved' to export.",
+      });
+      return;
     }
 
-    const ids = allItemsToExport.map(item => item.id).join(',');
-    router.push(`/sparepart-order?ids=${ids}`);
+    const poNumbers = approvedPOs.map(po => po.requestNumber).join(',');
+    router.push(`/sparepart-order?poNumbers=${poNumbers}`);
   };
 
   const handleExportCsv = () => {

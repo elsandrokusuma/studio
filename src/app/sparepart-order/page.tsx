@@ -23,19 +23,23 @@ export default async function SparepartOrderPage({ searchParams }: { searchParam
         return { error: "Firebase not configured. Please check your environment variables." };
     }
 
-    const idsParam = searchParams?.ids;
-    const ids = typeof idsParam === 'string' ? idsParam.split(",") : [];
+    const poNumbersParam = searchParams?.poNumbers;
+    const poNumbers = typeof poNumbersParam === 'string' ? poNumbersParam.split(",") : [];
 
-    if (!ids || ids.length === 0) {
+    if (!poNumbers || poNumbers.length === 0) {
         return [];
     };
 
     try {
-        const q = query(collection(db, "sparepart-requests"), where(documentId(), "in", ids));
+        const q = query(collection(db, "sparepart-requests"), where("requestNumber", "in", poNumbers));
         const querySnapshot = await getDocs(q);
         const selectedOrders: SparepartRequest[] = [];
         querySnapshot.forEach((doc) => {
-            selectedOrders.push({ id: doc.id, ...doc.data() } as SparepartRequest);
+            // We only want to print approved items or items with revised quantities
+            const data = doc.data() as SparepartRequest;
+            if(data.status === 'Approved') {
+               selectedOrders.push({ id: doc.id, ...data });
+            }
         });
         
         const groups: { [key: string]: SparepartRequest[] } = {};
