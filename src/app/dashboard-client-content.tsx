@@ -102,7 +102,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format, subDays } from 'date-fns';
 import { useAuth } from "@/hooks/use-auth";
 import { LoginForm } from "@/components/login-form";
-import { useNotifications, playNotificationSound } from "@/hooks/use-notifications";
+import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
 import { useTheme } from "@/hooks/use-theme";
 import { useAudio } from "@/hooks/use-audio";
@@ -786,8 +786,7 @@ export function DashboardClientContent({
   const router = useRouter();
   const { toast } = useToast();
   const { addNotification } = useNotifications();
-  const { user, loading: authLoading } = useAuth();
-  const [showLogin, setShowLogin] = React.useState(false);
+  const { user, loading: authLoading, setLoginModalOpen } = useAuth();
   const { language } = useTheme();
   const { playNotificationSound } = useAudio();
 
@@ -827,13 +826,10 @@ export function DashboardClientContent({
 
   // Set up real-time listeners for data that needs to be fresh
   React.useEffect(() => {
-    if (!db) return;
+    if (!db || !user) return; // Only listen if user is logged in
 
     const unsubs: (() => void)[] = [];
 
-    // Only listen to inventory for real-time updates.
-    // Transactions are handled by the notification hook for sounds.
-    // The main list is passed as initial data.
     const qInventory = query(collection(db, "inventory"), orderBy("name"));
     unsubs.push(onSnapshot(qInventory, (snapshot) => {
       const items: InventoryItem[] = [];
@@ -841,7 +837,6 @@ export function DashboardClientContent({
       setInventoryItems(items);
     }));
     
-    // We still need to listen to pre-orders to get the awaiting approval count
      const qPreOrders = query(collection(db, "pre-orders"), orderBy("orderDate", "desc"));
     unsubs.push(onSnapshot(qPreOrders, (snapshot) => {
         const orders: PreOrder[] = [];
@@ -849,7 +844,6 @@ export function DashboardClientContent({
         setPreOrders(orders);
     }));
 
-    // This listener is for the chart data, to keep it reasonably fresh
     const qTransactions = query(collection(db, "transactions"), orderBy("date", "desc"));
     unsubs.push(onSnapshot(qTransactions, (snapshot) => {
      const trans: Transaction[] = [];
@@ -859,7 +853,7 @@ export function DashboardClientContent({
    }));
 
     return () => unsubs.forEach(unsub => unsub());
-  }, []);
+  }, [user]);
 
 
   const chartData = React.useMemo(() => {
@@ -960,19 +954,14 @@ export function DashboardClientContent({
       setGreetingInfo(getGreeting());
     }
 
-    // Set daily motivational quote
     const dayOfMonth = new Date().getDate();
     setDailyQuote(motivationalQuotes[language][dayOfMonth - 1]);
     
   }, [t, language, user]);
 
   React.useEffect(() => {
-    if (!authLoading) {
-      if (user && user.email === 'kreztservice@gmail.com') {
-        router.push('/approval-sparepart');
-      } else {
-        setShowLogin(!user);
-      }
+    if (!authLoading && user && user.email === 'kreztservice@gmail.com') {
+      router.push('/approval-sparepart');
     }
   }, [user, authLoading, router]);
 
@@ -995,6 +984,14 @@ export function DashboardClientContent({
   React.useEffect(() => {
     setSelectedItemName(t.itemRequired);
   }, [t.itemRequired]);
+
+  const handleActionClick = (action: () => void) => {
+    if (!user) {
+      setLoginModalOpen(true);
+    } else {
+      action();
+    }
+  };
 
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -1171,12 +1168,14 @@ export function DashboardClientContent({
   };
 
   const handleStockItemClick = (item: InventoryItem) => {
-    setStockStatusOpen(false);
-    setSelectedItemId(item.id);
-    setSelectedItemName(item.name);
-    setSelectedUnit(item.unit);
-    setPoPrice(item.price);
-    setCreatePoOpen(true);
+    handleActionClick(() => {
+      setStockStatusOpen(false);
+      setSelectedItemId(item.id);
+      setSelectedItemName(item.name);
+      setSelectedUnit(item.unit);
+      setPoPrice(item.price);
+      setCreatePoOpen(true);
+    });
   };
 
   const formatCurrency = (amount: number) => {
@@ -1191,18 +1190,9 @@ export function DashboardClientContent({
     return <FullPageSpinner />;
   }
   
-  if (showLogin) {
-    return <LoginForm />;
-  }
-  
   if (user && user.email === 'kreztservice@gmail.com') {
     return null;
   }
-
-  if (!user) {
-    return <FullPageSpinner />;
-  }
-
 
   if (!db) {
     return (
@@ -1250,8 +1240,8 @@ export function DashboardClientContent({
   );
   
   const GreetingIcon = greetingInfo.icon;
-  const isHrdUser = user.email === 'krezthrd@gmail.com';
-  const isStandardUser = user.email === 'kreztuser@gmail.com';
+  const isHrdUser = user && user.email === 'krezthrd@gmail.com';
+  const isStandardUser = user && user.email === 'kreztuser@gmail.com';
 
 
   return (
@@ -1371,7 +1361,7 @@ export function DashboardClientContent({
           <CardContent className="grid grid-cols-2 gap-3 p-4 pt-0 md:p-6 md:pt-0">
              <div className="col-span-2 grid grid-cols-2 gap-3 md:flex md:flex-col md:gap-3 md:space-y-0">
                 <Button
-                onClick={() => setAddOpen(true)}
+                onClick={() => handleActionClick(() => setAddOpen(true))}
                 className="h-auto w-full justify-start text-left bg-gradient-to-r from-blue-400 to-cyan-400 text-white hover:from-blue-500 hover:to-cyan-500 gap-2 p-3 md:p-4"
                 disabled={isHrdUser || isStandardUser}
                 >
@@ -1386,7 +1376,7 @@ export function DashboardClientContent({
                 </div>
                 </Button>
                 <Button
-                onClick={() => setStockInOpen(true)}
+                onClick={() => handleActionClick(() => setStockInOpen(true))}
                 className="h-auto w-full justify-start text-left bg-gradient-to-r from-green-400 to-emerald-400 text-white hover:from-green-500 hover:to-emerald-500 gap-2 p-3 md:p-4"
                 disabled={isHrdUser || isStandardUser}
                 >
@@ -1399,7 +1389,7 @@ export function DashboardClientContent({
                 </div>
                 </Button>
                 <Button
-                onClick={() => setStockOutOpen(true)}
+                onClick={() => handleActionClick(() => setStockOutOpen(true))}
                 className="h-auto w-full justify-start text-left bg-gradient-to-r from-red-400 to-pink-400 text-white hover:from-red-500 hover:to-pink-500 gap-2 p-3 md:p-4"
                 disabled={isHrdUser}
                 >
@@ -1412,7 +1402,7 @@ export function DashboardClientContent({
                 </div>
                 </Button>
                 <Button
-                onClick={() => setCreatePoOpen(true)}
+                onClick={() => handleActionClick(() => setCreatePoOpen(true))}
                 className="h-auto w-full justify-start text-left bg-gradient-to-r from-purple-400 to-indigo-400 text-white hover:from-purple-500 hover:to-indigo-500 gap-2 p-3 md:p-4"
                 disabled={isHrdUser || isStandardUser}
                 >
@@ -2175,3 +2165,5 @@ export function DashboardClientContent({
     </div>
   );
 }
+
+    

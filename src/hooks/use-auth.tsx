@@ -20,6 +20,7 @@ import { useToast } from './use-toast';
 import { useNotifications } from './use-notifications';
 import { LogIn, LogOut } from 'lucide-react';
 import { useTheme } from './use-theme';
+import { LoginForm } from '@/components/login-form';
 
 interface AuthContextType {
   user: User | null;
@@ -27,6 +28,7 @@ interface AuthContextType {
   signIn: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  setLoginModalOpen: (open: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -166,12 +168,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState<Auth | null>(null);
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const { toast } = useToast();
   const { addNotification } = useNotifications();
   const router = useRouter();
-  // We need to get the language from the theme context to show translated toasts
-  // Since this provider wraps the ThemeProvider, we'll manage a local language state
-  // that syncs with the one from useTheme when available.
   const [language, setLanguage] = useState<'id' | 'en' | 'es' | 'fr' | 'de' | 'ja' | 'ko' | 'zh-CN'>('id');
   const themeContext = useTheme();
 
@@ -236,6 +236,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, pass);
         setUser(userCredential.user);
+        setLoginModalOpen(false); // Close modal on success
         addNotification({
             title: t.signInSuccess,
             description: t.welcomeBack,
@@ -284,15 +285,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
   
-  const value = { user, loading, signIn, signOut: signOutUser, deleteAccount };
-  
-  if(loading && !user) {
-    // Show spinner only on initial load when user status is unknown
-    return <FullPageSpinner />;
-  }
+  const value = { user, loading, signIn, signOut: signOutUser, deleteAccount, setLoginModalOpen };
 
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      {isLoginModalOpen && <LoginForm onClose={() => setLoginModalOpen(false)} />}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
@@ -302,3 +302,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    

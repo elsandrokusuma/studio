@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { useAudio } from '@/hooks/use-audio';
 
@@ -71,7 +71,7 @@ const translations = {
     }
 };
 
-export function LoginForm() {
+export function LoginForm({ onClose }: { onClose: () => void }) {
   const { signIn } = useAuth();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -86,6 +86,7 @@ export function LoginForm() {
     unlockAudio();
     try {
       await signIn(email, password);
+      // onClose will be called from the auth context on successful sign-in
     } catch (error) {
       // Error is handled by toast in useAuth hook
     } finally {
@@ -95,8 +96,11 @@ export function LoginForm() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
       <Card className="relative z-10 w-full max-w-sm">
+        <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={onClose}>
+            <X className="h-4 w-4" />
+        </Button>
         <CardHeader className="items-center text-center">
           <Image src="/favicon.ico?v=8" alt="Logo" width={48} height={48} className="mb-4" />
           <CardTitle className="text-2xl">{t.title}</CardTitle>
@@ -143,3 +147,5 @@ export function LoginForm() {
     </div>
   );
 }
+
+    

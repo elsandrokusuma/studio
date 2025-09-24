@@ -13,11 +13,10 @@ import type { InventoryItem, Transaction, PreOrder } from "@/lib/types";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Dynamically import the client component
 const DashboardClientContent = dynamic(() =>
   import('./dashboard-client-content').then(mod => mod.DashboardClientContent),
   {
-    ssr: false, // This component is interactive and depends on client-side state/APIs
+    ssr: false, 
     loading: () => <FullPageSpinner />,
   }
 );
@@ -25,11 +24,16 @@ const DashboardClientContent = dynamic(() =>
 
 async function getDashboardData() {
   if (!db) {
-    throw new Error("Firebase not configured");
+    console.warn("Firebase not configured, returning empty data.");
+    return {
+      inventoryItems: [],
+      transactions: [],
+      recentTransactions: [],
+      preOrders: [],
+    };
   }
 
   try {
-    // Fetch Inventory
     const qInventory = query(collection(db, "inventory"), orderBy("name"));
     const inventorySnapshot = await getDocs(qInventory);
     const inventoryItems: InventoryItem[] = [];
@@ -37,7 +41,6 @@ async function getDashboardData() {
       inventoryItems.push({ id: doc.id, ...doc.data() } as InventoryItem);
     });
 
-    // Fetch all Transactions for chart
     const qTransactions = query(
       collection(db, "transactions"),
       orderBy("date", "desc")
@@ -48,7 +51,6 @@ async function getDashboardData() {
       transactions.push({ id: doc.id, ...doc.data() } as Transaction);
     });
 
-    // Fetch Recent Transactions
     const qRecentTransactions = query(
       collection(db, "transactions"),
       orderBy("date", "desc"),
@@ -60,7 +62,6 @@ async function getDashboardData() {
       recentTransactions.push({ id: doc.id, ...doc.data() } as Transaction);
     });
 
-    // Fetch Pre-Orders
     const qPreOrders = query(
       collection(db, "pre-orders"),
       orderBy("orderDate", "desc")
@@ -78,27 +79,18 @@ async function getDashboardData() {
       preOrders,
     };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    // Return null or an empty state in case of error
-    return null;
+    console.error("Error fetching dashboard data for anonymous user:", error);
+    return {
+      inventoryItems: [],
+      transactions: [],
+      recentTransactions: [],
+      preOrders: [],
+    };
   }
 }
 
 export default async function DashboardPage() {
   const data = await getDashboardData();
-
-  if (!data) {
-     return (
-      <div className="flex items-center justify-center h-full">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertTitle>Error Loading Data</AlertTitle>
-          <AlertDescription>
-            Could not fetch dashboard data. Please check the server connection and try again.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   return (
     <DashboardClientContent
@@ -109,3 +101,5 @@ export default async function DashboardPage() {
     />
   );
 }
+
+    
