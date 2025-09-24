@@ -259,18 +259,20 @@ export function AppHeader() {
         </div>
 
         <div className="hidden flex-1 justify-center md:flex">
-          <NavLinks />
+          {user && <NavLinks />}
         </div>
         
         <div className="flex items-center">
-            <div className="flex items-center gap-2">
-                <ClientOnlyNotificationBell />
-                <Link href="/settings">
-                    <Button variant="ghost" size="icon">
-                        <Settings className="h-5 w-5" />
-                    </Button>
-                </Link>
-            </div>
+            {user && (
+              <div className="flex items-center gap-2">
+                  <ClientOnlyNotificationBell />
+                  <Link href="/settings">
+                      <Button variant="ghost" size="icon">
+                          <Settings className="h-5 w-5" />
+                      </Button>
+                  </Link>
+              </div>
+            )}
             <div className="md:hidden ml-2">
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
@@ -285,7 +287,7 @@ export function AppHeader() {
                        <Image src="/favicon.ico?v=8" alt="Logo" width={32} height={32} className="h-8 w-8" />
                       <span>{t.appName}</span>
                     </Link>
-                    <NavLinks className="flex-col items-start gap-2" inSheet={true} />
+                    {user && <NavLinks className="flex-col items-start gap-2" inSheet={true} />}
                   </div>
                 </SheetContent>
               </Sheet>
