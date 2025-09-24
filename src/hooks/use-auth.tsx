@@ -287,6 +287,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const value = { user, loading, signIn, signOut: signOutUser, deleteAccount, setLoginModalOpen };
 
+  if (loading) {
+    return <FullPageSpinner />;
+  }
+  
   return (
     <AuthContext.Provider value={value}>
       {children}
