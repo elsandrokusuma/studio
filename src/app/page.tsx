@@ -11,7 +11,6 @@ import {
 import { db } from "@/lib/firebase";
 import type { InventoryItem, Transaction, PreOrder } from "@/lib/types";
 import { FullPageSpinner } from "@/components/full-page-spinner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const DashboardClientContent = dynamic(() =>
   import('./dashboard-client-content').then(mod => mod.DashboardClientContent),
@@ -101,5 +100,3 @@ export default async function DashboardPage() {
     />
   );
 }
-
-    

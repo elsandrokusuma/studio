@@ -286,15 +286,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
   
   const value = { user, loading, signIn, signOut: signOutUser, deleteAccount, setLoginModalOpen };
-
-  if (loading) {
-    return <FullPageSpinner />;
-  }
   
   return (
     <AuthContext.Provider value={value}>
-      {children}
-      {isLoginModalOpen && <LoginForm onClose={() => setLoginModalOpen(false)} />}
+      {loading ? (
+        <FullPageSpinner />
+      ) : (
+        <>
+          {children}
+          {isLoginModalOpen && <LoginForm onClose={() => setLoginModalOpen(false)} />}
+        </>
+      )}
     </AuthContext.Provider>
   );
 };
@@ -306,5 +308,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    
