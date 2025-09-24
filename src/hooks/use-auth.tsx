@@ -286,7 +286,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
   
   const value = { user, loading, signIn, signOut: signOutUser, deleteAccount, setLoginModalOpen };
-  
+
   return (
     <AuthContext.Provider value={value}>
       {loading ? (
