@@ -115,9 +115,10 @@ const useBreakpoint = (breakpoint: number) => {
       setIsMatch(window.innerWidth >= breakpoint);
     };
 
-    handleResize(); // Check on initial render
+    // Set initial value
+    handleResize(); 
+    
     window.addEventListener('resize', handleResize);
-
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -810,7 +811,7 @@ export function DashboardClientContent({
   const { playNotificationSound } = useAudio();
 
   const t = translations[language] || translations.en;
-  const isDesktop = useBreakpoint(768); // md breakpoint
+  const isDesktop = useBreakpoint(768);
 
   // Dialog states
   const [isAddOpen, setAddOpen] = React.useState(false);
@@ -1264,6 +1265,10 @@ export function DashboardClientContent({
   const isHrdUser = user && user.email === 'krezthrd@gmail.com';
   const isStandardUser = user && user.email === 'kreztuser@gmail.com';
 
+  const chartMargin = isDesktop 
+    ? { right: 40 } 
+    : { right: 30, left: -30 };
+
 
   return (
     <div className="flex flex-col gap-4">
@@ -1508,7 +1513,7 @@ export function DashboardClientContent({
                 className="min-w-[300px] w-full h-full"
               >
                 {chartType === 'bar' && (
-                  <BarChart accessibilityLayer data={chartData} margin={{ right: isDesktop ? 40 : 20 }}>
+                  <BarChart accessibilityLayer data={chartData} margin={chartMargin}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1519,7 +1524,7 @@ export function DashboardClientContent({
                   </BarChart>
                 )}
                 {chartType === 'line' && (
-                  <LineChart accessibilityLayer data={chartData} margin={{ right: isDesktop ? 40 : 20 }}>
+                  <LineChart accessibilityLayer data={chartData} margin={chartMargin}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1530,7 +1535,7 @@ export function DashboardClientContent({
                   </LineChart>
                 )}
                 {chartType === 'area' && (
-                  <AreaChart accessibilityLayer data={chartData} margin={{ right: isDesktop ? 40 : 20 }}>
+                  <AreaChart accessibilityLayer data={chartData} margin={chartMargin}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -2186,4 +2191,3 @@ export function DashboardClientContent({
     </div>
   );
 }
-
