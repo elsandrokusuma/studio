@@ -594,7 +594,7 @@ const translations = {
         searchItem: "アイテムを検索...",
         noItemFound: "アイテムが見つかりません。",
         unitsFull: {
-            "Pcs": "個", "Pack": "パック", "Box": "箱", "Roll": "ロール", "Rim": "連", "Tube": "チューブ", "Bottle": "ボトル", "Can": "缶", "Sheet": "枚", "Cartridge": "カートリッジ"
+            "Pcs": "個", "Pack": "パック", "Box": "箱", "Roll": "連", "Tube": "チューブ", "Bottle": "ボトル", "Can": "缶", "Sheet": "枚", "Cartridge": "カートリッジ"
         }
     },
     ko: {
@@ -1481,14 +1481,14 @@ export function DashboardClientContent({
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+          <CardContent className="px-0 pt-0">
             <div className="h-[350px] w-full">
               <ChartContainer
                 config={chartConfig}
                 className="min-w-[300px] w-full h-full"
               >
                 {chartType === 'bar' && (
-                  <BarChart accessibilityLayer data={chartData}>
+                  <BarChart accessibilityLayer data={chartData} margin={{ right: 16 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1499,7 +1499,7 @@ export function DashboardClientContent({
                   </BarChart>
                 )}
                 {chartType === 'line' && (
-                  <LineChart accessibilityLayer data={chartData}>
+                  <LineChart accessibilityLayer data={chartData} margin={{ right: 16 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1510,7 +1510,7 @@ export function DashboardClientContent({
                   </LineChart>
                 )}
                 {chartType === 'area' && (
-                  <AreaChart accessibilityLayer data={chartData}>
+                  <AreaChart accessibilityLayer data={chartData} margin={{ right: 16 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -2166,3 +2166,5 @@ export function DashboardClientContent({
     </div>
   );
 }
+
+    
