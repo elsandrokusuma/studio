@@ -83,9 +83,10 @@ import { cn } from "@/lib/utils";
 import { FullPageSpinner } from "@/components/full-page-spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
-import { useNotifications, playNotificationSound } from "@/hooks/use-notifications";
+import { useNotifications } from "@/hooks/use-notifications";
 import { manageTransaction } from "@/lib/transactions";
 import { useTheme } from "@/hooks/use-theme";
+import { useAudio } from '@/hooks/use-audio';
 
 
 type GroupedPO = {
@@ -775,7 +776,7 @@ function PreOrderForm({ poNumber, isCreatingNew, inventoryItems, onSubmit, initi
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="item" className="text-right">{t.item}</Label>
                 <div className="col-span-3">
-                    <Popover open={isComboOpen} onOpenChange={setComboOpen}>
+                    <Popover open={isComboOpen} onOpenChange={setComboOpen} modal={false}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" role="combobox" aria-expanded={isComboOpen} className="w-full justify-between">
                                 {selectedItemName}
@@ -841,6 +842,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [selectedPo, setSelectedPo] = React.useState<GroupedPO | null>(null);
   const { toast } = useToast();
   const { addNotification } = useNotifications();
+  const { playNotificationSound } = useAudio();
   const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [dateFilter, setDateFilter] = React.useState<Date | undefined>(undefined);
@@ -1760,5 +1762,3 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
     </div>
   );
 }
-
-    

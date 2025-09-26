@@ -8,13 +8,6 @@ import { AlertCircle, Clock } from 'lucide-react';
 import type { Transaction } from '@/lib/types';
 import { useAudio } from './use-audio';
 
-// Export the function so it can be used anywhere
-export function playNotificationSound() {
-  const audio = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
-  audio.play().catch(error => console.error("Error playing sound:", error));
-}
-
-
 export type Notification = {
   id: string;
   title: string;

@@ -1480,14 +1480,14 @@ export function DashboardClientContent({
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
-            <div className="h-[350px] flex justify-center items-end md:overflow-x-auto">
+          <CardContent className="p-0">
+            <div className="h-[350px] w-full pt-4 pr-4">
               <ChartContainer
                 config={chartConfig}
-                className="min-w-[300px] w-full h-[300px]"
+                className="min-w-[300px] w-full h-full"
               >
                 {chartType === 'bar' && (
-                  <BarChart accessibilityLayer data={chartData} margin={{ left: -20 }}>
+                  <BarChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1498,7 +1498,7 @@ export function DashboardClientContent({
                   </BarChart>
                 )}
                 {chartType === 'line' && (
-                  <LineChart accessibilityLayer data={chartData} margin={{ left: -20 }}>
+                  <LineChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -1509,7 +1509,7 @@ export function DashboardClientContent({
                   </LineChart>
                 )}
                 {chartType === 'area' && (
-                  <AreaChart accessibilityLayer data={chartData} margin={{ left: -20 }}>
+                  <AreaChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey={timePeriod === 'monthly' ? 'month' : 'date'} tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
                     <YAxis />
@@ -2165,5 +2165,3 @@ export function DashboardClientContent({
     </div>
   );
 }
-
-    

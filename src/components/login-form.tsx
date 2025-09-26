@@ -147,5 +147,3 @@ export function LoginForm({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
-
-    
