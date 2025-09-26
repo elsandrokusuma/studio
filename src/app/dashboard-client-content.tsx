@@ -2166,5 +2166,3 @@ export function DashboardClientContent({
     </div>
   );
 }
-
-    
