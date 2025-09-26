@@ -16,7 +16,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Initialize the audio element once on the client side
-    audioRef.current = new Audio("/nada-dering-mainan-tembakan-363154.mp3");
+    audioRef.current = new Audio("/new-notification-024-370048.mp3");
     audioRef.current.preload = 'auto';
   }, []);
   
