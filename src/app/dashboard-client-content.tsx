@@ -1267,7 +1267,7 @@ export function DashboardClientContent({
 
   const chartMargin = isDesktop 
     ? { right: 40 } 
-    : { right: 30, left: -30 };
+    : { right: 25, left: -30 };
 
 
   return (
