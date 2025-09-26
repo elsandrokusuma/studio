@@ -1028,6 +1028,7 @@ export function DashboardClientContent({
       description: `${newItemData.name} has been added to inventory.`,
       icon: Plus
     });
+    playNotificationSound();
 
     setAddOpen(false);
     setSelectedUnit(undefined);
@@ -1040,7 +1041,6 @@ export function DashboardClientContent({
       if (!db || isSubmitting) return;
       
       setIsSubmitting(true);
-      playNotificationSound();
       
       try {
         const selectedItem = inventoryItems.find((i) => i.id === selectedItemId);
@@ -1092,6 +1092,7 @@ export function DashboardClientContent({
           description: `Quantity for ${selectedItem.name} updated.`,
           icon: type === 'in' ? TrendingUp : TrendingDown,
         });
+        playNotificationSound();
 
         if (type === "in") setStockInOpen(false);
         else setStockOutOpen(false);
@@ -1117,8 +1118,6 @@ export function DashboardClientContent({
       return;
     }
     
-    playNotificationSound();
-
     const newPreOrderData: Omit<PreOrder, "id"> = {
       poNumber: activePoNumber,
       itemId: selectedItem.id,
@@ -1140,6 +1139,8 @@ export function DashboardClientContent({
       description: `PO for ${newPreOrderData.quantity}x ${newPreOrderData.itemName} created.`,
       icon: FileText
     });
+    playNotificationSound();
+
     setCreatePoOpen(false);
     setSelectedUnit(undefined);
     setSelectedItemId(null);
@@ -1480,8 +1481,8 @@ export function DashboardClientContent({
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-[350px] w-full pt-4 pr-4">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+            <div className="h-[350px] w-full">
               <ChartContainer
                 config={chartConfig}
                 className="min-w-[300px] w-full h-full"
@@ -2165,3 +2166,5 @@ export function DashboardClientContent({
     </div>
   );
 }
+
+    

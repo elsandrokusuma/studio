@@ -14,11 +14,12 @@ export type Notification = {
   description: string;
   icon: React.ElementType;
   href?: string;
+  timestamp: number;
 };
 
 interface NotificationContextType {
   notifications: Notification[];
-  addNotification: (notification: Omit<Notification, 'id'>) => void;
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
   clearNotifications: () => void;
 }
 
@@ -31,41 +32,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [systemNotifications, setSystemNotifications] = useState<Notification[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const { playNotificationSound } = useAudio();
+  const systemNotificationCounts = useRef<Record<string, number>>({});
+
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // Real-time listener for new transactions to play sound
-  useEffect(() => {
-    if (!db) return;
-
-    const transactionsRef = collection(db, "transactions");
-    const q = query(transactionsRef);
-    let isInitialLoad = true;
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      // To prevent playing sound on initial page load
-      if (isInitialLoad) {
-        isInitialLoad = false;
-        return;
-      }
-
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          const data = change.doc.data() as Transaction;
-          const validTypes = ['add', 'edit', 'out', 'in', 'delete'];
-          if (validTypes.includes(data.type)) {
-             // This logic is now handled by direct calls in components
-             // playNotificationSound();
-          }
-        }
-      });
-    });
-
-    return () => unsubscribe();
-  }, [playNotificationSound]);
-
 
   useEffect(() => {
     if (!db || !isMounted) return;
@@ -75,19 +47,26 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const lowStockQuery = query(collection(db, "inventory"), where("quantity", "<=", 5));
     const unsubscribeLowStock = onSnapshot(lowStockQuery, (snapshot) => {
         const hasLowStock = !snapshot.empty;
+        const newCount = snapshot.size;
+        const id = 'system-low_stock';
+
         setSystemNotifications(prev => {
-            const hadLowStock = prev.some(n => n.id === 'system-low_stock');
-            const others = prev.filter(n => n.id !== 'system-low_stock');
+            const others = prev.filter(n => n.id !== id);
             if (hasLowStock) {
-                if (!hadLowStock) playNotificationSound();
+                if (systemNotificationCounts.current[id] !== newCount) {
+                    playNotificationSound();
+                }
+                systemNotificationCounts.current[id] = newCount;
                 return [{
-                    id: 'system-low_stock',
+                    id,
                     title: 'Low Stock Items',
-                    description: `You have ${snapshot.size} items with low stock.`,
+                    description: `You have ${newCount} items with low stock.`,
                     href: '/inventory',
                     icon: AlertCircle,
+                    timestamp: Date.now(),
                 }, ...others];
             }
+            delete systemNotificationCounts.current[id];
             return others;
         });
     });
@@ -106,21 +85,26 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       const q = query(collection(db, collectionName), where(statusField, "==", statusValue));
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const uniqueItems = new Set(snapshot.docs.map(doc => doc.data()[groupByField]));
-        const hasNotifications = uniqueItems.size > 0;
+        const newCount = uniqueItems.size;
+        const id = `system-${notificationType}`;
         
         setSystemNotifications(prev => {
-          const hadNotifications = prev.some(n => n.id === `system-${notificationType}`);
-          const others = prev.filter(n => n.id !== `system-${notificationType}`);
-          if (hasNotifications) {
-            if (!hadNotifications) playNotificationSound();
+          const others = prev.filter(n => n.id !== id);
+          if (newCount > 0) {
+            if (systemNotificationCounts.current[id] !== newCount) {
+                playNotificationSound();
+            }
+            systemNotificationCounts.current[id] = newCount;
             return [{
-              id: `system-${notificationType}`,
+              id,
               title: title,
-              description: `You have ${uniqueItems.size} request(s) that need attention.`,
+              description: `You have ${newCount} request(s) that need attention.`,
               href: href,
               icon: icon,
+              timestamp: Date.now(),
             }, ...others];
           }
+          delete systemNotificationCounts.current[id];
           return others;
         });
       });
@@ -137,14 +121,13 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   }, [isMounted, playNotificationSound]);
   
   const combinedNotifications = React.useMemo(() => {
-    return [...userNotifications, ...systemNotifications].sort((a, b) => (a.id < b.id ? 1 : -1));
+    return [...userNotifications, ...systemNotifications].sort((a, b) => b.timestamp - a.timestamp);
   }, [userNotifications, systemNotifications]);
 
-  const addNotification = useCallback((notification: Omit<Notification, 'id'>) => {
-    const newNotif = { ...notification, id: `notif-${notificationId++}` };
+  const addNotification = useCallback((notification: Omit<Notification, 'id' | 'timestamp'>) => {
+    const newNotif = { ...notification, id: `notif-${notificationId++}`, timestamp: Date.now() };
     setUserNotifications(prev => [newNotif, ...prev]);
-    playNotificationSound();
-  }, [playNotificationSound]);
+  }, []);
 
   const clearNotifications = useCallback(() => {
     setUserNotifications([]);
@@ -170,3 +153,5 @@ export const useNotifications = () => {
   }
   return context;
 };
+
+    

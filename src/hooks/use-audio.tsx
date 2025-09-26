@@ -20,31 +20,39 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     audioRef.current.preload = 'auto';
   }, []);
   
+  // This function is to be called on the first user interaction (e.g., login click)
   const unlockAudio = useCallback(() => {
     if (audioRef.current && !isUnlocked.current) {
         // Play and immediately pause the audio. This is a common trick
         // to get audio permissions from the browser on user interaction.
         audioRef.current.muted = true;
-        audioRef.current.play().then(() => {
-            audioRef.current?.pause();
-            audioRef.current!.currentTime = 0;
-            audioRef.current!.muted = false;
-            isUnlocked.current = true;
-            console.log("Audio unlocked successfully.");
-        }).catch(error => {
-            console.error("Audio unlock failed:", error);
-        });
+        const playPromise = audioRef.current.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                audioRef.current?.pause();
+                audioRef.current!.currentTime = 0;
+                audioRef.current!.muted = false;
+                isUnlocked.current = true;
+                console.log("Audio unlocked successfully.");
+            }).catch(error => {
+                console.error("Audio unlock failed:", error);
+            });
+        }
     }
   }, []);
 
   const playNotificationSound = useCallback(() => {
-    if (audioRef.current && isUnlocked.current) {
+    if (audioRef.current) {
+      // Always try to play. If it's the first time, this might be blocked,
+      // but subsequent calls after user interaction should succeed.
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(error => {
-        console.error("Error playing notification sound:", error);
+        // Log error only if it's not the common "NotAllowedError"
+        if (error.name !== 'NotAllowedError') {
+            console.error("Error playing notification sound:", error);
+        }
       });
-    } else {
-        console.warn("Audio context not unlocked. Sound was suppressed.");
     }
   }, []);
 
@@ -62,3 +70,5 @@ export const useAudio = () => {
   }
   return context;
 };
+
+    
