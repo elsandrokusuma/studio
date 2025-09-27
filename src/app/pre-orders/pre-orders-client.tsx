@@ -62,7 +62,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, Ban, Eye, ChevronDown } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Send, Calendar as CalendarIcon, X, FileDown, Trash2, Box, CalendarDays, Undo2, ChevronsUpDown, Check, Pencil, CheckCircle, FileText, Ban, Eye, ChevronDown, Loader2 } from "lucide-react";
 import type { PreOrder, InventoryItem } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -729,9 +729,10 @@ interface PreOrderFormProps {
     inventoryItems: InventoryItem[];
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     initialItemId?: string;
+    isSubmitting: boolean;
 }
 
-function PreOrderForm({ poNumber, isCreatingNew, inventoryItems, onSubmit, initialItemId }: PreOrderFormProps) {
+function PreOrderForm({ poNumber, isCreatingNew, inventoryItems, onSubmit, initialItemId, isSubmitting }: PreOrderFormProps) {
     const { language } = useTheme();
     const t = translations[language] || translations.en;
 
@@ -779,7 +780,7 @@ function PreOrderForm({ poNumber, isCreatingNew, inventoryItems, onSubmit, initi
                 <div className="col-span-3">
                     <Popover open={isComboOpen} onOpenChange={setComboOpen} modal={false}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" aria-expanded={isComboOpen} className="w-full justify-between">
+                            <Button variant="outline" role="combobox" aria-expanded={isComboOpen} className="w-full justify-between" disabled={isSubmitting}>
                                 {selectedItemName}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -805,11 +806,11 @@ function PreOrderForm({ poNumber, isCreatingNew, inventoryItems, onSubmit, initi
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="price" className="text-right">{t.price}</Label>
-                <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={price} onChange={(e) => setPrice(e.target.value)} />
+                <Input id="price" name="price" type="number" min="0" className="col-span-3" required value={price} onChange={(e) => setPrice(e.target.value)} disabled={isSubmitting} />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="unit" className="text-right">{t.unit}</Label>
-                <Select name="unit" required onValueChange={setUnit} value={unit}>
+                <Select name="unit" required onValueChange={setUnit} value={unit} disabled={isSubmitting}>
                     <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
                     <SelectContent>
                         {Object.entries(t.unitsFull).map(([key, value]) => (<SelectItem key={key} value={key}>{value}</SelectItem>))}
@@ -818,16 +819,19 @@ function PreOrderForm({ poNumber, isCreatingNew, inventoryItems, onSubmit, initi
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="quantity" className="text-right">{t.qty}</Label>
-                <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required />
+                <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" required disabled={isSubmitting} />
             </div>
             {isCreatingNew && (
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="expectedDate" className="text-right">{t.expectedDate}</Label>
-                    <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required />
+                    <Input id="expectedDate" name="expectedDate" type="date" className="col-span-3" required disabled={isSubmitting} />
                 </div>
             )}
             <DialogFooter>
-                <Button type="submit">{t.addItemBtn}</Button>
+                 <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t.addItemBtn}
+                </Button>
             </DialogFooter>
         </form>
     );
@@ -876,6 +880,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   const [isApprovalOpen, setApprovalOpen] = React.useState(false);
   const [poToApprove, setPoToApprove] = React.useState<GroupedPO | null>(null);
   const [approverName, setApproverName] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // States for viewing details
   const [isDetailsOpen, setDetailsOpen] = React.useState(false);
@@ -948,100 +953,114 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
 
   const handleCreatePreOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!db) return;
-    const formData = new FormData(e.currentTarget);
-    const selectedItemId = formData.get("itemId") as string;
-    const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
-    
-    if (!selectedItem) {
-        toast({ variant: "destructive", title: "Please select an item." });
-        return;
-    };
+    if (!db || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+        const formData = new FormData(e.currentTarget);
+        const selectedItemId = formData.get("itemId") as string;
+        const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
+        
+        if (!selectedItem) {
+            toast({ variant: "destructive", title: "Please select an item." });
+            return;
+        };
 
-    const newPreOrderData: Omit<PreOrder, 'id'> = {
-      poNumber: activePoNumber,
-      itemId: selectedItem.id,
-      itemName: selectedItem.name,
-      price: Number(formData.get("price")),
-      unit: formData.get("unit") as string,
-      quantity: Number(formData.get("quantity")),
-      orderDate: new Date().toISOString(),
-      expectedDate: new Date(formData.get("expectedDate") as string).toISOString(),
-      status: "Pending",
-    };
-    
-    await addDoc(collection(db, "pre-orders"), newPreOrderData);
-    
-    addNotification({
-      title: "Pre-Order Created",
-      description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
-      icon: PlusCircle,
-    });
-    
-    setCreateOpen(false);
+        const newPreOrderData: Omit<PreOrder, 'id'> = {
+          poNumber: activePoNumber,
+          itemId: selectedItem.id,
+          itemName: selectedItem.name,
+          price: Number(formData.get("price")),
+          unit: formData.get("unit") as string,
+          quantity: Number(formData.get("quantity")),
+          orderDate: new Date().toISOString(),
+          expectedDate: new Date(formData.get("expectedDate") as string).toISOString(),
+          status: "Pending",
+        };
+        
+        await addDoc(collection(db, "pre-orders"), newPreOrderData);
+        
+        addNotification({
+          title: "Pre-Order Created",
+          description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
+          icon: PlusCircle,
+        });
+        
+        setCreateOpen(false);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
   
   const handleAddItemToPo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!db) return;
-    const formData = new FormData(e.currentTarget);
-    const selectedItemId = formData.get("itemId") as string;
-    const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
+    if (!db || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+        const formData = new FormData(e.currentTarget);
+        const selectedItemId = formData.get("itemId") as string;
+        const selectedItem = inventoryItems.find(i => i.id === selectedItemId);
 
-    if (!selectedItem) {
-        toast({ variant: "destructive", title: "Please select an item." });
-        return;
-    };
-    
-    const existingPoItem = preOrders.find(po => po.poNumber === activePoNumber);
-    const expectedDate = existingPoItem ? existingPoItem.expectedDate : new Date().toISOString();
+        if (!selectedItem) {
+            toast({ variant: "destructive", title: "Please select an item." });
+            return;
+        };
+        
+        const existingPoItem = preOrders.find(po => po.poNumber === activePoNumber);
+        const expectedDate = existingPoItem ? existingPoItem.expectedDate : new Date().toISOString();
 
 
-    const newPreOrderData: Omit<PreOrder, 'id'> = {
-      poNumber: activePoNumber,
-      itemId: selectedItem.id,
-      itemName: selectedItem.name,
-      price: Number(formData.get("price")),
-      unit: formData.get("unit") as string,
-      quantity: Number(formData.get("quantity")),
-      orderDate: new Date().toISOString(),
-      expectedDate: expectedDate,
-      status: "Pending",
-    };
-    
-    await addDoc(collection(db, "pre-orders"), newPreOrderData);
-    
-    addNotification({
-      title: "Item Added to PO",
-      description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
-      icon: PlusCircle,
-    });
-    
-    setAddItemOpen(false);
+        const newPreOrderData: Omit<PreOrder, 'id'> = {
+          poNumber: activePoNumber,
+          itemId: selectedItem.id,
+          itemName: selectedItem.name,
+          price: Number(formData.get("price")),
+          unit: formData.get("unit") as string,
+          quantity: Number(formData.get("quantity")),
+          orderDate: new Date().toISOString(),
+          expectedDate: expectedDate,
+          status: "Pending",
+        };
+        
+        await addDoc(collection(db, "pre-orders"), newPreOrderData);
+        
+        addNotification({
+          title: "Item Added to PO",
+          description: `Item ${newPreOrderData.itemName} added to PO ${newPreOrderData.poNumber}.`,
+          icon: PlusCircle,
+        });
+        
+        setAddItemOpen(false);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const handleEditOrderItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedOrderItem || !db) return;
+    if (!selectedOrderItem || !db || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+        const formData = new FormData(e.currentTarget);
+        const updatedData = {
+          price: Number(formData.get("price")),
+          unit: selectedUnit || selectedOrderItem.unit,
+          quantity: Number(formData.get("quantity")),
+        };
 
-    const formData = new FormData(e.currentTarget);
-    const updatedData = {
-      price: Number(formData.get("price")),
-      unit: selectedUnit || selectedOrderItem.unit,
-      quantity: Number(formData.get("quantity")),
-    };
+        const itemRef = doc(db, "pre-orders", selectedOrderItem.id);
+        await updateDoc(itemRef, updatedData);
 
-    const itemRef = doc(db, "pre-orders", selectedOrderItem.id);
-    await updateDoc(itemRef, updatedData);
-
-    addNotification({
-      title: "Item Updated",
-      description: `${selectedOrderItem.itemName} has been updated.`,
-      icon: Pencil,
-    });
-    setEditItemOpen(false);
-    setSelectedOrderItem(null);
-    setSelectedUnit(undefined);
+        addNotification({
+          title: "Item Updated",
+          description: `${selectedOrderItem.itemName} has been updated.`,
+          icon: Pencil,
+        });
+        setEditItemOpen(false);
+        setSelectedOrderItem(null);
+        setSelectedUnit(undefined);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const handleDeleteOrderItem = async () => {
@@ -1058,7 +1077,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   
   const handleFulfillItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!itemToFulfill || !db) return;
+    if (!itemToFulfill || !db || isSubmitting) return;
+    setIsSubmitting(true);
 
     const finalQuantity = Number(fulfillQuantity);
     if (isNaN(finalQuantity) || finalQuantity <= 0) {
@@ -1067,6 +1087,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             title: "Invalid Quantity",
             description: "Please enter a valid number greater than 0.",
         });
+        setIsSubmitting(false);
         return;
     }
 
@@ -1115,6 +1136,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             title: "Fulfillment Failed",
             description: "Could not update inventory and pre-order status.",
         });
+    } finally {
+        setIsSubmitting(false);
     }
 };
 
@@ -1161,13 +1184,15 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   
   const handleMarkAsApproved = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!poToApprove || !db) return;
+    if (!poToApprove || !db || isSubmitting) return;
+    setIsSubmitting(true);
 
     if (!approverName.trim()) {
       toast({
         variant: 'destructive',
         title: 'Approver name required',
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -1195,6 +1220,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
       setApprovalOpen(false);
       setPoToApprove(null);
       setApproverName('');
+      setIsSubmitting(false);
     }
   };
 
@@ -1221,7 +1247,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
   };
 
   const handleRequestApproval = async () => {
-    if (!db) return;
+    if (!db || isSubmitting) return;
+    setIsSubmitting(true);
     playNotificationSound(); // Play sound on user interaction to unlock audio
     const posToApprove = groupedPreOrders.filter(po => selectedRows.includes(po.poNumber) && po.status === 'Pending');
 
@@ -1231,6 +1258,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         title: 'No items to send',
         description: 'Please select pending pre-orders to request approval.',
       });
+      setIsSubmitting(false);
       return;
     }
     
@@ -1266,6 +1294,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
         variant: 'destructive',
         title: 'Failed to request approvals',
       });
+    } finally {
+        setIsSubmitting(false);
     }
   };
   
@@ -1464,7 +1494,8 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
             {selectedRows.length > 0 && (
               <div className="flex items-center gap-2">
                 {canPerformWriteActions && (
-                  <Button onClick={handleRequestApproval} disabled={!canRequestApproval}>
+                  <Button onClick={handleRequestApproval} disabled={!canRequestApproval || isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     <Send className="mr-2 h-4 w-4" />
                     <span className="hidden md:inline">{t.requestApproval}</span>
                   </Button>
@@ -1500,6 +1531,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   inventoryItems={inventoryItems}
                   onSubmit={handleCreatePreOrder}
                   initialItemId={initialItemId}
+                  isSubmitting={isSubmitting}
               />
           </DialogContent>
       </Dialog>
@@ -1515,6 +1547,7 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                   isCreatingNew={false}
                   inventoryItems={inventoryItems}
                   onSubmit={handleAddItemToPo}
+                  isSubmitting={isSubmitting}
               />
           </DialogContent>
       </Dialog>
@@ -1694,10 +1727,10 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
           <DialogContent>
             <DialogHeader> <DialogTitle>{t.editItemTitle(selectedOrderItem?.itemName || '')}</DialogTitle> <DialogDescription> {t.editItemDesc} </DialogDescription> </DialogHeader>
             <form onSubmit={handleEditOrderItem} className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="price" className="text-right">{t.price}</Label> <Input id="price" name="price" type="number" min="0" className="col-span-3" defaultValue={selectedOrderItem?.price} required /> </div>
+              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="price" className="text-right">{t.price}</Label> <Input id="price" name="price" type="number" min="0" className="col-span-3" defaultValue={selectedOrderItem?.price} required disabled={isSubmitting} /> </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="unit" className="text-right">{t.unit}</Label>
-                <Select name="unit" required onValueChange={setSelectedUnit} defaultValue={selectedOrderItem?.unit}>
+                <Select name="unit" required onValueChange={setSelectedUnit} defaultValue={selectedOrderItem?.unit} disabled={isSubmitting}>
                   <SelectTrigger className="col-span-3"> <SelectValue placeholder="Select a unit" /> </SelectTrigger>
                    <SelectContent>
                       {Object.entries(t.unitsFull).map(([key, value]) => (
@@ -1706,8 +1739,13 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                     </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="quantity" className="text-right">{t.qty}</Label> <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required /> </div>
-              <DialogFooter> <Button type="submit">{t.saveChanges}</Button> </DialogFooter>
+              <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="quantity" className="text-right">{t.qty}</Label> <Input id="quantity" name="quantity" type="number" min="1" className="col-span-3" defaultValue={selectedOrderItem?.quantity} required disabled={isSubmitting} /> </div>
+              <DialogFooter>
+                 <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t.saveChanges}
+                </Button>
+              </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
@@ -1724,9 +1762,15 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
               <DialogHeader> <DialogTitle>{t.fulfillItemTitle(itemToFulfill?.itemName || '')}</DialogTitle> <DialogDescription> {t.fulfillItemDesc} </DialogDescription> </DialogHeader>
               <form onSubmit={handleFulfillItem}>
                 <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="fulfill-quantity" className="text-right"> {t.quantityReceived} </Label> <Input id="fulfill-quantity" name="fulfill-quantity" type="number" min="1" className="col-span-3" value={fulfillQuantity} onChange={(e) => setFulfillQuantity(e.target.value)} required /> </div>
+                  <div className="grid grid-cols-4 items-center gap-4"> <Label htmlFor="fulfill-quantity" className="text-right"> {t.quantityReceived} </Label> <Input id="fulfill-quantity" name="fulfill-quantity" type="number" min="1" className="col-span-3" value={fulfillQuantity} onChange={(e) => setFulfillQuantity(e.target.value)} required disabled={isSubmitting} /> </div>
                 </div>
-                <DialogFooter> <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)}>{t.cancelBtn}</Button> <Button type="submit">{t.confirmAndAdd}</Button> </DialogFooter>
+                <DialogFooter> 
+                    <Button type="button" variant="outline" onClick={() => setFulfillOpen(false)} disabled={isSubmitting}>{t.cancelBtn}</Button> 
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {t.confirmAndAdd}
+                    </Button>
+                </DialogFooter>
               </form>
           </DialogContent>
         </Dialog>
@@ -1748,12 +1792,16 @@ export function PreOrdersClient({ searchParams }: { searchParams: { [key: string
                                 className="col-span-3"
                                 placeholder={t.approverNamePlaceholder}
                                 required
+                                disabled={isSubmitting}
                             />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setApprovalOpen(false)}>{t.cancelBtn}</Button>
-                        <Button type="submit">{t.confirmApproval}</Button>
+                        <Button type="button" variant="outline" onClick={() => setApprovalOpen(false)} disabled={isSubmitting}>{t.cancelBtn}</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t.confirmApproval}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

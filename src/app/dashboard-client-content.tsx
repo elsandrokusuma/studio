@@ -111,17 +111,13 @@ const useBreakpoint = (breakpoint: number) => {
   const [isMatch, setIsMatch] = React.useState(false);
 
   React.useEffect(() => {
-    const handleResize = () => {
+    const checkMatch = () => {
       setIsMatch(window.innerWidth >= breakpoint);
     };
 
-    // Set initial value
-    handleResize(); 
-    
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    checkMatch();
+    window.addEventListener('resize', checkMatch);
+    return () => window.removeEventListener('resize', checkMatch);
   }, [breakpoint]);
 
   return isMatch;
@@ -1016,44 +1012,50 @@ export function DashboardClientContent({
 
   const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!db) return;
-    const formData = new FormData(e.currentTarget);
-    const newItemData = {
-      name: formData.get("name") as string,
-      price: Number(formData.get("price")),
-      unit: selectedUnit,
-      quantity: Number(formData.get("quantity")),
-      photoUrl: (formData.get("photoUrl") as string) || undefined,
-    };
-
-    if (!newItemData.unit) {
-        toast({
-            variant: "destructive",
-            title: t.unitRequired,
-            description: t.unitRequiredDesc,
-        });
-        return;
-    }
+    if (!db || isSubmitting) return;
+    setIsSubmitting(true);
     
-    const docRef = await addDoc(collection(db, "inventory"), newItemData);
+    try {
+        const formData = new FormData(e.currentTarget);
+        const newItemData = {
+          name: formData.get("name") as string,
+          price: Number(formData.get("price")),
+          unit: selectedUnit,
+          quantity: Number(formData.get("quantity")),
+          photoUrl: (formData.get("photoUrl") as string) || undefined,
+        };
 
-    manageTransaction({
-      itemId: docRef.id,
-      itemName: newItemData.name,
-      type: "add",
-      quantity: newItemData.quantity,
-    });
+        if (!newItemData.unit) {
+            toast({
+                variant: "destructive",
+                title: t.unitRequired,
+                description: t.unitRequiredDesc,
+            });
+            return;
+        }
+        
+        const docRef = await addDoc(collection(db, "inventory"), newItemData);
 
-    addNotification({
-      title: "Item Added",
-      description: `${newItemData.name} has been added to inventory.`,
-      icon: Plus
-    });
-    playNotificationSound();
+        manageTransaction({
+          itemId: docRef.id,
+          itemName: newItemData.name,
+          type: "add",
+          quantity: newItemData.quantity,
+        });
 
-    setAddOpen(false);
-    setSelectedUnit(undefined);
-    (e.target as HTMLFormElement).reset();
+        addNotification({
+          title: "Item Added",
+          description: `${newItemData.name} has been added to inventory.`,
+          icon: Plus
+        });
+        playNotificationSound();
+
+        setAddOpen(false);
+        setSelectedUnit(undefined);
+        (e.target as HTMLFormElement).reset();
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const handleStockUpdate =
@@ -1130,44 +1132,50 @@ export function DashboardClientContent({
 
   const handleCreatePreOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!db) return;
-    const formData = new FormData(e.currentTarget);
-    const selectedItem = inventoryItems.find((i) => i.id === selectedItemId);
-
-    if (!selectedItem) {
-      toast({ variant: "destructive", title: t.itemRequired });
-      return;
-    }
+    if (!db || isSubmitting) return;
+    setIsSubmitting(true);
     
-    const newPreOrderData: Omit<PreOrder, "id"> = {
-      poNumber: activePoNumber,
-      itemId: selectedItem.id,
-      itemName: selectedItem.name,
-      price: Number(formData.get("price")),
-      unit: selectedUnit || "Pcs",
-      quantity: Number(formData.get("quantity")),
-      orderDate: new Date().toISOString(),
-      expectedDate: new Date(
-        formData.get("expectedDate") as string
-      ).toISOString(),
-      status: "Pending",
-    };
+    try {
+        const formData = new FormData(e.currentTarget);
+        const selectedItem = inventoryItems.find((i) => i.id === selectedItemId);
 
-    await addDoc(collection(db, "pre-orders"), newPreOrderData);
+        if (!selectedItem) {
+          toast({ variant: "destructive", title: t.itemRequired });
+          return;
+        }
+        
+        const newPreOrderData: Omit<PreOrder, "id"> = {
+          poNumber: activePoNumber,
+          itemId: selectedItem.id,
+          itemName: selectedItem.name,
+          price: Number(formData.get("price")),
+          unit: selectedUnit || "Pcs",
+          quantity: Number(formData.get("quantity")),
+          orderDate: new Date().toISOString(),
+          expectedDate: new Date(
+            formData.get("expectedDate") as string
+          ).toISOString(),
+          status: "Pending",
+        };
 
-    addNotification({
-      title: "Pre-Order Created",
-      description: `PO for ${newPreOrderData.quantity}x ${newPreOrderData.itemName} created.`,
-      icon: FileText
-    });
-    playNotificationSound();
+        await addDoc(collection(db, "pre-orders"), newPreOrderData);
 
-    setCreatePoOpen(false);
-    setSelectedUnit(undefined);
-    setSelectedItemId(null);
-    setSelectedItemName(t.itemRequired);
-    setPoPrice("");
-    (e.target as HTMLFormElement).reset();
+        addNotification({
+          title: "Pre-Order Created",
+          description: `PO for ${newPreOrderData.quantity}x ${newPreOrderData.itemName} created.`,
+          icon: FileText
+        });
+        playNotificationSound();
+
+        setCreatePoOpen(false);
+        setSelectedUnit(undefined);
+        setSelectedItemId(null);
+        setSelectedItemName(t.itemRequired);
+        setPoPrice("");
+        (e.target as HTMLFormElement).reset();
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const handleTransactionClick = (transaction: Transaction) => {
@@ -1768,7 +1776,7 @@ export function DashboardClientContent({
               <Label htmlFor="name" className="text-right">
                 {t.name}
               </Label>
-              <Input id="name" name="name" className="col-span-3" required />
+              <Input id="name" name="name" className="col-span-3" required disabled={isSubmitting} />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="price" className="text-right">
@@ -1781,13 +1789,14 @@ export function DashboardClientContent({
                 className="col-span-3"
                 required
                 min="0"
+                disabled={isSubmitting}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="unit" className="text-right">
                 {t.unit}
               </Label>
-              <Select name="unit" required onValueChange={setSelectedUnit}>
+              <Select name="unit" required onValueChange={setSelectedUnit} disabled={isSubmitting}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t.selectUnit} />
                 </SelectTrigger>
@@ -1809,6 +1818,7 @@ export function DashboardClientContent({
                 className="col-span-3"
                 required
                 min="0"
+                disabled={isSubmitting}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -1820,10 +1830,14 @@ export function DashboardClientContent({
                 name="photoUrl"
                 placeholder={t.optionalPhotoUrl}
                 className="col-span-3"
+                disabled={isSubmitting}
               />
             </div>
             <DialogFooter>
-              <Button type="submit">{t.saveItem}</Button>
+               <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t.saveItem}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1859,6 +1873,7 @@ export function DashboardClientContent({
                       role="combobox"
                       aria-expanded={comboInOpen}
                       className="w-full justify-between"
+                      disabled={isSubmitting}
                     >
                       {selectedItemName}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -1909,6 +1924,7 @@ export function DashboardClientContent({
                 className="col-span-3"
                 required
                 min="1"
+                disabled={isSubmitting}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -1920,6 +1936,7 @@ export function DashboardClientContent({
                 name="person"
                 placeholder={t.supplierNamePlaceholder}
                 className="col-span-3"
+                disabled={isSubmitting}
               />
             </div>
             <DialogFooter>
@@ -1962,6 +1979,7 @@ export function DashboardClientContent({
                       role="combobox"
                       aria-expanded={comboOutOpen}
                       className="w-full justify-between"
+                      disabled={isSubmitting}
                     >
                       {selectedItemName}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -2013,6 +2031,7 @@ export function DashboardClientContent({
                 required
                 min="1"
                 max={selectedItemForStockOut?.quantity}
+                disabled={isSubmitting}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -2025,6 +2044,7 @@ export function DashboardClientContent({
                 placeholder={t.customerDeptPlaceholder}
                 className="col-span-3"
                 required
+                disabled={isSubmitting}
               />
             </div>
             <DialogFooter>
@@ -2081,6 +2101,7 @@ export function DashboardClientContent({
                       role="combobox"
                       aria-expanded={comboPoOpen}
                       className="w-full justify-between"
+                      disabled={isSubmitting}
                     >
                       {selectedItemName}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -2135,6 +2156,7 @@ export function DashboardClientContent({
                 required
                 value={poPrice}
                 onChange={(e) => setPoPrice(e.target.value)}
+                disabled={isSubmitting}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -2146,6 +2168,7 @@ export function DashboardClientContent({
                 required
                 onValueChange={setSelectedUnit}
                 value={selectedUnit}
+                disabled={isSubmitting}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t.selectUnit} />
@@ -2168,6 +2191,7 @@ export function DashboardClientContent({
                 min="1"
                 className="col-span-3"
                 required
+                disabled={isSubmitting}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -2180,10 +2204,14 @@ export function DashboardClientContent({
                 type="date"
                 className="col-span-3"
                 required
+                disabled={isSubmitting}
               />
             </div>
             <DialogFooter>
-              <Button type="submit">{t.createPreOrder}</Button>
+               <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t.createPreOrder}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
